@@ -1,0 +1,43 @@
+{{- $page := .page }}
+{{- $taxonomy := .taxonomy }}
+{{- $class := .class }}
+{{- $color := .color | default "" }}
+{{- $style := .style | default "" }}
+{{- if and (not $style) (eq (len $style) 0) }}
+  {{- $color = .color | default "var(--INTERNAL-TAG-BG-color)" }}
+{{- end }}
+{{- $icon := .icon | default "" }}
+{{- $icon = trim $icon " " }}
+{{- if and $icon (not (findRE ".*?\\bfa-\\w.*?" $icon)) }}
+  {{- $icon = printf "fa-fw fas fa-%s" $icon }}
+{{- end }}
+{{- $taxonomy_page := $page.Site.GetPage $taxonomy }}
+{{- $terms := slice | append (index $page.Params $taxonomy) }}
+{{- $term_pages := dict }}
+{{- range sort $terms }}
+  {{- $term := trim . " " }}
+  {{- if not $term }}
+    {{- continue }}
+  {{- end }}
+  {{- $term_key := ($term | plainify | anchorize) }}
+  {{- with $page.Site.GetPage (printf "%s/%s" $taxonomy $term_key) }}
+    {{- $term_pages = $term_pages | merge (dict $term_key .) }}
+  {{- end }}
+  {{- $term_key = ($term | urlize) }}
+  {{- with $page.Site.GetPage (printf "%s/%s" $taxonomy $term_key) }}
+    {{- $term_pages = $term_pages | merge (dict $term_key .) }}
+  {{- end }}
+{{- end }}
+{{- with $term_pages }}
+<div class=" taxonomy-{{ $taxonomy }} term-list cstyle {{ $style }} {{ $class }}" title="{{ $taxonomy_page.Title }}"{{ if $color }}{{ printf " style=\"--VARIABLE-TAGS-BG-color: %s;\"" $color | safeHTMLAttr }}{{ end }}>
+  {{- if $icon }}
+  <i class="{{ $icon }}"></i>
+  {{- end }}
+  <ul>
+  {{- range $term_page := . }}
+    {{- $to := . }}
+    <li><a class="term-link" href="{{ partial "relLangPrettyUglyURL.hugo" (dict "to" $to) }}">{{ $to.Title }}</a></li>
+  {{- end }}
+  </ul>
+</div>
+{{- end }}
