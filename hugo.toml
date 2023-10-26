@@ -2,3 +2,36 @@ baseURL = 'https://hierobytes.xyz'
 languageCode = 'en-us'
 title = 'Welcome to H1roBytes'
 theme = 'relearn'
+
++++
+# Table of contents (toc) is enabled by default. Set this parameter to true to disable it.
+# Note: Toc is always disabled for chapter pages
+disableToc = false
+# If set, this will be used for the page's menu entry (instead of the `title` attribute)
+menuTitle = ""
+# If set to true, the menu in the sidebar will be displayed in a collapsible tree view. Although the functionality works with old browsers (IE11), the display of the expander icons is limited to modern browsers
+collapsibleMenu = true
+# If set, this will explicitly override common rules for the expand state of a page's menu entry
+alwaysopen = true
+# If set, this will explicitly override common rules for the sorting order of a page's submenu entries
+ordersectionsby = "weight"
+# The title of the page heading will be prefixed by this HTML content
+headingPre = ""
+# The title of the page heading will be postfixed by this HTML content
+headingPost = ""
+# The title of the page in menu will be prefixed by this HTML content
+menuPre = ""
+# The title of the page in menu will be postfixed by this HTML content
+menuPost = ""
+# Hide a menu entry by setting this to true
+hidden = false
+# Display name of this page modifier. If set, it will be displayed in the footer.
+LastModifierDisplayName = ""
+# Email of this page modifier. If set with LastModifierDisplayName, it will be displayed in the footer
+LastModifierEmail = ""
+# Override default values for image effects, you can even add your own arbitrary effects to the list
+[params.imageEffects]
+  border = false
+  lightbox = true
+  shadow = false
++++
