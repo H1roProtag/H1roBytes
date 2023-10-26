@@ -1,13 +1,13 @@
 baseURL = 'https://hierobytes.xyz'
 languageCode = 'en-us'
-title = 'Welcome to H1roBytes'
+title = 'H1roBytes'
 theme = 'hugo-theme-relearn'
 
 [params]
   # This controls whether submenus will be expanded (true), or collapsed (false) in the
   # menu; if no setting is given, the first menu level is set to false, all others to true;
   # this can be overridden in the pages frontmatter
-  alwaysopen = true
+  alwaysopen = false
   # Prefix URL to edit current page. Will display an "Edit" button on top right hand corner of every page.
   # Useful to give opportunity to people to create merge request for your doc.
   # See the config.toml file from this documentation site to have an example.
@@ -70,14 +70,15 @@ theme = 'hugo-theme-relearn'
   # Order menu sections by "weight", "title", "linktitle", "modifieddate", "expirydate", "publishdate", "date", "length" or "default" (adhering to Hugo's default sort order). Default to "weight";
   # this can be overridden in the pages frontmatter
   ordersectionsby = "weight"
-  # Change default color scheme with a variant one. Eg. can be "auto", "red", "blue", "green" or an array like [ "blue", "green" ].
-  themeVariant = "auto"
+  # Change default color scheme with a variant one. Eg. can be "auto", "red", "blue", "green" or an array like ["blue", "green"]. Options "auto", "relearn-bright", "relearn-light", "relearn-dark", "zen-light", "zen-dark", "neon", "learn", "blue", "green", "red".
+  themeVariant = ["relearn-dark", "zen-dark", "relearn-bright", "relearn-light", "zen-light", "neon", "learn", "blue", "green", "red"]
+  themeVariantAuto = [ "relearn-dark" ]
   # Change the breadcrumb separator. Default to ">".
   breadcrumbSeparator = "|"
   # Change the title separator. Default to "::".
   titleSeparator = "-"
   # If set to true, the menu in the sidebar will be displayed in a collapsible tree view. Although the functionality works with old browsers (IE11), the display of the expander icons is limited to modern browsers
-  collapsibleMenu = false
+  collapsibleMenu = true
   # If a single page can contain content in multiple languages, add those here
   additionalContentLanguage = [ "en" ]
   # If set to true, no index.html will be appended to prettyURLs; this will cause pages not
@@ -90,3 +91,5 @@ theme = 'hugo-theme-relearn'
     border = false
     lightbox = true
     shadow = false
+
+
