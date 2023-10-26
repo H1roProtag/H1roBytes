@@ -1,4 +1,4 @@
 baseURL = 'https://hierobytes.xyz'
 languageCode = 'en-us'
 title = 'Welcome to H1roBytes'
-theme = 'relearn'
+theme = 'hugo-theme-relearn'
