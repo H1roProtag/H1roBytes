@@ -92,4 +92,6 @@ theme = 'hugo-theme-relearn'
     lightbox = true
     shadow = false
 
+[outputs]
+  home = ["HTML", "RSS", "SEARCH"]
 
