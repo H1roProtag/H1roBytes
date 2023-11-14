@@ -2,7 +2,7 @@
 tags = ["HTB", "RCE", "Linux", "BootStrap", "SpringBoot", "HTTP", "SSH", "SessionHijacking"]
 title = "Cozy Hosting Walkthrough"
 weight = 10
-draft: true
+draft = true
 +++
 
 ![Cozy Hosting](CozyHosting.png)
