@@ -10,4 +10,4 @@ weight = 3
 
 ### Latest Walkthroughs
 
-[Kenobi - TryHackMe](https://hirobytes.xyz/walkthroughs/kenobi) - Published November 11th, 2023
+[Kenobi - TryHackMe](https://hirobytes.xyz/walkthroughs/kenobi) - Published November 22nd, 2023

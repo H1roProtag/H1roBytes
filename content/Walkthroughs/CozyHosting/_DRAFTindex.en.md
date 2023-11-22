@@ -5,8 +5,7 @@ weight = 10
 draft = true
 +++
 
-Date written: November 14th 2023
-
+Date written: November 14th 2023            
 Date published:
 
 ![Cozy Hosting](CozyHosting.png)

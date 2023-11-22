@@ -5,6 +5,9 @@ weight = 20
 draft = false
 +++
 
+Date written: November 20th, 2023       
+Date published: November 22nd, 2023
+
 ![KenobiLogo](kenobi.png)
 
 ### Task 1: Deploying the Vulnerable Machine
@@ -313,3 +316,5 @@ All thats left is to cat your root flag at /root/root.txt.
 
 > Answer: root.txt's value
 
+
+And that's root! Happy Hacking!
