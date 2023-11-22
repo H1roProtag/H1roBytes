@@ -1,0 +1,49 @@
+{{ define "main" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success - Action Completed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eaf7ea;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .success-container {
+            text-align: center;
+        }
+
+        h1 {
+            color: #2ecc71;
+        }
+
+        p {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <img src="https://yourwebsite.com/path/to/success-image.png" alt="Success Image">
+        <h1>Success! Action Completed</h1>
+        <p>Your request has been successfully processed.</p>
+    </div>
+</body>
+</html>
+{{ end }}

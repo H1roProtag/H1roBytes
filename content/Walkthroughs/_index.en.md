@@ -1,5 +1,5 @@
 +++
-architype = "default"
+archetype = "default"
 title = "Walkthroughs"
 weight = 3
 +++
