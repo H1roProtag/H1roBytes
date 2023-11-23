@@ -3,6 +3,7 @@ tags = ["HTB", "RCE", "Linux", "BootStrap", "SpringBoot", "HTTP", "SSH", "Sessio
 title = "Cozy Hosting Walkthrough"
 weight = 10
 draft = true
+images = [ "/walkthroughs/cozyhosting/cozyhosting.png" ]
 +++
 
 Date written: November 14th 2023            

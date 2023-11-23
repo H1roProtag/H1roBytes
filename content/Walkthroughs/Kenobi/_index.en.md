@@ -3,6 +3,7 @@ tags = ["TryHackMe", "Samba", "proftpd", "SUID binary"]
 title = "Kenobi - TryHackMe"
 weight = 20
 draft = false
+images = [ "/walkthroughs/kenobi/kenobi.png" ]
 +++
 
 Date written: November 20th, 2023       
