@@ -3,6 +3,7 @@ archetype = "home"
 title = "Welcome to H1roBytes:"
 weight = 1
 draft = false
+images = [ "/images/logo.png" ]
 +++
 
 ## **Decoding the Path to Offensive Security One Byte at a Time!**
