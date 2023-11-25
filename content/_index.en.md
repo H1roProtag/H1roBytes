@@ -43,10 +43,14 @@ Jordan (H1ro)
 
 {{< rawhtml >}}
 <script src="https://tryhackme.com/badge/494270"></script>
- {{< /rawhtml >}}
+{{< /rawhtml >}}
 
 **Keep up to date with my [HackTheBox](https://app.hackthebox.com/profile/647719) Journey.**
 
 {{< rawhtml >}}
 <img src="https://www.hackthebox.eu/badge/image/647719" class="left"></img>
- {{< /rawhtml >}}
+{{< /rawhtml >}}
+
+{{< rawhtml >}}
+<meta name="image" property="og:image" content="[/images/logo.png]">
+{{< /rawhtml >}}
