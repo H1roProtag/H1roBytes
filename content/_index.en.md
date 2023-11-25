@@ -12,7 +12,7 @@ images = [ "/images/logo.png" ]
 
 ## 🚀 About Me
 
-Hi I'm H1ro, AKA Jordan! I started my journey into cybersecurity from the fashion design world where I tried to implement as much technology and programming into my designed as I could. Now I'm diving head first into everything cybersecurity. I have an insatiable curiosity and a commitment to never stop learning. This blog is my digital laboratory, a space where I'll experiment, document, and share my journey through offensive security.
+Hi I'm H1ro, AKA Jordan! I started my journey into cybersecurity from the fashion design world where I tried to implement as much technology and programming into my designs as I could. Now I'm diving head first into everything cybersecurity. I have an insatiable curiosity and a commitment to never stop learning. This blog is my digital laboratory, a space where I'll experiment, document, and share my journey through offensive security.
 
 ## 📚 Building Skills, One Byte at a Time
 

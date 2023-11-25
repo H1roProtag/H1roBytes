@@ -16,7 +16,7 @@ theme = 'hugo-theme-relearn'
   author.name = ""
   # Description of the site, will be used in meta information
   description = ""
-  images = [ "/images/logo.png" ]
+  images = ["/images/logo.png"]
   # Shows a checkmark for visited pages on the menu
   showVisitedLinks = false
   # Disable search function. It will hide search bar
