@@ -1,17 +1,18 @@
 +++
 tags = ["TryHackMe", "Samba", "proftpd", "SUID binary"]
 title = "Kenobi - TryHackMe"
-weight = 20
+weight = 10
 draft = false
 images = [ "/walkthroughs/kenobi/kenobi.png" ]
+description = "Walkthrough on exploiting a Linux machine. Enumerate Samba for shares, manipulate a vulnerable version of proftpd and escalate your privileges with path variable manipulation."
 +++
 
-Date written: November 20th, 2023       
-Date published: November 22nd, 2023
+Date written: November 2023       
+Date published: November 2023
 
 ![KenobiLogo](kenobi.png)
 
-### Task 1: Deploying the Vulnerable Machine
+## Task 1: Deploying the Vulnerable Machine
 
 This room will cover accessing a Samba share, manipulating a vulnerable version of proftpd to gain initial access and escalate your privileges to root via an SUID binary.
 
@@ -50,7 +51,7 @@ MAC Address: 02:55:B9:EF:01:D9 (Unknown)
 
 >Answer: 7
 
-### Task 2: Enumerating Samba for Shares
+## Task 2: Enumerating Samba for Shares
 
 "Samba is the standard Windows interoperability suite of programs for Linux and Unix. It allows end users to access and use files, printers and other commonly shared resources on a companies intranet or internet. Its often referred to as a network file system.
 
@@ -176,8 +177,7 @@ MAC Address: 02:B9:E3:41:0F:B9 (Unknown)
 
 >Answer: /var
 
-
-### Task 3: Gain Initial Access with ProFtpd
+## Task 3: Gain Initial Access with ProFtpd
 
 "ProFtpd is a free and open-source FTP server, compatible with Unix and Windows systems. Its also been vulnerable in the past software versions." - [TryHackMe](https://tryhackme.com/room/kenobi)
 
@@ -193,7 +193,7 @@ Connection to 10.10.48.208 21 port [tcp/*] succeeded!
 
 >Lets get the version of ProFtpd. Use netcat to connect to the machine on the FTP port. What is the version?
 
-> 1.3.5
+> Answer: 1.3.5
 
 Now that I know the version of the software I can move to [Searchsploit](https://book.hacktricks.xyz/generic-methodologies-and-resources/search-exploits) to see if there are any known exploits for this version of ProFTPD. This can be done in the terminal or in your [browser](https://www.exploit-db.com/search) which ever you are comfortable with, but I personally prefer the terminal. 
 
@@ -274,7 +274,7 @@ Once logged in you can cat the user flag.
 
 > Answer: user.txt's value. 
 
-### Task 4: Privilege Escalation with Path Variable Manipulation 
+## Task 4: Privilege Escalation with Path Variable Manipulation 
 
 SUID bits can be dangerous, some binaries such as passwd need to be run with elevated privileges (as its resetting your password on the system), however other custom files could that have the SUID bit can lead to all sorts of issues.
 
@@ -288,7 +288,7 @@ To search the a system for these type of files run the following: ```find / -per
 
 > Run the binary, how many options appear?
 
-> 3
+> Answer: 3
 
 ![Binary](task4_binary.png)
 
