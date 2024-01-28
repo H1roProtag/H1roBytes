@@ -26,7 +26,7 @@ Room prerequisites:
 
 > Answer: No answer needed
 
-## Task 2 Vulnerability Assessment and Penetration Tests Limitations 
+## Task 2: Vulnerability Assessment and Penetration Tests Limitations 
 
 Vulnerability Assessments:
 - The simplest form of security assessment.
@@ -55,7 +55,7 @@ Penetration Tests:
 
 > Answer: Advanced Persistent Threats
 
-## Task 3 Red Team Engagements
+## Task 3: Red Team Engagements
 
 Red Team Engagements:
 - Starts with clear and defined goals.
@@ -77,7 +77,7 @@ Red Team Engagements:
 > Answer: Nay
 
 
-## Task 4 Teams and Functions of an Engagement 
+## Task 4: Teams and Functions of an Engagement 
 
 Teams or cells:
 - Red cell - the component that makes up the offensive portion of a red team engagement that simulates a given target's strategic and tactical responses.
@@ -98,7 +98,7 @@ Teams or cells:
 
 > Answer: White cell
 
-## Task 5 Engagement Structure 
+## Task 5: Engagement Structure 
 
 
 Reconnaissance:
@@ -137,14 +137,14 @@ Actions on Objectives:
 
 > Answer: Exploitation
 
-## Task 6 Overview of a Red Team Engagement 
+## Task 6: Overview of a Red Team Engagement 
 
 
 > Click the "View Site" button and follow the example engagement to get the flag 
 
 > Answer: Click through the engagement site to find the flag. 
 
-## Task 7 Conclusion 
+## Task 7: Conclusion 
 
 > Read the above and continue learning!
 
