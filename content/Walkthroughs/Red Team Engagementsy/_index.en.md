@@ -2,7 +2,7 @@
 tags = ["TryHackMe", "Red Team"]
 title = "Red Team Engagements - TryHackMe"
 weight = 10
-draft = false
+draft = true
 images = [ "/walkthroughs/Red Team Engagements/logo.png" ]
 description = "Learn the steps and procedures of a red team engagement, including planning, frameworks, and documentation."
 +++
