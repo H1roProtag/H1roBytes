@@ -6,7 +6,7 @@ draft = false
 images = [ "/walkthroughs/Red Team Fundamentals/logo.png" ]
 description = "Learn about the basics of a red engagement, the main components and stakeholders involved, and how red teaming differs from other cyber security engagements."
 +++
-oop
+
 ![Logo](logo.png)
 
 Date written: January 2023      
@@ -62,7 +62,7 @@ Red Team Engagements:
 - Tests the defensive (blue) team's capabilities at detecting and responding to a real attack(er).
 - The key is to remain undetected and not perform any "loud" testing.
 - TTP simulation. 
-- Can run in several ways. Rull engagement, assumed breach, and a table top exercise. 
+- Can run in several ways. Full engagement, assumed breach, and a table top exercise. 
 
 > The goals of a red team engagement will often be referred to as flags or...
 
@@ -81,10 +81,10 @@ Red Team Engagements:
 
 Teams or cells:
 - Red cell - the component that makes up the offensive portion of a red team engagement that simulates a given target's strategic and tactical responses.
-    - Red Team Lead - Plans and organises engagements at a high level—delegates, assistant lead, and operators engagement assignments.
+    - Red Team Lead - Plans and organizes engagements at a high level—delegates, assistant lead, and operators engagement assignments.
     - Red Team Assistant Lead - Assists the team lead in overseeing engagement operations and operators. Can also assist in writing engagement plans and documentation if needed.
-    - Red Team Operator - Executes assignments delegated by team leads. Interpret and analyse engagement plans from team leads.
-- Blue cell - the opposite side of red. It includes all the components defending a target network. The blue cell is typically comprised of blue team members, defenders, internal staff, and an organisation's management.
+    - Red Team Operator - Executes assignments delegated by team leads. Interpret and analyze engagement plans from team leads.
+- Blue cell - the opposite side of red. It includes all the components defending a target network. The blue cell is typically comprised of blue team members, defenders, internal staff, and an organization's management.
 - White cell - Serves as referee between red cell activities and blue cell responses during an engagement. Controls the engagement environment/network. Monitors adherence to the ROE. Coordinates activities required to achieve engagement goals. Correlates red cell activities with defensive actions. Ensures the engagement is conducted without bias to either side.
 - Learn more [here](https://redteam.guide/docs/definitions)
 
