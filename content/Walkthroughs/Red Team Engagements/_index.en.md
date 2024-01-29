@@ -2,7 +2,7 @@
 tags = ["TryHackMe", "Red Team"]
 title = "Red Team Engagements - TryHackMe"
 weight = 10
-draft = true
+draft = false
 images = [ "/walkthroughs/Red Team Engagements/logo.png" ]
 description = "Learn the steps and procedures of a red team engagement, including planning, frameworks, and documentation."
 +++
@@ -152,6 +152,7 @@ Type of Plans:
 
 ## Task 5: Engagement Documentation  
 
+After learning about the types of documentation the next few tasks will have you read the documentation and answer questions about them to ensure you understand what to look for. 
 
 > Read the above and move on to the upcoming engagement specific tasks. 
 > 
@@ -179,5 +180,62 @@ Type of Plans:
 >
 > Answer: Cobalt Strike
 
-## Task 7 Resource Plan
+## Task 7: Resource Plan
 
+> Navigate to the "View Site"  button and read the provided resource plan. Once complete, answer the questions below.
+>
+>  Answer: No answer needed,
+
+> When will the engagement end? (MM/DD/YYYY)
+>
+> Answer: 11/14/2021
+
+> What is the budget the red team has for AWS cloud cost?
+>
+> Answer: $1000 
+
+> Are there any miscellaneous requirements for the engagement? (Y/N)
+>
+> Answer: N
+
+## Task 8: Operations Plan 
+
+> Navigate to the "View Site"  button and read the provided operations plan. Once complete, answer the questions below.
+>
+> Answer: No answer needed. 
+
+> What phishing method will be employed during the initial access phase?
+>
+> Answer: spearphishing 
+
+> What site will be utilized for communication between the client and red cell?
+>
+> Answer: vectr.io
+
+> If there is a system outage, the red cell will continue with the engagement. (T/F)
+>
+> Answer: F
+
+## Task 9: Mission Plan 
+
+> Navigate to the "View Site"  button and read the provided mission plan. Once complete, answer the questions below.
+>
+> Answer: No answer needed
+
+> When will the phishing campaign end? (mm/dd/yyyy)
+>
+> Answer: 10/23/2021
+
+> Are you permitted to attack 10.10.6.78? (Y/N)
+>
+> Answer: N
+
+> When a stopping condition is encountered, you should continue working and determine the solution yourself without a team lead. (T/F)
+>
+> Answer: F
+
+## Task 10: Conclusion 
+
+> Read the above and continue learning! 
+>
+> Answer: No answer needed
