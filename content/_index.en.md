@@ -39,16 +39,12 @@ Jordan (H1ro)
 
 **Connect with me on [LinkedIn.](https://www.linkedin.com/in/jordandarrah/)**
 
+**Keep up to date with my [HackTheBox](https://app.hackthebox.com/profile/647719) Journey.**
+
 **Keep up to date with my [TryHackMe](https://tryhackme.com/p/Jordarrah) Journey.**
 
 {{< rawhtml >}}
 <script src="https://tryhackme.com/badge/494270"></script>
-{{< /rawhtml >}}
-
-**Keep up to date with my [HackTheBox](https://app.hackthebox.com/profile/647719) Journey.**
-
-{{< rawhtml >}}
-<img src="https://www.hackthebox.eu/badge/image/647719" class="left"></img>
 {{< /rawhtml >}}
 
 {{< rawhtml >}}
