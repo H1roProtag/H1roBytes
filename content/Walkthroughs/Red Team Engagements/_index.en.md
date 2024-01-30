@@ -29,7 +29,7 @@ Room prerequisites:
 ## Task 2: Defining Scope and Objectives 
 
 > Read the example client objectives and answer the questions below.
-> s
+> 
 > Answer: No answer needed. 
 
 Below is an example of the client objectives of a mature organization with a strong security posture.
