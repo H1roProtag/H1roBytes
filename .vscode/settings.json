@@ -1,6 +1,10 @@
 {
     "cSpell.words": [
+        "cleartext",
         "exfiltration",
-        "Hashcat"
+        "Hashcat",
+        "hostnames",
+        "NTLM",
+        "OSINT"
     ]
 }

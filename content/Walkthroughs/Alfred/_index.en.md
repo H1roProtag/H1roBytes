@@ -10,7 +10,7 @@ description = "Exploit Jenkins to gain an initial shell, then escalate your priv
 ![Logo](Alfred.png)
 
 Date written: January 2023      
-Date published: January 2023
+Date published: 
 
 ## Task 1: Introduction 
 
