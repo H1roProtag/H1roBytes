@@ -14,7 +14,7 @@ Date published: April 2024
 
 # Disclaimer 
 
-Please see the disclaimer here. 
+Please see the disclaimer [here](https://hirobytes.xyz/disclaimer/). 
 
 ## Tools
 
