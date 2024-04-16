@@ -18,7 +18,7 @@ Hi I'm H1ro, AKA Jordan! I started my journey into cybersecurity from the fashio
 
 Follow me on this journey as I refine my skills and stay ahead of the curve. I'll dissect the intricacies of this dynamic field, breaking down complex concepts into digestible write-ups, tutorials, and resources for beginners as I learn along the way.
 
-## 🛠️ Resources Galore (Coming Soon)
+## 🛠️ Resources Galore (In process! See the Resources tab)
 
 Discover a treasure trove of resources, including:
 
