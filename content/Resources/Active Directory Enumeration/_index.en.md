@@ -7,12 +7,12 @@ images = [ "/Resources/Active Directory Enumeration/logo.png" ]
 description = "Active Directory Enumeration."
 +++
 
-![Logo](logo.png)
+![Logo](logo.jpg)
 
 Date written: February 2024     
 Date published: April 2024
 
-# Disclaimer 
+## Disclaimer 
 
 Please see the disclaimer [here](https://hirobytes.xyz/disclaimer/). 
 
