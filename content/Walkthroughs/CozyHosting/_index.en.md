@@ -1,18 +1,15 @@
 +++
 tags = ["HTB", "RCE", "Linux", "BootStrap", "SpringBoot", "HTTP", "SSH", "SessionHijacking"]
-title = "Cozy Hosting Walkthrough"
+title = "Cozy Hosting - Hack The Box"
 weight = 10
 draft = false
-images = [ "/walkthroughs/cozyhosting/cozyhosting.png" ]
+images = [ "/walkthroughs/CozyHosting/CozyHosting.png" ]
 +++
 
-Date written: November 14th 2023            
-Date published:
+Date written: November 14th, 2023            
+Date published: July 1st, 2024
 
-![Cozy Hosting](CozyHosting.png)
-
-&nbsp;
-&nbsp;
+![logo](CozyHosting.png)
 
 ## Recon
 #### NMAP
