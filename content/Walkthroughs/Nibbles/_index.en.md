@@ -3,7 +3,7 @@ tags = ["HackTheBox", "Linux", "Web Application", "RCE"]
 title = "Nibbles - HTB"
 weight = 10
 draft = false
-images = [ "/walkthroughs/Nibbles/logo.png" ]
+images = [ "/walkthroughs/nibbles/logo.png" ]
 description = "Nibbles is a fairly simple machine, however with the inclusion of a login blacklist, it is a fair bit more challenging to find valid credentials. Luckily, a username can be enumerated and guessing the correct password does not take long for most."
 +++
 
