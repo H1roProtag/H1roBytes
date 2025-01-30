@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.142.0">
+    <meta name="generator" content="Relearn 5.22.1+tip">
+    <meta name="description" content="Active Directory Enumeration.">
+    <meta name="author" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/Resources/Active%20Directory%20Enumeration/logo.png">
+  <meta name="twitter:title" content="Active Directory Enumeration">
+  <meta name="twitter:description" content="Active Directory Enumeration."><meta property="og:url" content="http://localhost:1313/resources/active-directory-enumeration/">
+  <meta property="og:site_name" content="H1roBytes">
+  <meta property="og:title" content="Active Directory Enumeration">
+  <meta property="og:description" content="Active Directory Enumeration.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+    <meta property="og:image" content="http://localhost:1313/Resources/Active%20Directory%20Enumeration/logo.png">
+    <title>Active Directory Enumeration - H1roBytes</title>
+    <link href="/resources/active-directory-enumeration/index.xml" rel="alternate" type="application/rss+xml" title="Active Directory Enumeration - H1roBytes">
+    <link href="/images/logo.png?1738202701" rel="icon" type="image/png">
+    <!-- https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use -->
+    <link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/nucleus.css?1738202701" rel="stylesheet">
+    <link href="/css/auto-complete.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/auto-complete.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/perfect-scrollbar.min.css?1738202701" rel="stylesheet">
+    <link href="/css/fonts.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fonts.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/theme.css?1738202701" rel="stylesheet">
+    <link href="/css/theme-relearn-dark.css?1738202701" rel="stylesheet" id="R-variant-style">
+    <link href="/css/variant.css?1738202701" rel="stylesheet">
+    <link href="/css/print.css?1738202701" rel="stylesheet" media="print">
+    <link href="/css/ie.css?1738202701" rel="stylesheet">
+    <script src="/js/url.js?1738202701"></script>
+    <script src="/js/variant.js?1738202701"></script>
+    <script>
+      // hack to let hugo tell us how to get to the root when using relativeURLs, it needs to be called *url= for it to do its magic:
+      // https://github.com/gohugoio/hugo/blob/145b3fcce35fbac25c7033c91c1b7ae6d1179da8/transform/urlreplacers/absurlreplacer.go#L72
+      window.index_js_url="/index.search.js";
+      var root_url="/";
+      var baseUri=root_url.replace(/\/$/, '');
+      // translations
+      window.T_Copy_to_clipboard = 'Copy to clipboard';
+      window.T_Copied_to_clipboard = 'Copied to clipboard!';
+      window.T_Copy_link_to_clipboard = 'Copy link to clipboard';
+      window.T_Link_copied_to_clipboard = 'Copied link to clipboard!';
+      window.T_Reset_view = 'Reset view';
+      window.T_View_reset = 'View reset!';
+      window.T_No_results_found = 'No results found for \u0022{0}\u0022';
+      window.T_N_results_found = '{1} results found for \u0022{0}\u0022';
+      // some further base stuff
+      var baseUriFull='http:\/\/localhost:1313/';
+      window.variants && variants.init( [ 'relearn-dark', 'zen-dark', 'relearn-bright', 'relearn-light', 'zen-light', 'neon', 'learn', 'blue', 'green', 'red' ] );
+    </script>
+  </head>
+  <body class="mobile-support html" data-url="/resources/active-directory-enumeration/index.html">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar">
+        <div class="topbar-wrapper">
+          <div class="topbar-sidebar-divider"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+              <button class="topbar-control" onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)">
+                <i class="fa-fw fas fa-bars"></i>
+              </button>
+            </div>
+            <div class="topbar-button topbar-button-toc" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)">
+                <i class="fa-fw fas fa-list-alt"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper"><nav class="TableOfContents">
+  <ul>
+    <li><a href="#disclaimer">Disclaimer</a></li>
+    <li><a href="#tools">Tools</a></li>
+    <li><a href="#domain-enumeration">Domain Enumeration</a>
+      <ul>
+        <li><a href="#powerview">PowerView</a></li>
+        <li><a href="#ad-module">AD Module</a></li>
+        <li><a href="#bloodhound">BloodHound</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="topbar-breadcrumbs highlightable">
+            Active Directory Enumeration
+          </span>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More">
+                <i class="fa-fw fas fa-ellipsis-v"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable default" tabindex="-1">
+        <div class="flex-block-wrapper">
+          <article class="default">
+            <header class="headline">
+<div class=" taxonomy-tags term-list cstyle  tags" title="Tags" style="--VARIABLE-TAGS-BG-color: var(--INTERNAL-TAG-BG-color);">
+  <ul>
+    <li><a class="term-link" href="/tags/active-directory/index.html">Active Directory</a></li>
+    <li><a class="term-link" href="/tags/enumeration/index.html">Enumeration</a></li>
+    <li><a class="term-link" href="/tags/powerview/index.html">PowerView</a></li>
+    <li><a class="term-link" href="/tags/windows/index.html">Windows</a></li>
+  </ul>
+</div>
+            </header>
+<h1 id="active-directory-enumeration">Active Directory Enumeration</h1>
+
+<p><a href="#R-image-04ac24751fe7835f589514be50db7a6c" class="lightbox-link"><img src="/resources/active-directory-enumeration/logo.jpg" alt="Logo" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-04ac24751fe7835f589514be50db7a6c"><img src="/resources/active-directory-enumeration/logo.jpg" alt="Logo" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Date written: February 2024  <br>
+Date published: April 2024</p>
+<h2 id="disclaimer">Disclaimer</h2>
+<p>Please see the disclaimer 
+<a href="https://hirobytes.xyz/disclaimer/" target="_blank">here</a>.</p>
+<h2 id="tools">Tools</h2>
+<blockquote>
+<p>[!Note] Hacktricks also has a page about this
+
+<a href="https://book.hacktricks.xyz/windows-hardening/basic-powershell-for-pentesters/powerview" target="_blank">https://book.hacktricks.xyz/windows-hardening/basic-powershell-for-pentesters/powerview</a></p>
+<p>And S1ckB0y1337 PayloadAllTheThings-like
+
+<a href="https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet?tab=readme-ov-file#using-powerview" target="_blank">https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet?tab=readme-ov-file#using-powerview</a></p>
+</blockquote>
+<ul>
+<li>ActiveDirectory PowerShell module
+<ul>
+<li>
+<a href="https://learn.microsoft.com/en-us/powershell/module/activedirectory/?view=windowsserver2022-ps" target="_blank">https://learn.microsoft.com/en-us/powershell/module/activedirectory/?view=windowsserver2022-ps</a></li>
+<li>
+<a href="https://github.com/samratashok/ADModule" target="_blank">https://github.com/samratashok/ADModule</a></li>
+</ul>
+</li>
+</ul>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Import ADModule</span>
+</span></span><span style="display:flex;"><span>Import-Module C:\AD\Tools\ADModule-master\Microsoft.ActiveDirectory.Management.dll
+</span></span><span style="display:flex;"><span>Import-Module C:\AD\Tools\ADModule-master\ActiveDirectory\ActiveDirectory.psd1</span></span></code></pre></div><ul>
+<li>Bloodhound
+<ul>
+<li>
+<a href="https://github.com/BloodHoundAD/BloodHound" target="_blank">https://github.com/BloodHoundAD/BloodHound</a></li>
+</ul>
+</li>
+<li>PowerView
+<ul>
+<li>
+<a href="https://github.com/ZeroDayLab/PowerSploit/blob/master/Recon/PowerView.ps1" target="_blank">https://github.com/ZeroDayLab/PowerSploit/blob/master/Recon/PowerView.ps1</a></li>
+</ul>
+</li>
+<li>SharpView - Doesn&rsquo;t support filtering using Pipeline
+<ul>
+<li>
+<a href="https://github.com/tevora-threat/SharpView/" target="_blank">https://github.com/tevora-threat/SharpView/</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="domain-enumeration">Domain Enumeration</h2>
+<h3 id="powerview">PowerView</h3>
+<h4 id="domains-and-dcs">Domains and DCs</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get current or specified domain (General enumeration)</span>
+</span></span><span style="display:flex;"><span>Get-Domain 
+</span></span><span style="display:flex;"><span>Get-Domain -Domain &lt;DomainName&gt; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get domain SID for the current domain</span>
+</span></span><span style="display:flex;"><span>Get-DomainSID 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get domain policy for the current domain</span>
+</span></span><span style="display:flex;"><span>Get-DomainPolicyData 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get domain controllers for the current or specified domain</span>
+</span></span><span style="display:flex;"><span>Get-DomainController 
+</span></span><span style="display:flex;"><span>Get-DomainController -Domain &lt;DomainName&gt;</span></span></code></pre></div><h4 id="users">Users</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get a list of users in the current domain</span>
+</span></span><span style="display:flex;"><span>Get-DomainUser 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Search for a specific user in the current domain and display all or specified properties. </span>
+</span></span><span style="display:flex;"><span>Get-DomainUser -Identity &lt;UserName&gt; 
+</span></span><span style="display:flex;"><span>Get-DomainUser -Identity &lt;UserName&gt; -Properties * <span style="color:#75715e"># all properties</span>
+</span></span><span style="display:flex;"><span>Get-DomainUser -Properties samaccountname,logonCount <span style="color:#75715e"># specified properties</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lists only the &#34;samaccountname&#34; property for domain users. Could replace with any User field.</span>
+</span></span><span style="display:flex;"><span>Get-DomainUser | select -ExpandProperty samaccountname 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Search for a string in a user&#39;s attributes.</span>
+</span></span><span style="display:flex;"><span>Get-DomainUser -LDAPFilter <span style="color:#e6db74">&#34;Description=*built*&#34;</span> |  Select name,Description </span></span></code></pre></div><h4 id="logon-and-sessions">Logon and Sessions</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get actively logged users on a computer (needs local admin rights on  the target)</span>
+</span></span><span style="display:flex;"><span>Get-NetLoggedon -ComputerName &lt;ComputerName&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get locally logged users on a computer (needs remote registry on the target - started by-default on server OS)</span>
+</span></span><span style="display:flex;"><span>Get-LoggedonLocal -ComputerName &lt;ComputerName&gt; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get the last logged user on a computer (needs administrative rights and  remote registry on the target)</span>
+</span></span><span style="display:flex;"><span>Get-LastLoggedOn -ComputerName &lt;ComputerName&gt; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># Lists the current network session properties</span>
+</span></span><span style="display:flex;"><span>Get-NetSession 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lists current users that are logged onto the domain</span>
+</span></span><span style="display:flex;"><span>Get-NetLoggedon </span></span></code></pre></div><h4 id="computers">Computers</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get a list of computers in the current domain. Can only show dnshostname/specific fields. </span>
+</span></span><span style="display:flex;"><span>Get-DomainComputer 
+</span></span><span style="display:flex;"><span>Get-DomainComputer | select dnshostname 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lists all computers in the current domain with the operating system containing Server 2022</span>
+</span></span><span style="display:flex;"><span>Get-DomainComputer -OperatingSystem <span style="color:#e6db74">&#34;*Server 2022*&#34;</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Gets all current domain computers and also checks to see if the host is up. </span>
+</span></span><span style="display:flex;"><span>Get-DomainComputer -Ping <span style="color:#75715e"># Gets all current domain computers and also checks to see if the host is up. </span></span></span></code></pre></div><h4 id="shared-files-and-folder">Shared Files and Folder</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Find shares on hosts in current domain.</span>
+</span></span><span style="display:flex;"><span>Invoke-ShareFinder -Verbose 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Find sensitive files on computers in the domain</span>
+</span></span><span style="display:flex;"><span>Invoke-FileFinder -Verbose 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get all fileservers of the domain</span>
+</span></span><span style="display:flex;"><span>Get-NetFileServer </span></span></code></pre></div><h4 id="groups">Groups</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get all the groups in the current or specified domain</span>
+</span></span><span style="display:flex;"><span>Get-DomainGroup 
+</span></span><span style="display:flex;"><span>Get-DomainGroup -Domain &lt;targetdomain&gt;
+</span></span><span style="display:flex;"><span>Get-DomainGroup | select Name <span style="color:#75715e"># Lists all groups in the current domain, only showing Name. </span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get all groups containing the words like &#34;admin&#34; in group name. Use quotes instead of * for more refined results.</span>
+</span></span><span style="display:flex;"><span>Get-DomainGroup *admin* 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get all the members of the specified group on the current or specified domain</span>
+</span></span><span style="display:flex;"><span>Get-DomainGroupMember -Identity <span style="color:#e6db74">&#34;&lt;GroupName&gt;&#34;</span> -Recurse 
+</span></span><span style="display:flex;"><span>Get-DomainGroupMember -Identity <span style="color:#e6db74">&#34;&lt;GroupName&gt;&#34;</span> -Domain &lt;DomainName&gt; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get the group membership for specific user</span>
+</span></span><span style="display:flex;"><span>Get-DomainGroup -UserName <span style="color:#e6db74">&#34;&lt;UserName&gt;&#34;</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lists all local groups on the machine with in the current or specified domain. Requireds admin on non-DC mahcines.</span>
+</span></span><span style="display:flex;"><span>Get-NetLocalGroup -ComputerName &lt;ComputerName&gt; 
+</span></span><span style="display:flex;"><span>Get-NetLocalGroupMember -ComputerName &lt;ComputerName&gt; -GroupName &lt;GroupName&gt; </span></span></code></pre></div><h4 id="gpo">GPO</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get list of GPO in current domain. Can also specify a single computer. </span>
+</span></span><span style="display:flex;"><span>Get-DomainGPO 
+</span></span><span style="display:flex;"><span>Get-DomainGPO -ComputerIdentity &lt;ComputerName&gt; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get GPO(s) that use Restricted Groups or groups.xml for interesting users</span>
+</span></span><span style="display:flex;"><span>Get-DomainGPOLocalGroup 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get users that are in a local group of a machine using GPO</span>
+</span></span><span style="display:flex;"><span>Get-DomainGPOComputerLocalGroupMapping -ComputerIdentity &lt;ComputerName&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get machines where the given user is member of a specific group</span>
+</span></span><span style="display:flex;"><span>Get-DomainGPOUserLocalGroupMapping -Identity &lt;UserName&gt; - Verbose </span></span></code></pre></div><h4 id="ou">OU</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># List all OUs in current Domain. Can filter and only show name</span>
+</span></span><span style="display:flex;"><span>Get-DomainOU 
+</span></span><span style="display:flex;"><span>Get-DomainOU | select -ExpandProperty name 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># List all computers in the OU.</span>
+</span></span><span style="display:flex;"><span>(Get-DomainOU -Identity &lt;OUName&gt;).distinguishedname | %{Get-DomainComputer -SearchBase $_} | select name 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># Shows the gplink for the StudentMachines OU. Used to enumerate GPO of that OU. </span>
+</span></span><span style="display:flex;"><span>(Get-DomainOU -Identity &lt;OUName&gt;).gplink
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> <span style="color:#75715e"># Enumerates the GPOs on the StudentMachines OU.</span>
+</span></span><span style="display:flex;"><span>Get-DomainGPO -Identity <span style="color:#e6db74">&#39;{7478F170-6A0C-490C-B355-9E4618BC785D}&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The above two commands into 1</span>
+</span></span><span style="display:flex;"><span>Get-DomainGPO -Identity (Get-DomainOU -Identity StudentMachines).gplink.substring(<span style="color:#ae81ff">11</span>,(Get-DomainOU -Identity StudentMachines).gplink.length-<span style="color:#ae81ff">72</span>)</span></span></code></pre></div><p><code>(Get-DomainOU -Identity StudentMachines).distinguishedname | %{Get-DomainComputer -SearchBase $_} | select name</code></p>
+<table>
+  <thead>
+      <tr>
+          <th>Command Component</th>
+          <th>Explanation</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>Get-DomainOU</code></td>
+          <td>Retrieves information about Organizational Units (OUs) within a domain.</td>
+      </tr>
+      <tr>
+          <td><code>-Identity StudentMachines</code></td>
+          <td>This specifies the OU named &ldquo;StudentMachines&rdquo; as the target. <code>Identity</code> is a parameter used to specify the object (in this case, OU) to retrieve.</td>
+      </tr>
+      <tr>
+          <td><code>.distinguishedname</code></td>
+          <td>This accesses the <code>distinguishedname</code> property of the OU returned by <code>Get-DomainOU</code>. This property contains the unique identifier for the OU.</td>
+      </tr>
+      <tr>
+          <td><code>%{}</code></td>
+          <td>For Each Object. So this will cycle through each domain computer.</td>
+      </tr>
+      <tr>
+          <td><code>Get-DomainComputer</code></td>
+          <td>Retrieves information about computers within a specified domain or OU.</td>
+      </tr>
+      <tr>
+          <td><code>-SearchBase $_</code></td>
+          <td>This parameter specifies the search base for the <code>Get-DomainComputer</code> command. <code>$_</code> refers to the current object in the pipeline, which is an OU&rsquo;s DN.</td>
+      </tr>
+      <tr>
+          <td><code>select name</code></td>
+          <td>Outputs only the name.</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="access-control-lists">Access Control Lists</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get the ACLs associated with the specified object</span>
+</span></span><span style="display:flex;"><span>Get-DomainObjectAcl -SamAccountName &lt;AccountName&gt; -ResolveGUIDs 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get the ACLs associated with the specified prefix to be used for search</span>
+</span></span><span style="display:flex;"><span>Get-DomainObjectAcl -SearchBase <span style="color:#e6db74">&#34;LDAP://CN=Domain Admins,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local&#34;</span> -ResolveGUIDs - Verbose 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Search for interesting ACEs</span>
+</span></span><span style="display:flex;"><span>Find-InterestingDomainAcl -ResolveGUIDs 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># check for modify rights/permissions for a user</span>
+</span></span><span style="display:flex;"><span>Find-InterestingDomainAcl -ResolveGUIDs | ?{$_.IdentityReferenceName <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;&lt;UserName&gt;&#34;</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># check for modify rights/permissions for a group</span>
+</span></span><span style="display:flex;"><span>Find-InterestingDomainAcl -ResolveGUIDs | ?{$_.IdentityReferenceName <span style="color:#f92672">-match</span> <span style="color:#e6db74">&#34;&lt;GroupName&gt;&#34;</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get the ACLs associated with the specified path</span>
+</span></span><span style="display:flex;"><span>Get-PathAcl -Path <span style="color:#e6db74">&#34;\\Path\Of\Share&#34;</span> </span></span></code></pre></div><h4 id="trusts">Trusts</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get a list of all domain trusts for the current or specified domain</span>
+</span></span><span style="display:flex;"><span>Get-DomainTrust 
+</span></span><span style="display:flex;"><span>Get-DomainTrust -Domain &lt;DomainName&gt; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lists only the external trusts in the current **forest**. </span>
+</span></span><span style="display:flex;"><span>Get-ForestDomain | %{Get-DomainTrust -Domain $_.Name} | ?{$_.TrustAttributes <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;FILTER_SIDS&#34;</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lists external trusts of the current **domain**</span>
+</span></span><span style="display:flex;"><span>Get-DomainTrust | ?{$_.TrustAttributes <span style="color:#f92672">-eq</span> <span style="color:#e6db74">&#34;FILTER_SIDS&#34;</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Gets all domains in specified forest and then for each domain it gets trust info??</span>
+</span></span><span style="display:flex;"><span>Get-ForestDomain -Forest &lt;ForestName&gt; | %{Get-DomainTrust -Domain $_.Name}</span></span></code></pre></div><h4 id="forests">Forests</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get details about the current or specified forest</span>
+</span></span><span style="display:flex;"><span>Get-Forest 
+</span></span><span style="display:flex;"><span>Get-Forest -Forest &lt;ForestName&gt; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get all domains in the current or specified forest</span>
+</span></span><span style="display:flex;"><span>Get-ForestDomain 
+</span></span><span style="display:flex;"><span>Get-ForestDomain -Forest &lt;ForestName&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get all global catalogs for the current or specified forest</span>
+</span></span><span style="display:flex;"><span>Get-ForestGlobalCatalog 
+</span></span><span style="display:flex;"><span>Get-ForestGlobalCatalog -Forest &lt;ForestName&gt; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Map trusts of the current or specified forest (no Forest trusts in the lab)</span>
+</span></span><span style="display:flex;"><span>Get-ForestTrust 
+</span></span><span style="display:flex;"><span>Get-ForestTrust -Forest &lt;ForestName&gt; </span></span></code></pre></div><h4 id="user-hunting">User Hunting</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Find all machines on the current domain where the current user has local admin access</span>
+</span></span><span style="display:flex;"><span>Find-LocalAdminAccess -Verbose 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># You need to give the list of computers in the domain. Need admin privs. Useful if RCP and SMB ports are closed.</span>
+</span></span><span style="display:flex;"><span>.\Find-WMILocalAdminAccess.ps1 -ComputerFile .\computers.txt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Find computers where a domain admin (or specified user/group) has sessions</span>
+</span></span><span style="display:flex;"><span>Find-DomainUserLocation -Verbose
+</span></span><span style="display:flex;"><span>Find-DomainUserLocation -UserGroupIdentity <span style="color:#e6db74">&#34;RDPUsers&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Find computers where a domain admin session is available and current user  has admin access (uses Test-AdminAccess).</span>
+</span></span><span style="display:flex;"><span>Find-DomainUserLocation -CheckAccess
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Find computers (File Servers and Distributed File servers) where a domain  admin session is available.</span>
+</span></span><span style="display:flex;"><span>Find-DomainUserLocation -Stealth
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># List sessions on remote machines (https://github.com/Leo4j/Invoke-SessionHunter)</span>
+</span></span><span style="display:flex;"><span>Invoke-SessionHunter -FailSafe
+</span></span><span style="display:flex;"><span>Invoke-SessionHunter -NoPortScan -Targets  C:\AD\Tools\servers.txt</span></span></code></pre></div><h3 id="ad-module">AD Module</h3>
+<h4 id="domains-and-dcs-1">Domains and DCs</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get current or specified domain (General enumeration)</span>
+</span></span><span style="display:flex;"><span>Get-AADomain 
+</span></span><span style="display:flex;"><span>Get-AADDomain -Identity &lt;DomainName&gt; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get domain SID for the current domain</span>
+</span></span><span style="display:flex;"><span>(Get-AADomain).DomainSID 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get domain policy for the current domain</span>
+</span></span><span style="display:flex;"><span>(Get-DomainPolicyData).systemaccess
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get domain policy for another domain  </span>
+</span></span><span style="display:flex;"><span>(Get-DomainPolicyData -domain  &lt;DomainName&gt;).systemaccess <span style="color:#75715e"># AAD Module</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get domain controllers for the current or specified domain</span>
+</span></span><span style="display:flex;"><span>Get-ADDomainController
+</span></span><span style="display:flex;"><span>Get-ADDomainController -DomainName &lt;DomainName&gt; - Discover </span></span></code></pre></div><h4 id="users-1">Users</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Search for a specific user with all properties shown</span>
+</span></span><span style="display:flex;"><span>Get-ADUser -Filter * -Properties *
+</span></span><span style="display:flex;"><span>Get-ADUser -Identity &lt;UserName&gt; -Properties *
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># User Properties </span>
+</span></span><span style="display:flex;"><span>Get-ADUser -Filter * -Properties * | select -First <span style="color:#ae81ff">1</span> | Get-Member -  MemberType *Property | select Name
+</span></span><span style="display:flex;"><span>Get-ADUser -Filter * -Properties * | select  name,logoncount,@{expression={[<span style="color:#66d9ef">datetime</span>]::fromFileTime($_.pwdlastset)}}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Search for a  string in a user&#39;s attributes:</span>
+</span></span><span style="display:flex;"><span>Get-ADUser -Filter <span style="color:#e6db74">&#39;Description -like &#34;*built*&#34;&#39;</span> -  Properties Description | select name,Description</span></span></code></pre></div><h4 id="computers-1">Computers</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get a list of computers in the current domain</span>
+</span></span><span style="display:flex;"><span>Get-ADComputer -Filter * | select Name
+</span></span><span style="display:flex;"><span>Get-ADComputer -Filter * - Properties *
+</span></span><span style="display:flex;"><span>Get-ADComputer -Filter <span style="color:#e6db74">&#39;OperatingSystems -like &#34;*Server 2022*&#34;&#39;</span> - Properties OperatingSystem | select Name, OperatingSystem
+</span></span><span style="display:flex;"><span>Get-ADComputer -Filter * -Properties DNSHostName | %{Test-Connection -Count <span style="color:#ae81ff">1</span> -ComputerName $_.DNSHostName}</span></span></code></pre></div><h4 id="groups-1">Groups</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># List groups in the current domain</span>
+</span></span><span style="display:flex;"><span>Get-ADGroup -Filter * | select Name  
+</span></span><span style="display:flex;"><span>Get-ADGroup -Filter * -Properties *
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get all groups containing the word &#34;admin&#34; in group name. To only filter results with just &#34;admin&#34; use quotes</span>
+</span></span><span style="display:flex;"><span>Get-ADGroup -Filter <span style="color:#e6db74">&#39;Name -like &#34;*admin*&#34;&#39;</span> | select Name 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get all the members of the specified group</span>
+</span></span><span style="display:flex;"><span>Get-ADGroupMember -Identity <span style="color:#e6db74">&#34;&lt;GroupName&gt;&#34;</span> -Recursive
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get the group membership for a user</span>
+</span></span><span style="display:flex;"><span>Get-ADPrincipalGroupMembership -Identity &lt;UserName&gt;</span></span></code></pre></div><h4 id="ou-1">OU</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># General OU</span>
+</span></span><span style="display:flex;"><span>Get-ADOrganizationalUnit -Filter * -Properties *</span></span></code></pre></div><h4 id="access-control-lists-1">Access Control Lists</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Enumerate ACLs using ActiveDirectory module but without resolving GUIDs</span>
+</span></span><span style="display:flex;"><span>(Get-Acl<span style="color:#e6db74">&#39;AD:\CN=Administrator,CN=Users,DC=dollarcorp,DC=moneycorp,DC=local&#39;</span>).Access</span></span></code></pre></div><h4 id="trusts-1">Trusts</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get a list of all domain trusts for the current or specigied domain</span>
+</span></span><span style="display:flex;"><span>Get-ADTrust
+</span></span><span style="display:flex;"><span>Get-ADTrust -Identity &lt;DomainName&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Maps all the tusts in the current domain. -Server Optional</span>
+</span></span><span style="display:flex;"><span>Get-ADTrust -Filter * -Server &lt;ServerName&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lists all trusts in the current forest</span>
+</span></span><span style="display:flex;"><span>Get-ADForest | %{Get-ADTrust -Filter *} 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lists only the external trusts in current domain?</span>
+</span></span><span style="display:flex;"><span>(Get-ADForest).Domains | %{Get-ADTrust -Filter <span style="color:#e6db74">&#39;(intraForest -ne $True) -and (ForestTransitive -ne $True)&#39;</span> -Server $_} 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Lists external trusts in all domains?</span>
+</span></span><span style="display:flex;"><span>Get-ADTrust -Filter <span style="color:#e6db74">&#39;(intraForest -ne $True) -and(ForestTransitive -ne $True)&#39;</span> </span></span></code></pre></div><h4 id="forests-1">Forests</h4>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Get details about the current or specified forest</span>
+</span></span><span style="display:flex;"><span>Get-ADForest
+</span></span><span style="display:flex;"><span>Get-ADForest -Identity &lt;ForestName&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get all domains in the current forest</span>
+</span></span><span style="display:flex;"><span>(Get-ADForest).Domains
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Get all global catalogs for the current forest</span>
+</span></span><span style="display:flex;"><span>Get-ADForest | select -ExpandProperty GlobalCatalogs
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Map trusts of a forest (no Forest trusts in the lab)</span>
+</span></span><span style="display:flex;"><span>Get-ADTrust -Filter <span style="color:#e6db74">&#39;msDS-TrustForestTrustInfo -ne &#34;$null&#34;&#39;</span></span></span></code></pre></div><h3 id="bloodhound">BloodHound</h3>
+<blockquote>
+<p>[!Note] CRTP Note
+BloodHound Legacy is present in the C:\AD\Tools directory of your student VM.</p>
+<p>You can have Read-only access to to the prep-populated BloodHound CE -  
+<a href="https://crtpbloodhound-altsecdashboard.msappproxy.net/" target="_blank">https://crtpbloodhound-altsecdashboard.msappproxy.net/</a></p>
+<p>Use the credentials for 
+<a href="mailto:crtpreader@altsecdashboard.onmicrosoft.com">crtpreader@altsecdashboard.onmicrosoft.com</a> from the lab portal - 
+<a href="https://adlab.enterprisesecurity.io/" target="_blank">https://adlab.enterprisesecurity.io/</a></p>
+<p>Just need to run the following to access BloodHound during exam. It is already set up</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>. C:\AD\Tools\BloodHound-master\Collectors\SharpHound.ps1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Invoke-BloodHound -CollectionMethod All</span></span></code></pre></div></blockquote>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span><span style="color:#75715e"># Supply data to BloodHound (Remember to bypass .NET AMSI):</span>
+</span></span><span style="display:flex;"><span>. C:\AD\Tools\BloodHound-master\Collectors\SharpHound.ps1
+</span></span><span style="display:flex;"><span>Invoke-BloodHound -CollectionMethod All
+</span></span><span style="display:flex;"><span>**or**
+</span></span><span style="display:flex;"><span>SharpHound.exe
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Removes noisy collction methods like RDP, DCOM, PSRemote and  LocalAdmin</span>
+</span></span><span style="display:flex;"><span>Invoke-BloodHound -Steatlh
+</span></span><span style="display:flex;"><span>SharpHound.exe --steatlh
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Avoid detections like MDI (Microsoft Defender for Identity?)</span>
+</span></span><span style="display:flex;"><span>Invoke-BloodHound -ExcludeDCs</span></span></code></pre></div>
+            <footer class="footline">
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation">
+        <div id="R-header" class="default-animation">
+<a href="/index.html">
+    <img src="/images/logo.png" 
+        width="200"
+        height="120"
+        alt="Website logo of hacker cat"/>
+    <h2 style="padding:0; margin:0;">H1roBytes</h2>
+</a>
+        </div>
+        <div class="searchbox default-animation">
+          <i class="fas fa-search" title="Search (CTRL+ALT+f)"></i>
+          <label class="a11y-only" for="R-search-by">Search</label>
+          <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+          <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
+        </div>
+        <script>
+          var contentLangs=['en'];
+        </script>
+        <script src="/js/auto-complete.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.stemmer.support.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.multi.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.en.min.js?1738202701" defer></script>
+        <script src="/js/search.js?1738202701" defer></script>
+      </div>
+      <div id="R-homelinks" class="default-animation">
+        <hr class="padding">
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div id="R-topics">
+          <ul class="enlarge morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/index.html" class=""><input type="checkbox" id="R-section-a25630664138ae6b33064dc3d9c0b30e" aria-controls="R-subsections-a25630664138ae6b33064dc3d9c0b30e"><label for="R-section-a25630664138ae6b33064dc3d9c0b30e"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Walkthroughs</span></label><a class="padding" href="/walkthroughs/index.html">Walkthroughs</a><ul id="R-subsections-a25630664138ae6b33064dc3d9c0b30e" class="morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/2023-advent-of-cyber/index.html" class=""><a class="padding" href="/walkthroughs/2023-advent-of-cyber/index.html">Advent of Cyber 2023! - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/cozyhosting/index.html" class=""><a class="padding" href="/walkthroughs/cozyhosting/index.html">Cozy Hosting - Hack The Box</a></li>
+          <li data-nav-id="/walkthroughs/kenobi/index.html" class=""><a class="padding" href="/walkthroughs/kenobi/index.html">Kenobi - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/nibbles/index.html" class=""><a class="padding" href="/walkthroughs/nibbles/index.html">Nibbles - HTB</a></li>
+          <li data-nav-id="/walkthroughs/red-team-engagements/index.html" class=""><a class="padding" href="/walkthroughs/red-team-engagements/index.html">Red Team Engagements - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/red-team-fundamentals/index.html" class=""><a class="padding" href="/walkthroughs/red-team-fundamentals/index.html">Red Team Fundamentals - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/rootme/index.html" class=""><a class="padding" href="/walkthroughs/rootme/index.html">RootMe - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/steel-mountain/index.html" class=""><a class="padding" href="/walkthroughs/steel-mountain/index.html">Steel Mountain - TryHackMe</a></li></ul></li>
+          <li data-nav-id="/resources/index.html" class="parent "><input type="checkbox" id="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24" aria-controls="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24" checked><label for="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Resources</span></label><a class="padding" href="/resources/index.html">Resources</a><ul id="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24" class="morespace collapsible-menu">
+          <li data-nav-id="/resources/active-directory-enumeration/index.html" class="active"><a class="padding" href="/resources/active-directory-enumeration/index.html">Active Directory Enumeration</a></li></ul></li>
+          <li data-nav-id="/contact/index.html" class=""><a class="padding" href="/contact/index.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter"></div>
+        <div id="R-menu-footer">
+          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter">
+          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks showVariantSwitch">
+            <ul>
+              <li id="R-select-language-container" class="footerLangSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-language fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-language">Language</label>
+                    <select id="R-select-language" onchange="location = baseUri + this.value;">
+                      <option id="R-en" value="/resources/active-directory-enumeration/index.html" lang="en" selected></option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+              <li id="R-select-variant-container" class="footerVariantSwitch showVariantSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-paint-brush fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-variant">Theme</label>
+                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
+                      <option id="R-relearn-dark" value="relearn-dark" selected>Relearn Dark</option>
+                      <option id="R-zen-dark" value="zen-dark">Zen Dark</option>
+                      <option id="R-relearn-bright" value="relearn-bright">Relearn Bright</option>
+                      <option id="R-relearn-light" value="relearn-light">Relearn Light</option>
+                      <option id="R-zen-light" value="zen-light">Zen Light</option>
+                      <option id="R-neon" value="neon">Neon</option>
+                      <option id="R-learn" value="learn">Learn</option>
+                      <option id="R-blue" value="blue">Blue</option>
+                      <option id="R-green" value="green">Green</option>
+                      <option id="R-red" value="red">Red</option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                <script>window.variants && variants.markSelectedVariant();</script>
+              </li>
+              <li class="footerVisitedLinks">
+                <div class="padding menu-control">
+                  <i class="fas fa-history fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <button onclick="clearHistory();">Clear History</button>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div id="R-footer" class="footerFooter showFooter">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://gohugo.io/">Hugo</a></p>
+		<p><a href="https://hirobytes.xyz/disclaimer">Disclaimer</a></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <script src="/js/clipboard.min.js?1738202701" defer></script>
+    <script src="/js/perfect-scrollbar.min.js?1738202701" defer></script>
+    <script>
+      function useMathJax( config ){
+        if( !Object.assign ){
+          
+          return;
+        }
+        window.MathJax = Object.assign( window.MathJax || {}, {
+          loader: {
+            load: ['[tex]/mhchem']
+          },
+          startup: {
+            elements: [
+              '.math'
+            ]
+          },
+          tex: {
+            inlineMath: [
+              ['$', '$'], 
+              ['\\(', '\\)']
+            ]
+          },
+          options: {
+            enableMenu: false 
+          }
+        }, config );
+      }
+      useMathJax( JSON.parse( null ) );
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="/js/d3/d3-color.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-dispatch.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-drag.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-ease.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-interpolate.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-selection.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-timer.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-transition.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-zoom.min.js?1738202701" defer></script>
+    <script src="/js/js-yaml.min.js?1738202701" defer></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" defer></script>
+    <script>
+      window.themeUseMermaid = JSON.parse( null );
+    </script>
+    <script>window.noZensmooth = true;</script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js" defer></script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js" defer></script>
+    <script>
+      window.themeUseOpenapi = { css: "https://unpkg.com/swagger-ui-dist/swagger-ui.css", assetsBuster:  1738202701  };
+    </script>
+    <script src="/js/theme.js?1738202701" defer></script>
+  </body>
+</html>

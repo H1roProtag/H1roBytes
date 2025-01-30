@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ctf on H1roBytes</title>
+    <link>http://localhost:1313/tags/ctf/index.html</link>
+    <description>Recent content in Ctf on H1roBytes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="http://localhost:1313/tags/ctf/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>RootMe - TryHackMe</title>
+      <link>http://localhost:1313/walkthroughs/rootme/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/walkthroughs/rootme/index.html</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;#R-image-7a60135eb25ec759406c3d99745c41e5&#34; class=&#34;lightbox-link&#34;&gt;&lt;img src=&#34;http://localhost:1313/walkthroughs/rootme/rootme.png&#34; alt=&#34;Logo&#34; class=&#34;figure-image noborder lightbox noshadow&#34; style=&#34;height: auto; width: auto;&#34; loading=&#34;lazy&#34;&gt;&lt;/a&gt;
+&lt;a href=&#34;javascript:history.back();&#34; class=&#34;lightbox-back&#34; id=&#34;R-image-7a60135eb25ec759406c3d99745c41e5&#34;&gt;&lt;img src=&#34;http://localhost:1313/walkthroughs/rootme/rootme.png&#34; alt=&#34;Logo&#34; class=&#34;lightbox-image noborder lightbox noshadow&#34; loading=&#34;lazy&#34;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Date written: January 2025   &lt;br&gt;
+Date published:&lt;/p&gt;
+&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;In this room, you will learn how to enumerate directories, exploit file upload vulnerabilities, craft reverse shells, and exploit SUID permissions misconfigurations.&lt;/p&gt;
+&lt;h2 id=&#34;task-1-deploy-the-machine&#34;&gt;Task 1: Deploy the machine&lt;/h2&gt;
+&lt;p&gt;As always the first step to a TryHackMe room is to connect to either OpenVPN or AttackBox. If you have never connected to 
+&lt;a href=&#34;https://tryhackme.com/room/openvpn&#34; target=&#34;_blank&#34;&gt;OpenVPN&lt;/a&gt; or 
+&lt;a href=&#34;https://tryhackme.com/room/tutorial&#34; target=&#34;_blank&#34;&gt;AttackBox&lt;/a&gt; before try their respective rooms to for a tutorial on how to connect to each one.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

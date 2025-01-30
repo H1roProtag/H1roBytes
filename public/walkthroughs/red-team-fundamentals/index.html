@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.142.0">
+    <meta name="generator" content="Relearn 5.22.1+tip">
+    <meta name="description" content="Learn about the basics of a red engagement, the main components and stakeholders involved, and how red teaming differs from other cyber security engagements.">
+    <meta name="author" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/walkthroughs/Red%20Team%20Fundamentals/logo.png">
+  <meta name="twitter:title" content="Red Team Fundamentals - TryHackMe">
+  <meta name="twitter:description" content="Learn about the basics of a red engagement, the main components and stakeholders involved, and how red teaming differs from other cyber security engagements."><meta property="og:url" content="http://localhost:1313/walkthroughs/red-team-fundamentals/">
+  <meta property="og:site_name" content="H1roBytes">
+  <meta property="og:title" content="Red Team Fundamentals - TryHackMe">
+  <meta property="og:description" content="Learn about the basics of a red engagement, the main components and stakeholders involved, and how red teaming differs from other cyber security engagements.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+    <meta property="og:image" content="http://localhost:1313/walkthroughs/Red%20Team%20Fundamentals/logo.png">
+    <title>Red Team Fundamentals - TryHackMe - H1roBytes</title>
+    <link href="/walkthroughs/red-team-fundamentals/index.xml" rel="alternate" type="application/rss+xml" title="Red Team Fundamentals - TryHackMe - H1roBytes">
+    <link href="/images/logo.png?1738202701" rel="icon" type="image/png">
+    <!-- https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use -->
+    <link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/nucleus.css?1738202701" rel="stylesheet">
+    <link href="/css/auto-complete.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/auto-complete.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/perfect-scrollbar.min.css?1738202701" rel="stylesheet">
+    <link href="/css/fonts.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fonts.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/theme.css?1738202701" rel="stylesheet">
+    <link href="/css/theme-relearn-dark.css?1738202701" rel="stylesheet" id="R-variant-style">
+    <link href="/css/variant.css?1738202701" rel="stylesheet">
+    <link href="/css/print.css?1738202701" rel="stylesheet" media="print">
+    <link href="/css/ie.css?1738202701" rel="stylesheet">
+    <script src="/js/url.js?1738202701"></script>
+    <script src="/js/variant.js?1738202701"></script>
+    <script>
+      // hack to let hugo tell us how to get to the root when using relativeURLs, it needs to be called *url= for it to do its magic:
+      // https://github.com/gohugoio/hugo/blob/145b3fcce35fbac25c7033c91c1b7ae6d1179da8/transform/urlreplacers/absurlreplacer.go#L72
+      window.index_js_url="/index.search.js";
+      var root_url="/";
+      var baseUri=root_url.replace(/\/$/, '');
+      // translations
+      window.T_Copy_to_clipboard = 'Copy to clipboard';
+      window.T_Copied_to_clipboard = 'Copied to clipboard!';
+      window.T_Copy_link_to_clipboard = 'Copy link to clipboard';
+      window.T_Link_copied_to_clipboard = 'Copied link to clipboard!';
+      window.T_Reset_view = 'Reset view';
+      window.T_View_reset = 'View reset!';
+      window.T_No_results_found = 'No results found for \u0022{0}\u0022';
+      window.T_N_results_found = '{1} results found for \u0022{0}\u0022';
+      // some further base stuff
+      var baseUriFull='http:\/\/localhost:1313/';
+      window.variants && variants.init( [ 'relearn-dark', 'zen-dark', 'relearn-bright', 'relearn-light', 'zen-light', 'neon', 'learn', 'blue', 'green', 'red' ] );
+    </script>
+  </head>
+  <body class="mobile-support html" data-url="/walkthroughs/red-team-fundamentals/index.html">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar">
+        <div class="topbar-wrapper">
+          <div class="topbar-sidebar-divider"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+              <button class="topbar-control" onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)">
+                <i class="fa-fw fas fa-bars"></i>
+              </button>
+            </div>
+            <div class="topbar-button topbar-button-toc" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)">
+                <i class="fa-fw fas fa-list-alt"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper"><nav class="TableOfContents">
+  <ul>
+    <li><a href="#task-1-introduction">Task 1: Introduction</a></li>
+    <li><a href="#task-2-vulnerability-assessment-and-penetration-tests-limitations">Task 2: Vulnerability Assessment and Penetration Tests Limitations</a></li>
+    <li><a href="#task-3-red-team-engagements">Task 3: Red Team Engagements</a></li>
+    <li><a href="#task-4-teams-and-functions-of-an-engagement">Task 4: Teams and Functions of an Engagement</a></li>
+    <li><a href="#task-5-engagement-structure">Task 5: Engagement Structure</a></li>
+    <li><a href="#task-6-overview-of-a-red-team-engagement">Task 6: Overview of a Red Team Engagement</a></li>
+    <li><a href="#task-7-conclusion">Task 7: Conclusion</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="topbar-breadcrumbs highlightable">
+            Red Team Fundamentals - TryHackMe
+          </span>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More">
+                <i class="fa-fw fas fa-ellipsis-v"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable default" tabindex="-1">
+        <div class="flex-block-wrapper">
+          <article class="default">
+            <header class="headline">
+<div class=" taxonomy-tags term-list cstyle  tags" title="Tags" style="--VARIABLE-TAGS-BG-color: var(--INTERNAL-TAG-BG-color);">
+  <ul>
+    <li><a class="term-link" href="/tags/fundamentals/index.html">Fundamentals</a></li>
+    <li><a class="term-link" href="/tags/red-team/index.html">Red Team</a></li>
+    <li><a class="term-link" href="/tags/tryhackme/index.html">TryHackMe</a></li>
+  </ul>
+</div>
+            </header>
+<h1 id="red-team-fundamentals---tryhackme">Red Team Fundamentals - TryHackMe</h1>
+
+<p><a href="#R-image-e53f7ee32aa49dc9ce4bbb8d4f9e6aba" class="lightbox-link"><img src="/walkthroughs/red-team-fundamentals/logo.png" alt="Logo" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-e53f7ee32aa49dc9ce4bbb8d4f9e6aba"><img src="/walkthroughs/red-team-fundamentals/logo.png" alt="Logo" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Date written: January 2024   <br>
+Date published: January 2024</p>
+<h2 id="task-1-introduction">Task 1: Introduction</h2>
+<p>Room objectives:</p>
+<ul>
+<li>Learn about the basics of red team engagements</li>
+<li>Identify the main components and stakeholders involved in a red team engagement</li>
+<li>Understand the main differences between red teaming and other types of cybersecurity engagements</li>
+</ul>
+<p>Room prerequisites:</p>
+<ul>
+<li>Before beginning this room, familiarity with general hacking techniques is required. Although not strictly necessary, completing the Jr. Penetration Tester Learning Path is recommended.</li>
+</ul>
+<blockquote>
+<p>Click to continue to the next task</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<h2 id="task-2-vulnerability-assessment-and-penetration-tests-limitations">Task 2: Vulnerability Assessment and Penetration Tests Limitations</h2>
+<p>Vulnerability Assessments:</p>
+<ul>
+<li>The simplest form of security assessment.</li>
+<li>Main goal is to  identify as many vulnerabilities as possible.</li>
+<li>May not discover active attacks/attackers.</li>
+<li>Mostly done with automated tools.</li>
+<li>Little technical knowledge needed.</li>
+<li>Does not exploit any of the vulnerabilities.</li>
+</ul>
+<p>Penetration Tests:</p>
+<ul>
+<li>Scanning for vulnerabilities and then exploiting them.</li>
+<li>Need to understand how vulnerabilities impact the network as a whole. So you need to understand how the network works as a whole.</li>
+<li>Post exploitation steps are also used to gain additional useful knowledge that could allow for additional exploits.</li>
+<li>Will be able to detect real attack paths an attacker could take.</li>
+<li>Can be a &ldquo;loud&rdquo; test.</li>
+</ul>
+<blockquote>
+<p>Would vulnerability assessments prepare us to detect a real attacker on our networks? (Yay/Nay)</p>
+</blockquote>
+<blockquote>
+<p>Answer: Nay</p>
+</blockquote>
+<blockquote>
+<p>During a penetration test, are you concerned about being detected by the client? (Yay/Nay)</p>
+</blockquote>
+<blockquote>
+<p>Answer: Nay</p>
+</blockquote>
+<blockquote>
+<p>Highly organised groups of skilled attackers are nowadays referred to as &hellip;</p>
+</blockquote>
+<blockquote>
+<p>Answer: Advanced Persistent Threats</p>
+</blockquote>
+<h2 id="task-3-red-team-engagements">Task 3: Red Team Engagements</h2>
+<p>Red Team Engagements:</p>
+<ul>
+<li>Starts with clear and defined goals.</li>
+<li>Tests the defensive (blue) team&rsquo;s capabilities at detecting and responding to a real attack(er).</li>
+<li>The key is to remain undetected and not perform any &ldquo;loud&rdquo; testing.</li>
+<li>TTP simulation.</li>
+<li>Can run in several ways. Full engagement, assumed breach, and a table top exercise.</li>
+</ul>
+<blockquote>
+<p>The goals of a red team engagement will often be referred to as flags or&hellip;</p>
+</blockquote>
+<blockquote>
+<p>Answer: crown jewels</p>
+</blockquote>
+<blockquote>
+<p>During a red team engagement, common methods used by attackers are emulated against the target. Such methods are usually called TTPs. What does TTP stand for?</p>
+</blockquote>
+<blockquote>
+<p>Answer: Tactics, Techniques and Procedures</p>
+</blockquote>
+<blockquote>
+<p>The main objective of a red team engagement is to detect as many vulnerabilities in as many hosts as possible (Yay/Nay)</p>
+</blockquote>
+<blockquote>
+<p>Answer: Nay</p>
+</blockquote>
+<h2 id="task-4-teams-and-functions-of-an-engagement">Task 4: Teams and Functions of an Engagement</h2>
+<p>Teams or cells:</p>
+<ul>
+<li>Red cell - the component that makes up the offensive portion of a red team engagement that simulates a given target&rsquo;s strategic and tactical responses.
+<ul>
+<li>Red Team Lead - Plans and organizes engagements at a high level—delegates, assistant lead, and operators engagement assignments.</li>
+<li>Red Team Assistant Lead - Assists the team lead in overseeing engagement operations and operators. Can also assist in writing engagement plans and documentation if needed.</li>
+<li>Red Team Operator - Executes assignments delegated by team leads. Interpret and analyze engagement plans from team leads.</li>
+</ul>
+</li>
+<li>Blue cell - the opposite side of red. It includes all the components defending a target network. The blue cell is typically comprised of blue team members, defenders, internal staff, and an organization&rsquo;s management.</li>
+<li>White cell - Serves as referee between red cell activities and blue cell responses during an engagement. Controls the engagement environment/network. Monitors adherence to the ROE. Coordinates activities required to achieve engagement goals. Correlates red cell activities with defensive actions. Ensures the engagement is conducted without bias to either side.</li>
+<li>Learn more 
+<a href="https://redteam.guide/docs/definitions" target="_blank">here</a></li>
+</ul>
+<blockquote>
+<p>What cell is responsible for the offensive operations of an engagement?</p>
+</blockquote>
+<blockquote>
+<p>Answer: Red cell</p>
+</blockquote>
+<blockquote>
+<p>What cell is the trusted agent considered part of?</p>
+</blockquote>
+<blockquote>
+<p>Answer: White cell</p>
+</blockquote>
+<h2 id="task-5-engagement-structure">Task 5: Engagement Structure</h2>
+<p>Reconnaissance:</p>
+<ul>
+<li>Obtain information on the target</li>
+<li>Harvesting emails, OSINT</li>
+</ul>
+<p>Weaponization:</p>
+<ul>
+<li>Combine the objective with an exploit. Commonly results in a deliverable payload.</li>
+<li>Exploit with backdoor, malicious office document</li>
+</ul>
+<p>Delivery:</p>
+<ul>
+<li>How will the weaponized function be delivered to the target</li>
+<li>Email, web, USB</li>
+</ul>
+<p>Exploitation:</p>
+<ul>
+<li>Exploit the target&rsquo;s system to execute code</li>
+<li>MS17-010, Zero-Logon, etc.</li>
+</ul>
+<p>Installation:</p>
+<ul>
+<li>Install malware or other tooling</li>
+<li>Mimikatz, Rubeus, etc.</li>
+</ul>
+<p>Command &amp; Control:</p>
+<ul>
+<li>Control the compromised asset from a remote central controller</li>
+<li>Empire, Cobalt Strike, etc.</li>
+</ul>
+<p>Actions on Objectives:</p>
+<ul>
+<li>Any end objectives: ransomware, data exfiltration, etc.</li>
+<li>Conti, LockBit2.0, etc.</li>
+</ul>
+<blockquote>
+<p>If an adversary deployed Mimikatz on a target machine, where would they be placed in the Lockheed Martin cyber kill chain?</p>
+</blockquote>
+<blockquote>
+<p>Answer: Installation</p>
+</blockquote>
+<blockquote>
+<p>What technique&rsquo;s purpose is to exploit the target&rsquo;s system to execute code?</p>
+</blockquote>
+<blockquote>
+<p>Answer: Exploitation</p>
+</blockquote>
+<h2 id="task-6-overview-of-a-red-team-engagement">Task 6: Overview of a Red Team Engagement</h2>
+<blockquote>
+<p>Click the &ldquo;View Site&rdquo; button and follow the example engagement to get the flag</p>
+</blockquote>
+<blockquote>
+<p>Answer: Click through the engagement site to find the flag.</p>
+</blockquote>
+<h2 id="task-7-conclusion">Task 7: Conclusion</h2>
+<blockquote>
+<p>Read the above and continue learning!</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed.</p>
+</blockquote>
+
+            <footer class="footline">
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation">
+        <div id="R-header" class="default-animation">
+<a href="/index.html">
+    <img src="/images/logo.png" 
+        width="200"
+        height="120"
+        alt="Website logo of hacker cat"/>
+    <h2 style="padding:0; margin:0;">H1roBytes</h2>
+</a>
+        </div>
+        <div class="searchbox default-animation">
+          <i class="fas fa-search" title="Search (CTRL+ALT+f)"></i>
+          <label class="a11y-only" for="R-search-by">Search</label>
+          <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+          <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
+        </div>
+        <script>
+          var contentLangs=['en'];
+        </script>
+        <script src="/js/auto-complete.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.stemmer.support.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.multi.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.en.min.js?1738202701" defer></script>
+        <script src="/js/search.js?1738202701" defer></script>
+      </div>
+      <div id="R-homelinks" class="default-animation">
+        <hr class="padding">
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div id="R-topics">
+          <ul class="enlarge morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/index.html" class="parent "><input type="checkbox" id="R-section-a25630664138ae6b33064dc3d9c0b30e" aria-controls="R-subsections-a25630664138ae6b33064dc3d9c0b30e" checked><label for="R-section-a25630664138ae6b33064dc3d9c0b30e"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Walkthroughs</span></label><a class="padding" href="/walkthroughs/index.html">Walkthroughs</a><ul id="R-subsections-a25630664138ae6b33064dc3d9c0b30e" class="morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/2023-advent-of-cyber/index.html" class=""><a class="padding" href="/walkthroughs/2023-advent-of-cyber/index.html">Advent of Cyber 2023! - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/cozyhosting/index.html" class=""><a class="padding" href="/walkthroughs/cozyhosting/index.html">Cozy Hosting - Hack The Box</a></li>
+          <li data-nav-id="/walkthroughs/kenobi/index.html" class=""><a class="padding" href="/walkthroughs/kenobi/index.html">Kenobi - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/nibbles/index.html" class=""><a class="padding" href="/walkthroughs/nibbles/index.html">Nibbles - HTB</a></li>
+          <li data-nav-id="/walkthroughs/red-team-engagements/index.html" class=""><a class="padding" href="/walkthroughs/red-team-engagements/index.html">Red Team Engagements - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/red-team-fundamentals/index.html" class="active"><a class="padding" href="/walkthroughs/red-team-fundamentals/index.html">Red Team Fundamentals - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/rootme/index.html" class=""><a class="padding" href="/walkthroughs/rootme/index.html">RootMe - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/steel-mountain/index.html" class=""><a class="padding" href="/walkthroughs/steel-mountain/index.html">Steel Mountain - TryHackMe</a></li></ul></li>
+          <li data-nav-id="/resources/index.html" class=""><input type="checkbox" id="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24" aria-controls="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24"><label for="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Resources</span></label><a class="padding" href="/resources/index.html">Resources</a><ul id="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24" class="morespace collapsible-menu">
+          <li data-nav-id="/resources/active-directory-enumeration/index.html" class=""><a class="padding" href="/resources/active-directory-enumeration/index.html">Active Directory Enumeration</a></li></ul></li>
+          <li data-nav-id="/contact/index.html" class=""><a class="padding" href="/contact/index.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter"></div>
+        <div id="R-menu-footer">
+          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter">
+          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks showVariantSwitch">
+            <ul>
+              <li id="R-select-language-container" class="footerLangSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-language fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-language">Language</label>
+                    <select id="R-select-language" onchange="location = baseUri + this.value;">
+                      <option id="R-en" value="/walkthroughs/red-team-fundamentals/index.html" lang="en" selected></option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+              <li id="R-select-variant-container" class="footerVariantSwitch showVariantSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-paint-brush fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-variant">Theme</label>
+                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
+                      <option id="R-relearn-dark" value="relearn-dark" selected>Relearn Dark</option>
+                      <option id="R-zen-dark" value="zen-dark">Zen Dark</option>
+                      <option id="R-relearn-bright" value="relearn-bright">Relearn Bright</option>
+                      <option id="R-relearn-light" value="relearn-light">Relearn Light</option>
+                      <option id="R-zen-light" value="zen-light">Zen Light</option>
+                      <option id="R-neon" value="neon">Neon</option>
+                      <option id="R-learn" value="learn">Learn</option>
+                      <option id="R-blue" value="blue">Blue</option>
+                      <option id="R-green" value="green">Green</option>
+                      <option id="R-red" value="red">Red</option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                <script>window.variants && variants.markSelectedVariant();</script>
+              </li>
+              <li class="footerVisitedLinks">
+                <div class="padding menu-control">
+                  <i class="fas fa-history fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <button onclick="clearHistory();">Clear History</button>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div id="R-footer" class="footerFooter showFooter">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://gohugo.io/">Hugo</a></p>
+		<p><a href="https://hirobytes.xyz/disclaimer">Disclaimer</a></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <script src="/js/clipboard.min.js?1738202701" defer></script>
+    <script src="/js/perfect-scrollbar.min.js?1738202701" defer></script>
+    <script>
+      function useMathJax( config ){
+        if( !Object.assign ){
+          
+          return;
+        }
+        window.MathJax = Object.assign( window.MathJax || {}, {
+          loader: {
+            load: ['[tex]/mhchem']
+          },
+          startup: {
+            elements: [
+              '.math'
+            ]
+          },
+          tex: {
+            inlineMath: [
+              ['$', '$'], 
+              ['\\(', '\\)']
+            ]
+          },
+          options: {
+            enableMenu: false 
+          }
+        }, config );
+      }
+      useMathJax( JSON.parse( null ) );
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="/js/d3/d3-color.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-dispatch.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-drag.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-ease.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-interpolate.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-selection.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-timer.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-transition.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-zoom.min.js?1738202701" defer></script>
+    <script src="/js/js-yaml.min.js?1738202701" defer></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" defer></script>
+    <script>
+      window.themeUseMermaid = JSON.parse( null );
+    </script>
+    <script>window.noZensmooth = true;</script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js" defer></script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js" defer></script>
+    <script>
+      window.themeUseOpenapi = { css: "https://unpkg.com/swagger-ui-dist/swagger-ui.css", assetsBuster:  1738202701  };
+    </script>
+    <script src="/js/theme.js?1738202701" defer></script>
+  </body>
+</html>

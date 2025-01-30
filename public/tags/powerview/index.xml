@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>PowerView on H1roBytes</title>
+    <link>http://localhost:1313/tags/powerview/index.html</link>
+    <description>Recent content in PowerView on H1roBytes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="http://localhost:1313/tags/powerview/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Active Directory Enumeration</title>
+      <link>http://localhost:1313/resources/active-directory-enumeration/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/resources/active-directory-enumeration/index.html</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;#R-image-04ac24751fe7835f589514be50db7a6c&#34; class=&#34;lightbox-link&#34;&gt;&lt;img src=&#34;http://localhost:1313/resources/active-directory-enumeration/logo.jpg&#34; alt=&#34;Logo&#34; class=&#34;figure-image noborder lightbox noshadow&#34; style=&#34;height: auto; width: auto;&#34; loading=&#34;lazy&#34;&gt;&lt;/a&gt;
+&lt;a href=&#34;javascript:history.back();&#34; class=&#34;lightbox-back&#34; id=&#34;R-image-04ac24751fe7835f589514be50db7a6c&#34;&gt;&lt;img src=&#34;http://localhost:1313/resources/active-directory-enumeration/logo.jpg&#34; alt=&#34;Logo&#34; class=&#34;lightbox-image noborder lightbox noshadow&#34; loading=&#34;lazy&#34;&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Date written: February 2024  &lt;br&gt;
+Date published: April 2024&lt;/p&gt;
+&lt;h2 id=&#34;disclaimer&#34;&gt;Disclaimer&lt;/h2&gt;
+&lt;p&gt;Please see the disclaimer 
+&lt;a href=&#34;https://hirobytes.xyz/disclaimer/&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&#34;tools&#34;&gt;Tools&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[!Note] Hacktricks also has a page about this
+
+&lt;a href=&#34;https://book.hacktricks.xyz/windows-hardening/basic-powershell-for-pentesters/powerview&#34; target=&#34;_blank&#34;&gt;https://book.hacktricks.xyz/windows-hardening/basic-powershell-for-pentesters/powerview&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;And S1ckB0y1337 PayloadAllTheThings-like
+
+&lt;a href=&#34;https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet?tab=readme-ov-file#using-powerview&#34; target=&#34;_blank&#34;&gt;https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet?tab=readme-ov-file#using-powerview&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;ActiveDirectory PowerShell module
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;https://learn.microsoft.com/en-us/powershell/module/activedirectory/?view=windowsserver2022-ps&#34; target=&#34;_blank&#34;&gt;https://learn.microsoft.com/en-us/powershell/module/activedirectory/?view=windowsserver2022-ps&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;a href=&#34;https://github.com/samratashok/ADModule&#34; target=&#34;_blank&#34;&gt;https://github.com/samratashok/ADModule&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;wrap-code highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Import ADModule&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Import-Module C:\AD\Tools\ADModule-master\Microsoft.ActiveDirectory.Management.dll
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Import-Module C:\AD\Tools\ADModule-master\ActiveDirectory\ActiveDirectory.psd1&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Bloodhound
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;https://github.com/BloodHoundAD/BloodHound&#34; target=&#34;_blank&#34;&gt;https://github.com/BloodHoundAD/BloodHound&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;PowerView
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;https://github.com/ZeroDayLab/PowerSploit/blob/master/Recon/PowerView.ps1&#34; target=&#34;_blank&#34;&gt;https://github.com/ZeroDayLab/PowerSploit/blob/master/Recon/PowerView.ps1&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;SharpView - Doesn&amp;rsquo;t support filtering using Pipeline
+&lt;ul&gt;
+&lt;li&gt;
+&lt;a href=&#34;https://github.com/tevora-threat/SharpView/&#34; target=&#34;_blank&#34;&gt;https://github.com/tevora-threat/SharpView/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;domain-enumeration&#34;&gt;Domain Enumeration&lt;/h2&gt;
+&lt;h3 id=&#34;powerview&#34;&gt;PowerView&lt;/h3&gt;
+&lt;h4 id=&#34;domains-and-dcs&#34;&gt;Domains and DCs&lt;/h4&gt;
+&lt;div class=&#34;wrap-code highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get current or specified domain (General enumeration)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-Domain 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-Domain -Domain &amp;lt;DomainName&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get domain SID for the current domain&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainSID 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get domain policy for the current domain&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainPolicyData 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get domain controllers for the current or specified domain&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainController 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainController -Domain &amp;lt;DomainName&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;users&#34;&gt;Users&lt;/h4&gt;
+&lt;div class=&#34;wrap-code highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get a list of users in the current domain&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainUser 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Search for a specific user in the current domain and display all or specified properties. &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainUser -Identity &amp;lt;UserName&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainUser -Identity &amp;lt;UserName&amp;gt; -Properties * &lt;span style=&#34;color:#75715e&#34;&gt;# all properties&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainUser -Properties samaccountname,logonCount &lt;span style=&#34;color:#75715e&#34;&gt;# specified properties&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Lists only the &amp;#34;samaccountname&amp;#34; property for domain users. Could replace with any User field.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainUser | select -ExpandProperty samaccountname 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Search for a string in a user&amp;#39;s attributes.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainUser -LDAPFilter &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Description=*built*&amp;#34;&lt;/span&gt; |  Select name,Description &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;logon-and-sessions&#34;&gt;Logon and Sessions&lt;/h4&gt;
+&lt;div class=&#34;wrap-code highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get actively logged users on a computer (needs local admin rights on  the target)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-NetLoggedon -ComputerName &amp;lt;ComputerName&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get locally logged users on a computer (needs remote registry on the target - started by-default on server OS)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-LoggedonLocal -ComputerName &amp;lt;ComputerName&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get the last logged user on a computer (needs administrative rights and  remote registry on the target)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-LastLoggedOn -ComputerName &amp;lt;ComputerName&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# Lists the current network session properties&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-NetSession 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Lists current users that are logged onto the domain&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-NetLoggedon &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;computers&#34;&gt;Computers&lt;/h4&gt;
+&lt;div class=&#34;wrap-code highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get a list of computers in the current domain. Can only show dnshostname/specific fields. &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainComputer 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainComputer | select dnshostname 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Lists all computers in the current domain with the operating system containing Server 2022&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainComputer -OperatingSystem &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;*Server 2022*&amp;#34;&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Gets all current domain computers and also checks to see if the host is up. &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainComputer -Ping &lt;span style=&#34;color:#75715e&#34;&gt;# Gets all current domain computers and also checks to see if the host is up. &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;shared-files-and-folder&#34;&gt;Shared Files and Folder&lt;/h4&gt;
+&lt;div class=&#34;wrap-code highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Find shares on hosts in current domain.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Invoke-ShareFinder -Verbose 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Find sensitive files on computers in the domain&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Invoke-FileFinder -Verbose 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get all fileservers of the domain&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-NetFileServer &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;groups&#34;&gt;Groups&lt;/h4&gt;
+&lt;div class=&#34;wrap-code highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get all the groups in the current or specified domain&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGroup 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGroup -Domain &amp;lt;targetdomain&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGroup | select Name &lt;span style=&#34;color:#75715e&#34;&gt;# Lists all groups in the current domain, only showing Name. &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get all groups containing the words like &amp;#34;admin&amp;#34; in group name. Use quotes instead of * for more refined results.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGroup *admin* 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get all the members of the specified group on the current or specified domain&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGroupMember -Identity &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;lt;GroupName&amp;gt;&amp;#34;&lt;/span&gt; -Recurse 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGroupMember -Identity &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;lt;GroupName&amp;gt;&amp;#34;&lt;/span&gt; -Domain &amp;lt;DomainName&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get the group membership for specific user&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGroup -UserName &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;lt;UserName&amp;gt;&amp;#34;&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Lists all local groups on the machine with in the current or specified domain. Requireds admin on non-DC mahcines.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-NetLocalGroup -ComputerName &amp;lt;ComputerName&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-NetLocalGroupMember -ComputerName &amp;lt;ComputerName&amp;gt; -GroupName &amp;lt;GroupName&amp;gt; &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;gpo&#34;&gt;GPO&lt;/h4&gt;
+&lt;div class=&#34;wrap-code highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get list of GPO in current domain. Can also specify a single computer. &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGPO 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGPO -ComputerIdentity &amp;lt;ComputerName&amp;gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get GPO(s) that use Restricted Groups or groups.xml for interesting users&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGPOLocalGroup 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get users that are in a local group of a machine using GPO&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGPOComputerLocalGroupMapping -ComputerIdentity &amp;lt;ComputerName&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# Get machines where the given user is member of a specific group&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGPOUserLocalGroupMapping -Identity &amp;lt;UserName&amp;gt; - Verbose &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;ou&#34;&gt;OU&lt;/h4&gt;
+&lt;div class=&#34;wrap-code highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-powershell&#34; data-lang=&#34;powershell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# List all OUs in current Domain. Can filter and only show name&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainOU 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainOU | select -ExpandProperty name 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# List all computers in the OU.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;(Get-DomainOU -Identity &amp;lt;OUName&amp;gt;).distinguishedname | %{Get-DomainComputer -SearchBase $_} | select name 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# Shows the gplink for the StudentMachines OU. Used to enumerate GPO of that OU. &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;(Get-DomainOU -Identity &amp;lt;OUName&amp;gt;).gplink
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# Enumerates the GPOs on the StudentMachines OU.&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGPO -Identity &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;{7478F170-6A0C-490C-B355-9E4618BC785D}&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# The above two commands into 1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Get-DomainGPO -Identity (Get-DomainOU -Identity StudentMachines).gplink.substring(&lt;span style=&#34;color:#ae81ff&#34;&gt;11&lt;/span&gt;,(Get-DomainOU -Identity StudentMachines).gplink.length-&lt;span style=&#34;color:#ae81ff&#34;&gt;72&lt;/span&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;code&gt;(Get-DomainOU -Identity StudentMachines).distinguishedname | %{Get-DomainComputer -SearchBase $_} | select name&lt;/code&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

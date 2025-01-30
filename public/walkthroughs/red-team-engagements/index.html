@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.142.0">
+    <meta name="generator" content="Relearn 5.22.1+tip">
+    <meta name="description" content="Learn the steps and procedures of a red team engagement, including planning, frameworks, and documentation.">
+    <meta name="author" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/walkthroughs/Red%20Team%20Engagements/logo.png">
+  <meta name="twitter:title" content="Red Team Engagements - TryHackMe">
+  <meta name="twitter:description" content="Learn the steps and procedures of a red team engagement, including planning, frameworks, and documentation."><meta property="og:url" content="http://localhost:1313/walkthroughs/red-team-engagements/">
+  <meta property="og:site_name" content="H1roBytes">
+  <meta property="og:title" content="Red Team Engagements - TryHackMe">
+  <meta property="og:description" content="Learn the steps and procedures of a red team engagement, including planning, frameworks, and documentation.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+    <meta property="og:image" content="http://localhost:1313/walkthroughs/Red%20Team%20Engagements/logo.png">
+    <title>Red Team Engagements - TryHackMe - H1roBytes</title>
+    <link href="/walkthroughs/red-team-engagements/index.xml" rel="alternate" type="application/rss+xml" title="Red Team Engagements - TryHackMe - H1roBytes">
+    <link href="/images/logo.png?1738202701" rel="icon" type="image/png">
+    <!-- https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use -->
+    <link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/nucleus.css?1738202701" rel="stylesheet">
+    <link href="/css/auto-complete.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/auto-complete.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/perfect-scrollbar.min.css?1738202701" rel="stylesheet">
+    <link href="/css/fonts.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fonts.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/theme.css?1738202701" rel="stylesheet">
+    <link href="/css/theme-relearn-dark.css?1738202701" rel="stylesheet" id="R-variant-style">
+    <link href="/css/variant.css?1738202701" rel="stylesheet">
+    <link href="/css/print.css?1738202701" rel="stylesheet" media="print">
+    <link href="/css/ie.css?1738202701" rel="stylesheet">
+    <script src="/js/url.js?1738202701"></script>
+    <script src="/js/variant.js?1738202701"></script>
+    <script>
+      // hack to let hugo tell us how to get to the root when using relativeURLs, it needs to be called *url= for it to do its magic:
+      // https://github.com/gohugoio/hugo/blob/145b3fcce35fbac25c7033c91c1b7ae6d1179da8/transform/urlreplacers/absurlreplacer.go#L72
+      window.index_js_url="/index.search.js";
+      var root_url="/";
+      var baseUri=root_url.replace(/\/$/, '');
+      // translations
+      window.T_Copy_to_clipboard = 'Copy to clipboard';
+      window.T_Copied_to_clipboard = 'Copied to clipboard!';
+      window.T_Copy_link_to_clipboard = 'Copy link to clipboard';
+      window.T_Link_copied_to_clipboard = 'Copied link to clipboard!';
+      window.T_Reset_view = 'Reset view';
+      window.T_View_reset = 'View reset!';
+      window.T_No_results_found = 'No results found for \u0022{0}\u0022';
+      window.T_N_results_found = '{1} results found for \u0022{0}\u0022';
+      // some further base stuff
+      var baseUriFull='http:\/\/localhost:1313/';
+      window.variants && variants.init( [ 'relearn-dark', 'zen-dark', 'relearn-bright', 'relearn-light', 'zen-light', 'neon', 'learn', 'blue', 'green', 'red' ] );
+    </script>
+  </head>
+  <body class="mobile-support html" data-url="/walkthroughs/red-team-engagements/index.html">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar">
+        <div class="topbar-wrapper">
+          <div class="topbar-sidebar-divider"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+              <button class="topbar-control" onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)">
+                <i class="fa-fw fas fa-bars"></i>
+              </button>
+            </div>
+            <div class="topbar-button topbar-button-toc" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)">
+                <i class="fa-fw fas fa-list-alt"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper"><nav class="TableOfContents">
+  <ul>
+    <li><a href="#task-1-introduction">Task 1: Introduction</a></li>
+    <li><a href="#task-2-defining-scope-and-objectives">Task 2: Defining Scope and Objectives</a></li>
+    <li><a href="#task-3-rules-of-engagement">Task 3: Rules of Engagement</a></li>
+    <li><a href="#task-4-campaign-planning">Task 4: Campaign Planning</a></li>
+    <li><a href="#task-5-engagement-documentation">Task 5: Engagement Documentation</a></li>
+    <li><a href="#task-6-concept-of-operations">Task 6: Concept of Operations</a></li>
+    <li><a href="#task-7-resource-plan">Task 7: Resource Plan</a></li>
+    <li><a href="#task-8-operations-plan">Task 8: Operations Plan</a></li>
+    <li><a href="#task-9-mission-plan">Task 9: Mission Plan</a></li>
+    <li><a href="#task-10-conclusion">Task 10: Conclusion</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="topbar-breadcrumbs highlightable">
+            Red Team Engagements - TryHackMe
+          </span>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More">
+                <i class="fa-fw fas fa-ellipsis-v"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable default" tabindex="-1">
+        <div class="flex-block-wrapper">
+          <article class="default">
+            <header class="headline">
+<div class=" taxonomy-tags term-list cstyle  tags" title="Tags" style="--VARIABLE-TAGS-BG-color: var(--INTERNAL-TAG-BG-color);">
+  <ul>
+    <li><a class="term-link" href="/tags/red-team/index.html">Red Team</a></li>
+    <li><a class="term-link" href="/tags/tryhackme/index.html">TryHackMe</a></li>
+  </ul>
+</div>
+            </header>
+<h1 id="red-team-engagements---tryhackme">Red Team Engagements - TryHackMe</h1>
+
+<p><a href="#R-image-0fa902c3898854c368ac8b9013098038" class="lightbox-link"><img src="/walkthroughs/red-team-engagements/logo.png" alt="Logo" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-0fa902c3898854c368ac8b9013098038"><img src="/walkthroughs/red-team-engagements/logo.png" alt="Logo" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Date written: January 2024   <br>
+Date published: January 2024</p>
+<h2 id="task-1-introduction">Task 1: Introduction</h2>
+<p>Room objectives:</p>
+<ul>
+<li>Understand components and functions of a red team engagement.</li>
+<li>Learn how to properly plan an engagement based of needs and resources available and TTPs.</li>
+<li>Understand how to write engagement documentation in accordance to client objectives.</li>
+</ul>
+<p>Room prerequisites:</p>
+<ul>
+<li>None</li>
+</ul>
+<blockquote>
+<p>Read the above and continue to the next task.</p>
+<p>Answer: No answer needed</p>
+</blockquote>
+<h2 id="task-2-defining-scope-and-objectives">Task 2: Defining Scope and Objectives</h2>
+<blockquote>
+<p>Read the example client objectives and answer the questions below.</p>
+<p>Answer: No answer needed.</p>
+</blockquote>
+<p>Below is an example of the client objectives of a mature organization with a strong security posture.</p>
+<p>Example 1 - Global Enterprises:</p>
+<p>Objectives:</p>
+<ul>
+<li>Identify system misconfigurations and network weaknesses.
+<ul>
+<li>Focus on exterior systems.</li>
+</ul>
+</li>
+<li>Determine the effectiveness of endpoint detection and response systems.</li>
+<li>Evaluate overall security posture and response.
+<ul>
+<li>SIEM and detection measures.</li>
+<li>Remediation.</li>
+<li>Segmentation of DMZ and internal servers.</li>
+</ul>
+</li>
+<li>Use of white cards is permitted depending on downtime and length.</li>
+<li>Evaluate the impact of data exposure and exfiltration.</li>
+</ul>
+<p>Scope:</p>
+<ul>
+<li>System downtime is not permitted under any circumstances.
+<ul>
+<li>Any form of DDoS or DoS is prohibited.</li>
+<li>Use of any harmful malware is prohibited; this includes ransomware and other variations.</li>
+</ul>
+</li>
+<li>xfiltration of PII is prohibited. Use arbitrary exfiltration data.</li>
+<li>Attacks against systems within 10.0.4.0/22 are permitted.</li>
+<li>Attacks against systems within 10.0.12.0/22 are prohibited.</li>
+<li>Bean Enterprises will closely monitor interactions with the DMZ and critical/production systems.
+<ul>
+<li>Any interaction with &ldquo;*.bethechange.xyz&rdquo; is prohibited.</li>
+<li>All interaction with &ldquo;*.globalenterprises.thm&rdquo; is permitted.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<blockquote>
+<p>What CIDR range is permitted to be attacked?</p>
+<p>Answer: 10.0.4.0/22</p>
+</blockquote>
+<blockquote>
+<p>Is the use of white cards permitted? (Y/N)</p>
+<p>Answer: Y</p>
+</blockquote>
+<p>Learn a little more about what white cards and are how they are used 
+<a href="https://sixdub.medium.com/common-ground-part-1-red-team-history-overview-82803bbdc975" target="_blank">here</a>, but it is essentially a simulated portion of the test to overcome limitations and allow continued testing.</p>
+<blockquote>
+<p>Are you permitted to access &ldquo;*.bethechange.xyz?&rdquo; (Y/N)</p>
+<p>Answer: N</p>
+</blockquote>
+<h2 id="task-3-rules-of-engagement">Task 3: Rules of Engagement</h2>
+<p>Sections of Rules of Engagements or RoE:</p>
+<ul>
+<li>Executive Summary
+<ul>
+<li>Overarching summary of all contents and authorization within RoE document</li>
+</ul>
+</li>
+<li>Purpose
+<ul>
+<li>Defines why the RoE document is used</li>
+</ul>
+</li>
+<li>References
+<ul>
+<li>Any references used throughout the RoE document (HIPAA, ISO, etc.)</li>
+</ul>
+</li>
+<li>Scope
+<ul>
+<li>Statement of the agreement to restrictions and guidelines</li>
+</ul>
+</li>
+<li>Definitions
+<ul>
+<li>Definitions of technical terms used throughout the RoE document</li>
+</ul>
+</li>
+<li>Rules of Engagement and Support Agreement
+<ul>
+<li>Defines obligations of both parties and general technical expectations of engagement conduct</li>
+</ul>
+</li>
+<li>Provisions
+<ul>
+<li>Define exceptions and additional information from the Rules of Engagement</li>
+</ul>
+</li>
+<li>Requirements, Restrictions, and Authority
+<ul>
+<li>Define specific expectations of the red team cell</li>
+</ul>
+</li>
+<li>Ground Rules
+<ul>
+<li>Define limitations of the red team cell&rsquo;s interactions</li>
+</ul>
+</li>
+<li>Resolution of Issues/Points of Contact
+<ul>
+<li>Contains all essential personnel involved in an engagement</li>
+</ul>
+</li>
+<li>Authorization
+<ul>
+<li>Statement of authorization for the engagement</li>
+</ul>
+</li>
+<li>Approval
+<ul>
+<li>Signatures from both parties approving all subsections of the preceding document</li>
+</ul>
+</li>
+<li>Appendix
+<ul>
+<li>Any further information from preceding subsections</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Download the sample rules of engagement from the task files.
+Once downloaded, read the sample document and answer the questions below.</p>
+<p>Answer: No answer needed</p>
+</blockquote>
+<blockquote>
+<p>How many explicit restriction are specified?</p>
+<p>Answer: 3</p>
+</blockquote>
+<blockquote>
+<p>What is the first access type mentioned in the document?</p>
+<p>Answer: Phishing</p>
+</blockquote>
+<blockquote>
+<p>Is the red team permitted to attack 192.168.1.0/24? (Y/N)</p>
+<p>Answer: N</p>
+</blockquote>
+<h2 id="task-4-campaign-planning">Task 4: Campaign Planning</h2>
+<p>Type of Plans:</p>
+<ul>
+<li>Engagement Plan
+<ul>
+<li>An overarching description of technical requirements of the red team.</li>
+<li>CONOPS, Resource and Personnel Requirements, Timelines</li>
+</ul>
+</li>
+<li>Operations Plan
+<ul>
+<li>An expansion of the Engagement Plan. Goes further into specifics of each detail.</li>
+<li>Operators, Known Information, Responsibilities, etc.</li>
+</ul>
+</li>
+<li>Mission Plan
+<ul>
+<li>The exact commands to run and execution time of the engagement.</li>
+<li>Commands to run, Time Objectives, Responsible Operator, etc.</li>
+</ul>
+</li>
+<li>Remediation Plan
+<ul>
+<li>Defines how the engagement will proceed after the campaign is finished.</li>
+<li>Report, Remediation consultation, etc.</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Read the above and move on to engagement documentation.</p>
+<p>Answer: No answer needed</p>
+</blockquote>
+<h2 id="task-5-engagement-documentation">Task 5: Engagement Documentation</h2>
+<p>After learning about the types of documentation the next few tasks will have you read the documentation and answer questions about them to ensure you understand what to look for.</p>
+<blockquote>
+<p>Read the above and move on to the upcoming engagement specific tasks.</p>
+<p>Answer: No answer needed</p>
+</blockquote>
+<h2 id="task-6-concept-of-operations">Task 6: Concept of Operations</h2>
+<blockquote>
+<p>Read the example CONOP (Concept of Operation) and answer the questions below.</p>
+<p>Answer: No answer needed</p>
+</blockquote>
+<blockquote>
+<p>Based on customer security posture and maturity, the TTP of the threat group: FIN6, will be employed throughout the engagement.</p>
+<p>Answer: No answer needed</p>
+</blockquote>
+<blockquote>
+<p>How long will the engagement last?</p>
+<p>Answer: 1 month</p>
+</blockquote>
+<blockquote>
+<p>How long is the red cell expected to maintain persistence?</p>
+<p>Answer: 3 weeks</p>
+</blockquote>
+<blockquote>
+<p>What is the primary tool used within the engagement?</p>
+<p>Answer: Cobalt Strike</p>
+</blockquote>
+<h2 id="task-7-resource-plan">Task 7: Resource Plan</h2>
+<blockquote>
+<p>Navigate to the &ldquo;View Site&rdquo;  button and read the provided resource plan. Once complete, answer the questions below.</p>
+<p>Answer: No answer needed,</p>
+</blockquote>
+<blockquote>
+<p>When will the engagement end? (MM/DD/YYYY)</p>
+<p>Answer: 11/14/2021</p>
+</blockquote>
+<blockquote>
+<p>What is the budget the red team has for AWS cloud cost?</p>
+<p>Answer: $1000</p>
+</blockquote>
+<blockquote>
+<p>Are there any miscellaneous requirements for the engagement? (Y/N)</p>
+<p>Answer: N</p>
+</blockquote>
+<h2 id="task-8-operations-plan">Task 8: Operations Plan</h2>
+<blockquote>
+<p>Navigate to the &ldquo;View Site&rdquo;  button and read the provided operations plan. Once complete, answer the questions below.</p>
+<p>Answer: No answer needed.</p>
+</blockquote>
+<blockquote>
+<p>What phishing method will be employed during the initial access phase?</p>
+<p>Answer: spearphishing</p>
+</blockquote>
+<blockquote>
+<p>What site will be utilized for communication between the client and red cell?</p>
+<p>Answer: vectr.io</p>
+</blockquote>
+<blockquote>
+<p>If there is a system outage, the red cell will continue with the engagement. (T/F)</p>
+<p>Answer: F</p>
+</blockquote>
+<h2 id="task-9-mission-plan">Task 9: Mission Plan</h2>
+<blockquote>
+<p>Navigate to the &ldquo;View Site&rdquo;  button and read the provided mission plan. Once complete, answer the questions below.</p>
+<p>Answer: No answer needed</p>
+</blockquote>
+<blockquote>
+<p>When will the phishing campaign end? (mm/dd/yyyy)</p>
+<p>Answer: 10/23/2021</p>
+</blockquote>
+<blockquote>
+<p>Are you permitted to attack 10.10.6.78? (Y/N)</p>
+<p>Answer: N</p>
+</blockquote>
+<blockquote>
+<p>When a stopping condition is encountered, you should continue working and determine the solution yourself without a team lead. (T/F)</p>
+<p>Answer: F</p>
+</blockquote>
+<h2 id="task-10-conclusion">Task 10: Conclusion</h2>
+<blockquote>
+<p>Read the above and continue learning!</p>
+<p>Answer: No answer needed</p>
+</blockquote>
+
+            <footer class="footline">
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation">
+        <div id="R-header" class="default-animation">
+<a href="/index.html">
+    <img src="/images/logo.png" 
+        width="200"
+        height="120"
+        alt="Website logo of hacker cat"/>
+    <h2 style="padding:0; margin:0;">H1roBytes</h2>
+</a>
+        </div>
+        <div class="searchbox default-animation">
+          <i class="fas fa-search" title="Search (CTRL+ALT+f)"></i>
+          <label class="a11y-only" for="R-search-by">Search</label>
+          <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+          <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
+        </div>
+        <script>
+          var contentLangs=['en'];
+        </script>
+        <script src="/js/auto-complete.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.stemmer.support.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.multi.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.en.min.js?1738202701" defer></script>
+        <script src="/js/search.js?1738202701" defer></script>
+      </div>
+      <div id="R-homelinks" class="default-animation">
+        <hr class="padding">
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div id="R-topics">
+          <ul class="enlarge morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/index.html" class="parent "><input type="checkbox" id="R-section-a25630664138ae6b33064dc3d9c0b30e" aria-controls="R-subsections-a25630664138ae6b33064dc3d9c0b30e" checked><label for="R-section-a25630664138ae6b33064dc3d9c0b30e"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Walkthroughs</span></label><a class="padding" href="/walkthroughs/index.html">Walkthroughs</a><ul id="R-subsections-a25630664138ae6b33064dc3d9c0b30e" class="morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/2023-advent-of-cyber/index.html" class=""><a class="padding" href="/walkthroughs/2023-advent-of-cyber/index.html">Advent of Cyber 2023! - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/cozyhosting/index.html" class=""><a class="padding" href="/walkthroughs/cozyhosting/index.html">Cozy Hosting - Hack The Box</a></li>
+          <li data-nav-id="/walkthroughs/kenobi/index.html" class=""><a class="padding" href="/walkthroughs/kenobi/index.html">Kenobi - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/nibbles/index.html" class=""><a class="padding" href="/walkthroughs/nibbles/index.html">Nibbles - HTB</a></li>
+          <li data-nav-id="/walkthroughs/red-team-engagements/index.html" class="active"><a class="padding" href="/walkthroughs/red-team-engagements/index.html">Red Team Engagements - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/red-team-fundamentals/index.html" class=""><a class="padding" href="/walkthroughs/red-team-fundamentals/index.html">Red Team Fundamentals - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/rootme/index.html" class=""><a class="padding" href="/walkthroughs/rootme/index.html">RootMe - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/steel-mountain/index.html" class=""><a class="padding" href="/walkthroughs/steel-mountain/index.html">Steel Mountain - TryHackMe</a></li></ul></li>
+          <li data-nav-id="/resources/index.html" class=""><input type="checkbox" id="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24" aria-controls="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24"><label for="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Resources</span></label><a class="padding" href="/resources/index.html">Resources</a><ul id="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24" class="morespace collapsible-menu">
+          <li data-nav-id="/resources/active-directory-enumeration/index.html" class=""><a class="padding" href="/resources/active-directory-enumeration/index.html">Active Directory Enumeration</a></li></ul></li>
+          <li data-nav-id="/contact/index.html" class=""><a class="padding" href="/contact/index.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter"></div>
+        <div id="R-menu-footer">
+          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter">
+          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks showVariantSwitch">
+            <ul>
+              <li id="R-select-language-container" class="footerLangSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-language fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-language">Language</label>
+                    <select id="R-select-language" onchange="location = baseUri + this.value;">
+                      <option id="R-en" value="/walkthroughs/red-team-engagements/index.html" lang="en" selected></option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+              <li id="R-select-variant-container" class="footerVariantSwitch showVariantSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-paint-brush fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-variant">Theme</label>
+                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
+                      <option id="R-relearn-dark" value="relearn-dark" selected>Relearn Dark</option>
+                      <option id="R-zen-dark" value="zen-dark">Zen Dark</option>
+                      <option id="R-relearn-bright" value="relearn-bright">Relearn Bright</option>
+                      <option id="R-relearn-light" value="relearn-light">Relearn Light</option>
+                      <option id="R-zen-light" value="zen-light">Zen Light</option>
+                      <option id="R-neon" value="neon">Neon</option>
+                      <option id="R-learn" value="learn">Learn</option>
+                      <option id="R-blue" value="blue">Blue</option>
+                      <option id="R-green" value="green">Green</option>
+                      <option id="R-red" value="red">Red</option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                <script>window.variants && variants.markSelectedVariant();</script>
+              </li>
+              <li class="footerVisitedLinks">
+                <div class="padding menu-control">
+                  <i class="fas fa-history fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <button onclick="clearHistory();">Clear History</button>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div id="R-footer" class="footerFooter showFooter">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://gohugo.io/">Hugo</a></p>
+		<p><a href="https://hirobytes.xyz/disclaimer">Disclaimer</a></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <script src="/js/clipboard.min.js?1738202701" defer></script>
+    <script src="/js/perfect-scrollbar.min.js?1738202701" defer></script>
+    <script>
+      function useMathJax( config ){
+        if( !Object.assign ){
+          
+          return;
+        }
+        window.MathJax = Object.assign( window.MathJax || {}, {
+          loader: {
+            load: ['[tex]/mhchem']
+          },
+          startup: {
+            elements: [
+              '.math'
+            ]
+          },
+          tex: {
+            inlineMath: [
+              ['$', '$'], 
+              ['\\(', '\\)']
+            ]
+          },
+          options: {
+            enableMenu: false 
+          }
+        }, config );
+      }
+      useMathJax( JSON.parse( null ) );
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="/js/d3/d3-color.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-dispatch.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-drag.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-ease.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-interpolate.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-selection.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-timer.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-transition.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-zoom.min.js?1738202701" defer></script>
+    <script src="/js/js-yaml.min.js?1738202701" defer></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" defer></script>
+    <script>
+      window.themeUseMermaid = JSON.parse( null );
+    </script>
+    <script>window.noZensmooth = true;</script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js" defer></script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js" defer></script>
+    <script>
+      window.themeUseOpenapi = { css: "https://unpkg.com/swagger-ui-dist/swagger-ui.css", assetsBuster:  1738202701  };
+    </script>
+    <script src="/js/theme.js?1738202701" defer></script>
+  </body>
+</html>

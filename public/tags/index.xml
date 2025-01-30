@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on H1roBytes</title>
+    <link>http://localhost:1313/tags/index.html</link>
+    <description>Recent content in Tags on H1roBytes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>2023</title>
+      <link>http://localhost:1313/tags/2023/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/2023/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Active Directory</title>
+      <link>http://localhost:1313/tags/active-directory/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/active-directory/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Advent of Cyber</title>
+      <link>http://localhost:1313/tags/advent-of-cyber/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/advent-of-cyber/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>BootStrap</title>
+      <link>http://localhost:1313/tags/bootstrap/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/bootstrap/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ctf</title>
+      <link>http://localhost:1313/tags/ctf/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/ctf/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Digital Forensics and Incident Response</title>
+      <link>http://localhost:1313/tags/digital-forensics-and-incident-response/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/digital-forensics-and-incident-response/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Enumeration</title>
+      <link>http://localhost:1313/tags/enumeration/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/enumeration/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Fundamentals</title>
+      <link>http://localhost:1313/tags/fundamentals/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/fundamentals/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>HackTheBox</title>
+      <link>http://localhost:1313/tags/hackthebox/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/hackthebox/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>HFS</title>
+      <link>http://localhost:1313/tags/hfs/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/hfs/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>HTB</title>
+      <link>http://localhost:1313/tags/htb/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/htb/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>HTTP</title>
+      <link>http://localhost:1313/tags/http/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/http/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Linux</title>
+      <link>http://localhost:1313/tags/linux/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/linux/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Machine Learning</title>
+      <link>http://localhost:1313/tags/machine-learning/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/machine-learning/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Malware Analysis</title>
+      <link>http://localhost:1313/tags/malware-analysis/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/malware-analysis/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Metasploit</title>
+      <link>http://localhost:1313/tags/metasploit/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/metasploit/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Penetration Testing</title>
+      <link>http://localhost:1313/tags/penetration-testing/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/penetration-testing/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Powershell</title>
+      <link>http://localhost:1313/tags/powershell/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/powershell/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>PowerView</title>
+      <link>http://localhost:1313/tags/powerview/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/powerview/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Proftpd</title>
+      <link>http://localhost:1313/tags/proftpd/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/proftpd/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>RCE</title>
+      <link>http://localhost:1313/tags/rce/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/rce/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Red Team</title>
+      <link>http://localhost:1313/tags/red-team/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/red-team/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Rejetto</title>
+      <link>http://localhost:1313/tags/rejetto/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/rejetto/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Samba</title>
+      <link>http://localhost:1313/tags/samba/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/samba/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Security Operations and Engineering</title>
+      <link>http://localhost:1313/tags/security-operations-and-engineering/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/security-operations-and-engineering/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>SessionHijacking</title>
+      <link>http://localhost:1313/tags/sessionhijacking/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/sessionhijacking/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>SpringBoot</title>
+      <link>http://localhost:1313/tags/springboot/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/springboot/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>SSH</title>
+      <link>http://localhost:1313/tags/ssh/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/ssh/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>SUID Binary</title>
+      <link>http://localhost:1313/tags/suid-binary/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/suid-binary/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>TryHackMe</title>
+      <link>http://localhost:1313/tags/tryhackme/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/tryhackme/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Web Application</title>
+      <link>http://localhost:1313/tags/web-application/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/web-application/index.html</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Windows</title>
+      <link>http://localhost:1313/tags/windows/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/windows/index.html</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

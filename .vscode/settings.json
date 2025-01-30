@@ -5,6 +5,7 @@
         "Hashcat",
         "hostnames",
         "NTLM",
-        "OSINT"
+        "OSINT",
+        "wordlist"
     ]
 }

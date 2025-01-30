@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Welcome to H1roBytes: on H1roBytes</title>
+    <link>http://localhost:1313/index.html</link>
+    <description>Recent content in Welcome to H1roBytes: on H1roBytes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Walkthroughs</title>
+      <link>http://localhost:1313/walkthroughs/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/walkthroughs/index.html</guid>
+      <description>&lt;h3 id=&#34;coming-soon&#34;&gt;Coming Soon&lt;/h3&gt;
+
+
+&lt;div class=&#34;tenor-gif-embed&#34; data-postid=&#34;18341137&#34; data-share-method=&#34;host&#34; data-aspect-ratio=&#34;1.77778&#34; data-width=&#34;100%&#34;&gt;&lt;a href=&#34;https://tenor.com/view/hacker-gif-18341137&#34;&gt;Hacker GIF&lt;/a&gt;from &lt;a href=&#34;https://tenor.com/search/hacker-gifs&#34;&gt;Hacker GIFs&lt;/a&gt;&lt;/div&gt; &lt;script type=&#34;text/javascript&#34; async src=&#34;https://tenor.com/embed.js&#34;&gt;&lt;/script&gt;</description>
+    </item>
+    <item>
+      <title>Resources</title>
+      <link>http://localhost:1313/resources/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/resources/index.html</guid>
+      <description>&lt;h3 id=&#34;coming-soon&#34;&gt;Coming Soon&lt;/h3&gt;
+&lt;p&gt;Active Directory Enumeration&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Contact</title>
+      <link>http://localhost:1313/contact/index.html</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/contact/index.html</guid>
+      <description>&lt;p&gt;Contact form:&lt;/p&gt;
+
+
+&lt;head&gt;
+    &lt;script src=&#34;https://www.google.com/recaptcha/api.js&#34; async defer&gt;&lt;/script&gt;
+    &lt;script&gt;
+      function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+      }
+      function createPopup(message) {
+        alert(message);
+      }
+    function onPageLoad() {
+      const popupValue = getQueryParam(&#39;result&#39;);
+      if (popupValue !== null &amp;&amp; popupValue===&#34;error&#34;) {
+        createPopup(&#39;Something went wrong. Please try again.&#39;);
+      }
+      if (popupValue !== null &amp;&amp; popupValue===&#34;success&#34;) {
+        createPopup(&#39;Message sent successfully.&#39;);
+      }
+    }
+     window.onload = onPageLoad;
+&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;form
+	action=&#34;https://formie.io/form/1935388c-7d35-4e42-a837-badca86c8aaa&#34;
+	method=&#34;POST&#34;
+&gt; 
+    &lt;input name=&#34;_redirect&#34; type=&#34;hidden&#34; value=&#34;https://hirobytes.xyz/contact?result=success&#34;&gt;
+    &lt;input name=&#34;_redirect_error&#34; type=&#34;hidden&#34; value=&#34;https://hirobytes.xyz/contact?result=error&#34;&gt;
+
+  &lt;div class=&#34;mb-3 pt-0&#34;&gt;
+    &lt;input type=&#34;text&#34; placeholder=&#34;Your name&#34; name=&#34;name&#34; required /&gt;
+  &lt;/div&gt;
+  &lt;div class=&#34;mb-3 pt-0&#34;&gt;
+    &lt;input type=&#34;email&#34; placeholder=&#34;Email&#34; name=&#34;email&#34; required /&gt;
+  &lt;/div&gt;
+  &lt;div class=&#34;mb-3 pt-0&#34;&gt;
+    &lt;textarea placeholder=&#34;Your message&#34; name=&#34;message&#34; required&gt;&lt;/textarea&gt;
+  &lt;/div&gt;
+  &lt;div class=&#34;g-recaptcha&#34; data-sitekey=&#34;6LeIRRkpAAAAAELO5I7lk1Z8P1PQbryemvz_H4F4&#34;&gt;&lt;/div&gt;
+      &lt;br/&gt;
+  &lt;div class=&#34;mb-3 pt-0&#34;&gt;
+    &lt;button type=&#34;submit&#34;&gt;Send message&lt;/button&gt;
+  &lt;/div&gt;
+
+&lt;/form&gt;</description>
+    </item>
+  </channel>
+</rss>
