@@ -1,17 +1,18 @@
+{{- /* based on Hugo 0.125.5 twitter_cards.html */}}
 {{- $images := partial "_funcs/get-page-images" . }}
 {{- with index $images 0 }}
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="{{ .Permalink }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{ .Permalink }}">
 {{- else }}
-  <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary">
 {{- end }}
 
-{{- with or .Title site.Title site.Params.title | plainify }}
-  <meta name="twitter:title" content="{{ . }}">
+{{- with (partial "title.gotmpl" (dict "page" . "fullyQualified" true "reverse" true) | plainify) }}
+    <meta name="twitter:title" content="{{ . }}">
 {{- end }}
 
-{{- with or .Description .Summary site.Params.description | plainify | htmlUnescape }}
-  <meta name="twitter:description" content="{{ trim . "\n\r\t " }}">
+{{- with trim (or .Description .Summary | plainify | htmlUnescape) "\n\r\t " }}
+    <meta name="twitter:description" content="{{ . }}">
 {{- end }}
 
 {{- $twitterSite := "" }}
@@ -22,7 +23,7 @@
       {{- if not (strings.HasPrefix . "@") }}
         {{- $content = printf "@%v" . }}
       {{- end }}
-      <meta name="twitter:site" content="{{ $content }}">
+    <meta name="twitter:site" content="{{ $content }}"/>
     {{- end }}
   {{- end }}
 {{- end }}

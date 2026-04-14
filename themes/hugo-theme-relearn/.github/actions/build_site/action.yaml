@@ -1,14 +1,19 @@
 name: Build site
-description: Builds the Hugo exampleSite for later deploy on GitHub-Pages
+description: Builds the docs for later deploy on GitHub-Pages
 runs:
   using: composite
   steps:
     - name: Setup Hugo
-      uses: peaceiris/actions-hugo@v2
+      uses: peaceiris/actions-hugo@v3
       with:
         hugo-version: 'latest'
 
-    - name: Build site
+    - name: Build docs
       shell: bash
       run: |
-        hugo --source ${GITHUB_WORKSPACE}/exampleSite --destination ${GITHUB_WORKSPACE}/../public --cleanDestinationDir --gc --baseURL https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ --theme ${GITHUB_WORKSPACE}
+        hugo --source ${GITHUB_WORKSPACE}/docs --destination ${GITHUB_WORKSPACE}/../public --cleanDestinationDir --environment github
+
+    - name: Build exampleSite
+      shell: bash
+      run: |
+        hugo --source ${GITHUB_WORKSPACE}/exampleSite --destination ${GITHUB_WORKSPACE}/../public/exampleSite --environment github

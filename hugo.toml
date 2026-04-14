@@ -25,7 +25,7 @@ theme = 'hugo-theme-relearn'
   showVisitedLinks = false
 
   # Disable search function. It will hide search bar
-  disableSearch = false
+  search.disable = false
 
   # Disable search in hidden pages, otherwise they will be shown in search box
   disableSearchHiddenPages = false
@@ -58,7 +58,7 @@ theme = 'hugo-theme-relearn'
   disableLandingPageButton = true
 
   # When using mulitlingual website, disable the switch language button.
-  disableLanguageSwitchingButton = false
+  disableLanguageSwitchingButton = true
 
   # Hide breadcrumbs in the header and only show the current page title
   disableBreadcrumb = true
@@ -69,8 +69,8 @@ theme = 'hugo-theme-relearn'
   # If set to true, hide table of contents menu in the header of all pages
   disableToc = false
 
-  # If set to false, load the MathJax module on every page regardless if a MathJax shortcode is present
-  disableMathJax = false
+  # Load MathJax on every page regardless if a MathJax shortcode is present
+  math = true
 
   # Specifies the remote location of the MathJax js
   customMathJaxURL = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -78,8 +78,8 @@ theme = 'hugo-theme-relearn'
   # Initialization parameter for MathJax, see MathJax documentation
   mathJaxInitialize = "{}"
 
-  # If set to false, load the Mermaid module on every page regardless if a Mermaid shortcode or Mermaid codefence is present
-  disableMermaid = false
+  # Load Mermaid on every page regardless if a Mermaid shortcode or codefence is present
+  mermaid = true
 
   # Specifies the remote location of the Mermaid js
   customMermaidURL = "https://unpkg.com/mermaid/dist/mermaid.min.js"
@@ -87,8 +87,8 @@ theme = 'hugo-theme-relearn'
   # Initialization parameter for Mermaid, see Mermaid documentation
   mermaidInitialize = "{ \"theme\": \"default\" }"
 
-  # If set to false, load the OpenAPI module on every page regardless if a OpenAPI shortcode is present
-  disableOpenapi = false
+  # Load OpenAPI on every page regardless if an OpenAPI shortcode is present
+  openapi = true
 
   # Specifies the remote location of the swagger-ui js
   customOpenapiURL = "https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"
@@ -131,5 +131,5 @@ theme = 'hugo-theme-relearn'
   
 
 [outputs]
-  home = ["HTML", "RSS", "SEARCH"]
+  home = ["HTML", "RSS"]
 
