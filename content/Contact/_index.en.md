@@ -39,6 +39,9 @@ Contact form:
     <input name="_redirect_error" type="hidden" value="https://hirobytes.xyz/contact?result=error">
 
   <div class="mb-3 pt-0">
+    <div class="mb-3 pt-0">
+    <input type="hidden" placeholder="Mr., Mrs., Ms." name="contact_title" />
+  </div>
     <input type="text" placeholder="Your name" name="name" required />
   </div>
   <div class="mb-3 pt-0">
