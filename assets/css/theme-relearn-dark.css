@@ -42,4 +42,11 @@
     --BOX-CAPTION-color: rgba( 240, 240, 240, 1 ); /* text color of colored box titles */
     --BOX-BG-color: rgba( 20, 20, 20, 1 ); /* background color of colored boxes */
     --BOX-TEXT-color: rgba( 224, 224, 224, 1 ); /* text color of colored box content */
+
+    --LOGO-IMAGE-width: 200px; /* logo image width in the sidebar header */
+}
+
+/* center logo image and title in the sidebar header */
+#R-logo.R-default.layout-sidebar-column {
+    align-items: center;
 }

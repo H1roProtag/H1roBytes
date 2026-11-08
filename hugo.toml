@@ -109,6 +109,10 @@ theme = 'hugo-theme-relearn'
     lightbox = true
     shadow = false
   
+  # Logo in the sidebar header: image above the site title
+  [params.logo]
+    src = "/images/logo.png"
+    layout = "sidebar-column"
 
 [outputs]
   home = ["HTML", "RSS"]
