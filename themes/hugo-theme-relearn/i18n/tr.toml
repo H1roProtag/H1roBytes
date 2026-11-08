@@ -22,6 +22,15 @@ other = "\"{0}\" için {1} sonuç bulundu"
 [Clear-History]
 other = "Geçmişi Temizle"
 
+[History-cleared]
+other = "Geçmiş temizlendi"
+
+[Enlarge-graph]
+other = "Grafiği büyüt"
+
+[Close-graph]
+other = "Büyütülmüş grafiği kapat"
+
 [Reset-view]
 other = "Görünümü sıfırla"
 
@@ -44,7 +53,7 @@ other = "Anasayfaya dön"
 other = "Home"
 
 [Edit-this-page]
-other = "Düzenlemek"
+other = "Sayfayı düzenle"
 
 [Show-Markdown]
 other = "Markdown'ı Göster"
@@ -57,6 +66,12 @@ other = "Bölümün tamamını yazdır"
 
 [More-action]
 other = "Dahası Var"
+
+[Previous-page]
+other = "Önceki sayfa"
+
+[Next-page]
+other = "Sonraki sayfa"
 
 [shortcuts-menuTitle]
 other = "Dahası Var"
@@ -141,3 +156,66 @@ other = "Sürüm"
 
 [Browser-unsupported-feature]
 other = "Bu tarayıcı bu özelliği desteklemiyor"
+
+[Pages-group-fallback]
+other = "Diğer"
+
+[Skip-to-content]
+other = "Ana içeriğe geç"
+
+[Breadcrumbs]
+other = "İçerik haritası"
+
+[Search-page]
+other = "Arama sayfasını aç"
+
+[Close-image]
+other = "Büyütülmüş görseli kapat"
+
+[Expand-all]
+other = "Tümünü genişlet"
+
+[Collapse-all]
+other = "Tümünü daralt"
+
+[Inserted-text-start]
+other = "Eklenen metnin başlangıcı"
+
+[Inserted-text-end]
+other = "Eklenen metnin sonu"
+
+[Deleted-text-start]
+other = "Silinen metnin başlangıcı"
+
+[Deleted-text-end]
+other = "Silinen metnin sonu"
+
+[N-matches-on-page]
+other = "Bu sayfada \"{0}\" için {1} eşleşme bulundu"
+
+[Sortable-columns]
+other = "Düğmeli sütun başlıkları sıralanabilir."
+
+[Sort-key-ascending]
+other = "{0}. sırada sıralandı, artan"
+
+[Sort-key-descending]
+other = "{0}. sırada sıralandı, azalan"
+
+[Sorted-by-ascending]
+other = "\"{0}\" sütununa göre sıralandı, artan"
+
+[Sorted-by-descending]
+other = "\"{0}\" sütununa göre sıralandı, azalan"
+
+[Unsorted-by]
+other = "Artık \"{0}\" sütununa göre sıralı değil"
+
+[Change-sorting]
+other = "Sıralamayı değiştir"
+
+[Reset-sorting]
+other = "Sıralamayı sıfırla"
+
+[Sorting-reset]
+other = "Sıralama sıfırlandı!"

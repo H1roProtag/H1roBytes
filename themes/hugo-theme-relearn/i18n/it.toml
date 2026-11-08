@@ -22,6 +22,15 @@ other = "{1} risultati trovati per \"{0}\""
 [Clear-History]
 other = "Reimposta storico"
 
+[History-cleared]
+other = "Storico reimpostato"
+
+[Enlarge-graph]
+other = "Ingrandisci grafico"
+
+[Close-graph]
+other = "Chiudi grafico ingrandito"
+
 [Reset-view]
 other = "Azzeramento vista"
 
@@ -44,7 +53,7 @@ other = "Ritorna alla pagina iniziale"
 other = "Home"
 
 [Edit-this-page]
-other = "Modifica"
+other = "Modifica pagina"
 
 [Show-Markdown]
 other = "Mostra Markdown"
@@ -57,6 +66,12 @@ other = "Stampa l'intero capitolo"
 
 [More-action]
 other = "Altro"
+
+[Previous-page]
+other = "Pagina precedente"
+
+[Next-page]
+other = "Pagina successiva"
 
 [shortcuts-menuTitle]
 other = "Altro"
@@ -141,3 +156,66 @@ other = "Versione"
 
 [Browser-unsupported-feature]
 other = "Questo browser non supporta questa funzionalità"
+
+[Pages-group-fallback]
+other = "Altro"
+
+[Skip-to-content]
+other = "Vai al contenuto principale"
+
+[Breadcrumbs]
+other = "Percorso di navigazione"
+
+[Search-page]
+other = "Apri pagina di ricerca"
+
+[Close-image]
+other = "Chiudi immagine ingrandita"
+
+[Expand-all]
+other = "Espandi tutto"
+
+[Collapse-all]
+other = "Comprimi tutto"
+
+[Inserted-text-start]
+other = "Inizio del testo inserito"
+
+[Inserted-text-end]
+other = "Fine del testo inserito"
+
+[Deleted-text-start]
+other = "Inizio del testo eliminato"
+
+[Deleted-text-end]
+other = "Fine del testo eliminato"
+
+[N-matches-on-page]
+other = "{1} occorrenze di \"{0}\" in questa pagina"
+
+[Sortable-columns]
+other = "Le intestazioni di colonna con pulsanti sono ordinabili."
+
+[Sort-key-ascending]
+other = "ordinato in posizione {0}, crescente"
+
+[Sort-key-descending]
+other = "ordinato in posizione {0}, decrescente"
+
+[Sorted-by-ascending]
+other = "Ordinato per \"{0}\", crescente"
+
+[Sorted-by-descending]
+other = "Ordinato per \"{0}\", decrescente"
+
+[Unsorted-by]
+other = "Non più ordinato per \"{0}\""
+
+[Change-sorting]
+other = "Cambia ordinamento"
+
+[Reset-sorting]
+other = "Azzera ordinamento"
+
+[Sorting-reset]
+other = "Ordinamento azzerato!"

@@ -1,0 +1,40 @@
+function githubButtonsScheme(){
+  var scheme = 'light';
+  var colorPropertyValue = window.getComputedStyle( document.querySelector( '#R-sidebar' ) ).getPropertyValue( 'background-color' );
+  var colorValues = colorPropertyValue.match( /\d+/g ).map( function( e ){ return parseInt(e,10); });
+  if( colorValues.length === 3 && ((0.2126 * colorValues[0]) + (0.7152 * colorValues[1]) + (0.0722 * colorValues[2]) < 165) ){
+    // Luma, https://en.wikipedia.org/wiki/Luma_%28video%29, SMPTE C, Rec. 709 weightings
+    scheme = 'dark';
+  }
+  return scheme;
+}
+function githubButtonsInit(){
+  if( !window.githubButtons ){
+    // wait for the script to load
+    setTimeout( githubButtonsInit, 50 );
+    return;
+  }
+  var scheme = githubButtonsScheme();
+  var githubButtonsHTML = `
+    <a class="github-buttons-link" href="https://github.com/McShelby/hugo-theme-relearn/archive/main.zip" data-color-scheme="${scheme}" data-icon="octicon-cloud-download"  aria-label="Download McShelby/hugo-theme-relearn on GitHub">Download</a>
+    <a class="github-buttons-link" href="https://github.com/McShelby/hugo-theme-relearn" data-color-scheme="${scheme}" data-icon="octicon-star" data-show-count="true"  aria-label="Star McShelby/hugo-theme-relearn on GitHub">Star</a>
+    <a class="github-buttons-link" href="https://github.com/McShelby/hugo-theme-relearn/fork" data-color-scheme="${scheme}" data-icon="octicon-repo-forked"   data-show-count="true" aria-label="Fork McShelby/hugo-theme-relearn on GitHub">Fork</a>
+    `;
+  document.querySelector( '.github-buttons' ).innerHTML = githubButtonsHTML;
+  // not the library's own class, or it renders our links a second time on its own
+  document.querySelectorAll( '.github-buttons .github-buttons-link' ).forEach( function( anchor ){
+    anchor.dataset.colorScheme = scheme;
+    window.githubButtons.render( anchor, function( el ){
+      // a later call may have replaced our links while this one was rendering
+      anchor.parentNode && anchor.parentNode.replaceChild( el, anchor );
+    });
+  });
+}
+document.addEventListener( 'themeVariantLoaded', function( e ){
+  // we have to wait until the CSS class .default-animation has settled and the buttons have loaded to recalculate the scheme again
+  setTimeout( githubButtonsInit, 400 );
+});
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+  setTimeout( githubButtonsInit, 400 );
+});
+githubButtonsInit();

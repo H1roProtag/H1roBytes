@@ -1,0 +1,1080 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:98563ab3-e797-5f2c-a900-1507e1159494",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-10-31T00:00:00Z",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "relearn-sbom",
+          "description": "Generated from docs/data/relearn/thirdparty.toml by the Relearn infra repository"
+        }
+      ]
+    },
+    "component": {
+      "type": "library",
+      "bom-ref": "pkg:github/mcshelby/hugo-theme-relearn@9.5.0",
+      "name": "hugo-theme-relearn",
+      "version": "9.5.0",
+      "description": "A theme for Hugo designed for documentation",
+      "authors": [
+        {
+          "name": "Sören Weber"
+        }
+      ],
+      "purl": "pkg:github/mcshelby/hugo-theme-relearn@9.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://mcshelby.github.io/hugo-theme-relearn"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/McShelby/hugo-theme-relearn"
+        },
+        {
+          "type": "license",
+          "url": "https://github.com/McShelby/hugo-theme-relearn/blob/main/LICENSE"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "relearn:autocomplete",
+      "name": "autoComplete",
+      "version": "1.0.4",
+      "description": "A lightweight and powerful vanilla JavaScript completion suggester",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "copyright": "Copyright (c) 2014 Simon Steinberger / Pixabay",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/Pixabay/JavaScript-autoComplete"
+        }
+      ],
+      "pedigree": {
+        "ancestors": [
+          {
+            "type": "library",
+            "name": "autoComplete",
+            "version": "1.0.4"
+          }
+        ],
+        "patches": [
+          {
+            "type": "unofficial"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "Upstream is unmaintained. Carries fixes for theme issues #155, #387, #452, #1258 and #1304, listed in the file header. No registry coordinate, so no purl."
+        },
+        {
+          "name": "relearn:treehash",
+          "value": "df7b73c8f5097d258a0509834499864ec605b158537e751ed0c598d33c75e7a5"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/js/auto-complete"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/css/auto-complete"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/d3-color@3.1.0",
+      "name": "d3-color",
+      "version": "3.1.0",
+      "description": "Color spaces! RGB, HSL, Cubehelix, CIELAB, and more",
+      "purl": "pkg:npm/d3-color@3.1.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010-2022 Mike Bostock",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a12639010163230b8c130fbeb92a3a49bb5f6989a566d3664d759522db458489"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/d3/d3-color"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:path",
+          "value": "assets/js/d3/d3-color.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/d3-dispatch@3.0.1",
+      "name": "d3-dispatch",
+      "version": "3.0.1",
+      "description": "Register named callbacks and call them with arguments",
+      "purl": "pkg:npm/d3-dispatch@3.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010-2021 Mike Bostock",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "94b3bbdb6b98dc1325a15762b051013e8253999b0e0436b27d1da17b952ba0af"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/d3/d3-dispatch"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:path",
+          "value": "assets/js/d3/d3-dispatch.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/d3-drag@3.0.0",
+      "name": "d3-drag",
+      "version": "3.0.0",
+      "description": "Drag and drop SVG, HTML or Canvas using mouse or touch input",
+      "purl": "pkg:npm/d3-drag@3.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010-2021 Mike Bostock",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "158499fa8cdeef459e2ab9d01af22babd003c423a212fb24088c0f838864012b"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/d3/d3-drag"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:path",
+          "value": "assets/js/d3/d3-drag.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/d3-ease@3.0.1",
+      "name": "d3-ease",
+      "version": "3.0.1",
+      "description": "Easing functions for smooth animation",
+      "purl": "pkg:npm/d3-ease@3.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010-2021 Mike Bostock, 2001 Robert Penner",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e60a1ed750a1ad138dd18e8d3f463238113cfbf7d89685a13d19bd4e048dc3ce"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/d3/d3-ease"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:path",
+          "value": "assets/js/d3/d3-ease.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/d3-interpolate@3.0.1",
+      "name": "d3-interpolate",
+      "version": "3.0.1",
+      "description": "Interpolate numbers, colors, strings, arrays, objects, whatever",
+      "purl": "pkg:npm/d3-interpolate@3.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010-2021 Mike Bostock",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "bfc321e4c3f3b3aadc88cfe15ccb5e443abfeadef8b75c65b41c33a4d78a98ae"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/d3/d3-interpolate"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:path",
+          "value": "assets/js/d3/d3-interpolate.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/d3-selection@3.0.0",
+      "name": "d3-selection",
+      "version": "3.0.0",
+      "description": "Transform the DOM by selecting elements and joining to data",
+      "purl": "pkg:npm/d3-selection@3.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010-2021 Mike Bostock",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "45daab9cf677901bcae102f3f23ca2930db3c0fb8ff9e3dbed087d9c4de921ca"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/d3/d3-selection"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:path",
+          "value": "assets/js/d3/d3-selection.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/d3-timer@3.0.1",
+      "name": "d3-timer",
+      "version": "3.0.1",
+      "description": "An efficient queue for managing thousands of concurrent animations",
+      "purl": "pkg:npm/d3-timer@3.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010-2021 Mike Bostock",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "911ceda305f014b6b53ca68d5c896a9a387da120cfd56a421a2c60cca2fc9b36"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/d3/d3-timer"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:path",
+          "value": "assets/js/d3/d3-timer.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/d3-transition@3.0.1",
+      "name": "d3-transition",
+      "version": "3.0.1",
+      "description": "Animated transitions for D3 selections",
+      "purl": "pkg:npm/d3-transition@3.0.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010-2021 Mike Bostock",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c248d97f6c131af7f4a12a3ff1f2ed83f1cc6c0e17fc764a198b6ee452e6621b"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/d3/d3-transition"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:path",
+          "value": "assets/js/d3/d3-transition.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/d3-zoom@3.0.0",
+      "name": "d3-zoom",
+      "version": "3.0.0",
+      "description": "Pan and zoom SVG, HTML or Canvas using mouse or touch input",
+      "purl": "pkg:npm/d3-zoom@3.0.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010-2021 Mike Bostock",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "4fdce9b830b78225c58e27258296084253c41a5eaf8cad9bd9ccfe3025daf1cf"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/d3/d3-zoom"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "The only d3 package the theme calls directly. The rest are vendored because this one needs them, directly or through one another. The `requires` of each package follow its own package.json, peer dependencies included."
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/js/d3/d3-zoom.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40fortawesome/fontawesome-free@7.3.1",
+      "name": "Font Awesome Free",
+      "version": "7.3.1",
+      "description": "The internet's icon library and toolkit",
+      "purl": "pkg:npm/%40fortawesome/fontawesome-free@7.3.1",
+      "licenses": [
+        {
+          "expression": "MIT AND CC-BY-4.0 AND OFL-1.1"
+        }
+      ],
+      "copyright": "Copyright Fonticons, Inc.",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://fontawesome.com"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/FortAwesome/Font-Awesome"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "Tri-licensed by file kind, as the banner in css/all.min.css states: the icon designs are CC-BY-4.0, the webfonts OFL-1.1, the CSS MIT. The expression covers all three without saying which file is which."
+        },
+        {
+          "name": "relearn:treehash",
+          "value": "d656b6c745721f6837ed71504ccf76b3add8bb78a0fcd2ac207b07753a4b5d85"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/fonts/fontawesome"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "relearn:great-vibes",
+      "name": "Great Vibes",
+      "version": "1.103",
+      "description": "A beautifully flowing script with casual uppercase forms",
+      "licenses": [
+        {
+          "license": {
+            "id": "OFL-1.1"
+          }
+        }
+      ],
+      "copyright": "Copyright 2010 The Great Vibes Pro Project Authors",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://fonts.google.com/specimen/Great+Vibes"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/googlefonts/great-vibes"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "Unicode-range subsets from Google Fonts, used by the tome variants. Every file carries the same version in its `head` and `name` tables, which is where `version` comes from."
+        },
+        {
+          "name": "relearn:treehash",
+          "value": "01b38f89d25570aeb051c355c59ad441138be1636d21815d0b7e6797d222f4d6"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/fonts/greatvibes"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/js-yaml@4.1.1",
+      "name": "js-yaml",
+      "version": "4.1.1",
+      "description": "JavaScript YAML parser and dumper",
+      "purl": "pkg:npm/js-yaml@4.1.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "copyright": "Copyright (C) 2011-2015 by Vitaly Puzrin",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/nodeca/js-yaml"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:treehash",
+          "value": "e7a36e13fa6a916b1459720bd2d792252dc9e6110e79d2a082e5d030ace5be89"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/js/js-yaml"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/katex@0.18.4",
+      "name": "KaTeX",
+      "version": "0.18.4",
+      "description": "Fast math typesetting for the web",
+      "purl": "pkg:npm/katex@0.18.4",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "copyright": "Copyright (c) 2013-2020 Khan Academy and other contributors",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://katex.org"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/KaTeX/KaTeX"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "Only the stylesheet and its woff2 fonts; the formulae are rendered by the KaTeX that Hugo embeds for `transform.ToMath`, and the version follows that one. The stylesheet also names woff and ttf fonts, which a browser never asks for while it reads woff2."
+        },
+        {
+          "name": "relearn:treehash",
+          "value": "651975c60193ddc25af507e50e14cfa572243fbe45fb49986c3f5cb9b1ddf1eb"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/fonts/katex"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/lunr@2.3.9",
+      "name": "Lunr",
+      "version": "2.3.9",
+      "description": "Enables a great search experience without the need for external, server-side, search services",
+      "purl": "pkg:npm/lunr@2.3.9",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "copyright": "Copyright (C) 2020 Oliver Nightingale",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "75e90b6cec204a54a07060b42ec82f3816430c63ffd689d1e9771f469dc493dd"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://lunrjs.com"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/olivernn/lunr.js"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:path",
+          "value": "assets/js/lunr/lunr.min.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/lunr-languages@1.21.0",
+      "name": "Lunr Languages",
+      "version": "1.21.0",
+      "purl": "pkg:npm/lunr-languages@1.21.0",
+      "licenses": [
+        {
+          "expression": "MPL-1.1 AND BSD-3-Clause AND LGPL-3.0-only AND MIT AND ISC"
+        }
+      ],
+      "copyright": "Copyright (C) 2014 Mihai Valentin",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/MihaiValentin/lunr-languages"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "Licensed by file, which the expression covers without saying which file is which: the language files are MPL-1.1, `tinyseg.js` is TinySegmenter for Japanese under BSD-3-Clause, and `wordcut.js` is a browserify bundle of wordcut for Thai under LGPL-3.0 with underscore, glob and Node shims under MIT and ISC compiled in. Lunr itself is a component of its own, vendored into the same directory."
+        },
+        {
+          "name": "relearn:bundled",
+          "value": "true"
+        },
+        {
+          "name": "relearn:treehash",
+          "value": "3f35cc9aab2679355b4fef65621be5e293ea437bac547ccdbe61440149bf2bd9"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/js/lunr"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/mermaid@12.2.0",
+      "name": "Mermaid",
+      "version": "12.2.0",
+      "description": "Generation of diagram and flowchart from text in a similar manner as markdown",
+      "purl": "pkg:npm/mermaid@12.2.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "copyright": "Copyright (c) 2014 - 2024 Knut Sveidqvist",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://mermaid.js.org"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/mermaid-js/mermaid"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "An esbuild bundle with its own dependency tree compiled in, which is not enumerated: a hand-kept inventory of a bundle cannot be verified and would go stale unnoticed. The version is the one recorded at vendoring time - the file itself carries several conflicting ones."
+        },
+        {
+          "name": "relearn:bundled",
+          "value": "true"
+        },
+        {
+          "name": "relearn:treehash",
+          "value": "b5ee8672a35e6b9d0cbcfa5e322781dc07a22d29510bd9a48f5f7e5d4b0e4fc8"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/js/mermaid"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40orama/orama@3.0.8",
+      "name": "Orama",
+      "version": "3.0.8",
+      "description": "A high performance full-text and vector search engine with zero dependencies",
+      "purl": "pkg:npm/%40orama/orama@3.0.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "copyright": "Copyright (c) 2023-present Michele Riva",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://orama.com"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/oramasearch/orama"
+        }
+      ],
+      "pedigree": {
+        "ancestors": [
+          {
+            "type": "library",
+            "name": "Orama",
+            "version": "3.0.8",
+            "purl": "pkg:npm/%40orama/orama@3.0.8"
+          }
+        ],
+        "patches": [
+          {
+            "type": "unofficial"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "The jsDelivr ESM build, with import specifiers rewritten for local hosting. The rewrites are listed in the header of orama.js. A vulnerability match against the upstream coordinate should account for the copy not being pristine."
+        },
+        {
+          "name": "relearn:treehash",
+          "value": "1eebd45e973a107611a35d9b615ca204df44927fdcc58b6e9e2db57d866d94bf"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/js/orama"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40orama/plugin-pt15@3.0.8",
+      "name": "Orama Plugin PT15",
+      "version": "3.0.8",
+      "purl": "pkg:npm/%40orama/plugin-pt15@3.0.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "copyright": "Copyright 2024 OramaSearch Inc",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a6cea0f770d36ca61a3a16cd258e95c97d557818ae56538499a8d7e2b7a38538"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://docs.orama.com/docs/orama-js/plugins/plugin-pt15"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/oramasearch/orama"
+        }
+      ],
+      "pedigree": {
+        "ancestors": [
+          {
+            "type": "library",
+            "name": "Orama Plugin PT15",
+            "version": "3.0.8",
+            "purl": "pkg:npm/%40orama/plugin-pt15@3.0.8"
+          }
+        ],
+        "patches": [
+          {
+            "type": "unofficial"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "A package of its own, vendored into the Orama directory. Its import specifiers carry the same rewrite as Orama, listed in the header of orama.js."
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/js/orama/plugin-pt15.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/%40orama/plugin-qps@3.0.8",
+      "name": "Orama Plugin QPS",
+      "version": "3.0.8",
+      "purl": "pkg:npm/%40orama/plugin-qps@3.0.8",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "copyright": "Copyright 2024 OramaSearch Inc",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5a99d28fcb55979b30d78dc29d1a376d2f46d8318a2dd2141448eadb9e0a3b07"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://docs.orama.com/docs/orama-js/plugins/plugin-qps"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/oramasearch/orama"
+        }
+      ],
+      "pedigree": {
+        "ancestors": [
+          {
+            "type": "library",
+            "name": "Orama Plugin QPS",
+            "version": "3.0.8",
+            "purl": "pkg:npm/%40orama/plugin-qps@3.0.8"
+          }
+        ],
+        "patches": [
+          {
+            "type": "unofficial"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "A package of its own, vendored into the Orama directory. Its import specifiers carry the same rewrite as Orama, listed in the header of orama.js."
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/js/orama/plugin-qps.js"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:github/googlefonts/roboto-flex@3.200",
+      "name": "Roboto Flex",
+      "version": "3.200",
+      "description": "Google's most popular font gets customizable",
+      "purl": "pkg:github/googlefonts/roboto-flex@3.200",
+      "licenses": [
+        {
+          "license": {
+            "id": "OFL-1.1"
+          }
+        }
+      ],
+      "copyright": "Copyright 2017 The Roboto Flex Project Authors",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/googlefonts/roboto-flex"
+        }
+      ],
+      "pedigree": {
+        "ancestors": [
+          {
+            "type": "library",
+            "name": "Roboto Flex",
+            "version": "3.200",
+            "purl": "pkg:github/googlefonts/roboto-flex@3.200"
+          }
+        ],
+        "patches": [
+          {
+            "type": "unofficial"
+          }
+        ]
+      },
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "Unicode-range subsets from Google Fonts, beside the full variable font converted from the upstream TTF. Every file carries the same version in its `name` table, which is where `version` comes from - the serial in the Google Fonts download path numbers their packaging rather than the font. The weight axis is shifted by `npm run fontweight` in the infra repository, so a requested 400 draws as 300; outlines are untouched."
+        },
+        {
+          "name": "relearn:treehash",
+          "value": "ce555b0a8d498e3bad5b1684d6e9d17058447f83eb49fc80dd288a2b1ca05bb8"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/fonts/robotoflex"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/swagger-ui-dist@5.34.0",
+      "name": "SwaggerUI",
+      "version": "5.34.0",
+      "description": "Generate beautiful documentation from a Swagger-compliant API",
+      "purl": "pkg:npm/swagger-ui-dist@5.34.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "copyright": "Copyright 2020 SmartBear Software Inc.",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/swagger-api/swagger-ui"
+        }
+      ],
+      "properties": [
+        {
+          "name": "relearn:notes",
+          "value": "A webpack bundle with its own dependency tree compiled in, not enumerated here for the same reason as Mermaid. Each bundle carries the LICENSE.txt its banner points at."
+        },
+        {
+          "name": "relearn:bundled",
+          "value": "true"
+        },
+        {
+          "name": "relearn:treehash",
+          "value": "c7d8dba0d4ce4364b1f1142c803cd16c047bb452e3c85d7268bcacee806b140e"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/js/swagger-ui"
+        },
+        {
+          "name": "relearn:path",
+          "value": "assets/css/swagger-ui"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:github/mcshelby/hugo-theme-relearn@9.5.0",
+      "dependsOn": [
+        "relearn:autocomplete",
+        "pkg:npm/d3-zoom@3.0.0",
+        "pkg:npm/%40fortawesome/fontawesome-free@7.3.1",
+        "relearn:great-vibes",
+        "pkg:npm/js-yaml@4.1.1",
+        "pkg:npm/katex@0.18.4",
+        "pkg:npm/lunr@2.3.9",
+        "pkg:npm/lunr-languages@1.21.0",
+        "pkg:npm/mermaid@12.2.0",
+        "pkg:npm/%40orama/orama@3.0.8",
+        "pkg:npm/%40orama/plugin-pt15@3.0.8",
+        "pkg:npm/%40orama/plugin-qps@3.0.8",
+        "pkg:github/googlefonts/roboto-flex@3.200",
+        "pkg:npm/swagger-ui-dist@5.34.0"
+      ]
+    },
+    {
+      "ref": "relearn:autocomplete",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/d3-color@3.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/d3-dispatch@3.0.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/d3-drag@3.0.0",
+      "dependsOn": [
+        "pkg:npm/d3-dispatch@3.0.1",
+        "pkg:npm/d3-selection@3.0.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/d3-ease@3.0.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/d3-interpolate@3.0.1",
+      "dependsOn": [
+        "pkg:npm/d3-color@3.1.0"
+      ]
+    },
+    {
+      "ref": "pkg:npm/d3-selection@3.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/d3-timer@3.0.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/d3-transition@3.0.1",
+      "dependsOn": [
+        "pkg:npm/d3-color@3.1.0",
+        "pkg:npm/d3-dispatch@3.0.1",
+        "pkg:npm/d3-ease@3.0.1",
+        "pkg:npm/d3-interpolate@3.0.1",
+        "pkg:npm/d3-selection@3.0.0",
+        "pkg:npm/d3-timer@3.0.1"
+      ]
+    },
+    {
+      "ref": "pkg:npm/d3-zoom@3.0.0",
+      "dependsOn": [
+        "pkg:npm/d3-dispatch@3.0.1",
+        "pkg:npm/d3-drag@3.0.0",
+        "pkg:npm/d3-interpolate@3.0.1",
+        "pkg:npm/d3-selection@3.0.0",
+        "pkg:npm/d3-transition@3.0.1"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40fortawesome/fontawesome-free@7.3.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "relearn:great-vibes",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/js-yaml@4.1.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/katex@0.18.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/lunr@2.3.9",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/lunr-languages@1.21.0",
+      "dependsOn": [
+        "pkg:npm/lunr@2.3.9"
+      ]
+    },
+    {
+      "ref": "pkg:npm/mermaid@12.2.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/%40orama/orama@3.0.8",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/%40orama/plugin-pt15@3.0.8",
+      "dependsOn": [
+        "pkg:npm/%40orama/orama@3.0.8"
+      ]
+    },
+    {
+      "ref": "pkg:npm/%40orama/plugin-qps@3.0.8",
+      "dependsOn": [
+        "pkg:npm/%40orama/orama@3.0.8"
+      ]
+    },
+    {
+      "ref": "pkg:github/googlefonts/roboto-flex@3.200",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/swagger-ui-dist@5.34.0",
+      "dependsOn": []
+    }
+  ]
+}

@@ -5,6 +5,28 @@ need a way to calculate them ourself */
   --bpx: 1;
   --bpx1: 1;
 }
+/* the corners of the blocks standing out of the text, like tables, boxes,
+code and images */
+:root {
+  --block-radius: 6px;
+}
+/* the frame of what pops up over the page, like the overlays of the topbar */
+:root {
+  --overlay-border-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 40%, transparent);
+  --overlay-box-shadow: 1px 2px 5px 1px oklch(from var(--INTERNAL-BOX-GREY-color) calc(l * 0.94) c h / 0.2);
+}
+/* the shape of a tick, like the one of a checked task */
+:root {
+  --tick-clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+/* the scrollbars we draw ourselves: their thickness and the inset of their thumb,
+   which is smaller once the thumb is hovered, so it grows */
+:root {
+  --scrollbar-size: 15px;
+  --scrollbar-thumb-inset: 4px;
+  --scrollbar-thumb-hover-inset: 2px;
+  --scrollbar-thumb-radius: 8px;
+}
 @media (min-resolution: 105dpi) {
   :root {
     --dpr: 1.1;
@@ -104,29 +126,37 @@ need a way to calculate them ourself */
   }
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html {
   color-scheme: only var(--INTERNAL-BROWSER-theme);
   height: 100%;
-  width: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   --VARIABLE-LINK-color: var(--INTERNAL-MAIN-LINK-color);
   --VARIABLE-LINK-HOVER-color: var(--INTERNAL-MAIN-LINK-HOVER-color);
+  --VARIABLE-SCROLLBAR-THUMB-color: var(--INTERNAL-MAIN-SCROLLBAR-THUMB-color);
+  --VARIABLE-SCROLLBAR-THUMB-HOVER-color: var(--INTERNAL-MAIN-SCROLLBAR-THUMB-HOVER-color);
+  --VARIABLE-SCROLLBAR-TRACK-color: var(--INTERNAL-MAIN-SCROLLBAR-TRACK-color);
+  --VARIABLE-SCROLLBAR-TRACK-HOVER-color: var(--INTERNAL-MAIN-SCROLLBAR-TRACK-HOVER-color);
 }
 
 body {
   background-color: var(--INTERNAL-MAIN-BG-color);
   color: var(--INTERNAL-MAIN-TEXT-color);
   display: flex;
-  flex-direction: row-reverse; /* to allow body to have initial focus for PS in some browsers and better SEO and a11y */
   font-size: 1.015625rem;
   font-variation-settings: var(--INTERNAL-MAIN-font-variation-settings);
   font-weight: var(--INTERNAL-MAIN-font-weight);
   font-family: var(--INTERNAL-MAIN-font);
   height: 100%;
-  justify-content: flex-end;
   letter-spacing: var(--INTERNAL-MAIN-letter-spacing);
   line-height: 1.574;
-  /* overflow: hidden; PSC removed for #242 #243 #244; to avoid browser scrollbar to flicker before we create our own */
-  width: 100%;
+  margin: 0;
 }
 
 b,
@@ -134,7 +164,24 @@ strong,
 label,
 th,
 blockquote cite {
+  font-variation-settings: var(--INTERNAL-MAIN-BOLD-font-variation-settings);
   font-weight: var(--INTERNAL-MAIN-BOLD-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-BOLD-letter-spacing);
+}
+
+p {
+  margin: 1rem 0;
+}
+
+ul,
+ol {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  padding-inline-start: 1.5rem;
+}
+:is(ul, ol) :is(ul, ol) {
+  margin-bottom: 0;
+  margin-top: 0;
 }
 
 ul {
@@ -153,16 +200,120 @@ dd {
 
 a {
   color: var(--VARIABLE-LINK-color);
+  text-decoration: none;
 }
 
-a:hover,
-a:active,
-a:focus {
+a:is(:hover, :active, :focus) {
   color: var(--VARIABLE-LINK-HOVER-color);
+}
+
+figure {
+  margin: 1rem 2.5rem;
+}
+
+iframe {
+  border: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+small {
+  font-size: 0.925em;
+}
+
+/* sub- and superscripts must not stretch the line they sit in */
+sub,
+sup {
+  font-size: 0.8em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+
+/* form controls take the text of the page instead of the one of the browser */
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit;
+  font: inherit;
+  /* the font shorthand leaves the letter spacing to the browser */
+  letter-spacing: inherit;
+  margin: 0;
+}
+
+input {
+  line-height: normal;
+}
+
+input:is([type='checkbox'], [type='radio']) {
+  margin-inline-end: 0.425rem;
+}
+
+/* the font taken from the page is never bold, but a group title should be */
+optgroup {
+  font-variation-settings: var(--INTERNAL-MAIN-BOLD-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-BOLD-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-BOLD-letter-spacing);
+}
+
+button {
+  cursor: pointer;
+  padding: 0;
+}
+button:disabled {
+  cursor: default;
+}
+button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
 }
 
 .default-animation {
   transition: all 0.35s ease;
+}
+
+/* readers asking for less motion get none: what changes, changes at once */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  /* the fade between two states of the page is none of the above; it stands for itself
+     as a browser not knowing it drops the whole rule */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* the first stop for keyboard users, out of sight until it has the focus */
+#R-skiplink {
+  background-color: var(--INTERNAL-MAIN-BG-color);
+  border: 0.15rem solid var(--INTERNAL-MAIN-LINK-color);
+  border-radius: var(--block-radius);
+  color: var(--INTERNAL-MAIN-LINK-color);
+  inset-inline-start: 0.5rem;
+  padding: 0.5rem 1rem;
+  position: fixed;
+  top: 0.5rem;
+  transform: translateY(calc(-100% - 1rem));
+  z-index: 5000;
+}
+#R-skiplink:focus {
+  transform: none;
 }
 
 #R-sidebar {
@@ -175,17 +326,14 @@ a:focus {
   font-size: 0.953125rem;
   height: 100%;
   inset-inline-start: 0;
-  line-height: 1.574;
   min-height: 100%;
-  overflow: hidden;
+  /* clip instead of hidden: this must not become a scroll container itself, as
+     a focused menu entry would scroll us instead of the menu */
+  overflow: clip;
   position: fixed;
   min-width: var(--INTERNAL-MENU-L-width);
   max-width: var(--INTERNAL-MENU-L-width);
   width: var(--INTERNAL-MENU-L-width);
-}
-
-#R-sidebar a {
-  text-decoration: none;
 }
 
 #R-header-wrapper > * {
@@ -203,7 +351,10 @@ a:focus {
 }
 
 #R-header-wrapper > search > form {
+  /* room for the focus outline of the box, which is cut off otherwise */
+  margin: -0.3rem;
   overflow: hidden;
+  padding: 0.3rem;
 }
 
 .searchbox {
@@ -215,6 +366,11 @@ a:focus {
   position: relative;
 }
 
+/* the box is what looks like the input, so it shows the focus for it */
+.searchbox:has(input:focus-visible) {
+  outline: auto;
+}
+
 .searchbox > :first-child {
   inset-inline-start: 0.333rem;
   position: absolute;
@@ -223,11 +379,24 @@ a:focus {
 .searchbox > button {
   -webkit-appearance: none;
   appearance: none;
+  align-items: center;
   background-color: transparent;
   border: 0;
-  margin: 0;
-  padding: 0;
-  top: 0.25rem;
+  /* a square in the vertical center of the box, with the icon in its center */
+  bottom: 0;
+  display: flex;
+  height: 1.5rem;
+  justify-content: center;
+  margin: auto 0;
+  top: 0;
+  width: 1.5rem;
+}
+/* the square is wider than its icon, which is to stay where it is */
+.searchbox > button:first-child {
+  inset-inline-start: calc(0.333rem - (1.5rem - 1.25em) / 2);
+}
+.searchbox > button:last-child {
+  inset-inline-end: calc(0.333rem - (1.5rem - 1.25em) / 2);
 }
 
 .searchbox > i {
@@ -240,7 +409,6 @@ a:focus {
 }
 
 #R-sidebar .searchbox > button {
-  color: var(--INTERNAL-MENU-SEARCH-color);
   opacity: 0.75;
 }
 
@@ -250,7 +418,6 @@ a:focus {
 }
 
 .searchbox input {
-  display: inline-block;
   width: 100%;
   height: 1.875rem;
   background: transparent;
@@ -259,26 +426,193 @@ a:focus {
   padding-inline-end: 1.6rem;
   padding-inline-start: 1.8rem;
   padding-top: 0;
-  margin: 0;
+  /* the box shows the focus instead */
+  outline: none;
 }
 
-.searchbox input::-webkit-input-placeholder {
-  color: var(--INTERNAL-MENU-SEARCH-color);
-}
 .searchbox input::placeholder {
   color: var(--INTERNAL-MENU-SEARCH-color);
   opacity: 0.45;
 }
 
 #R-content-wrapper {
-  --ps-rail-hover-color: rgba(176, 176, 176, 0.25);
   display: flex;
   flex-direction: column;
   flex: 1; /* fill rest of vertical space */
-  overflow: hidden;
-  position: relative; /* PS */
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* the menu can hold custom content; without us as their containing block,
+     absolutely positioned elements would resolve against the fixed sidebar and
+     stay put while the menu scrolls */
+  position: relative;
+  /* our colors for the scrollbar the browser draws on top of us; on a device with
+     a mouse the rules below hide it again until the menu is hovered */
+  scrollbar-color: var(--VARIABLE-SCROLLBAR-THUMB-color) var(--VARIABLE-SCROLLBAR-TRACK-color);
+  transition: scrollbar-color 0.2s linear;
+  z-index: 100;
+  --VARIABLE-SCROLLBAR-THUMB-color: var(--INTERNAL-MENU-SCROLLBAR-THUMB-color);
+  --VARIABLE-SCROLLBAR-THUMB-HOVER-color: var(--INTERNAL-MENU-SCROLLBAR-THUMB-HOVER-color);
+  --VARIABLE-SCROLLBAR-TRACK-color: var(--INTERNAL-MENU-SCROLLBAR-TRACK-color);
+  --VARIABLE-SCROLLBAR-TRACK-HOVER-color: var(--INTERNAL-MENU-SCROLLBAR-TRACK-HOVER-color);
+}
+
+@media (hover: hover) {
+  #R-content-wrapper {
+    /* the browsers overlay scrollbar shows up on every scroll, even when the
+       active entry is scrolled into view on load; we only want it on hover */
+    scrollbar-color: transparent transparent;
+  }
+
+  #R-sidebar:hover #R-content-wrapper,
+  #R-content-wrapper:focus-within {
+    /* the rail we draw ourselves knows three states, a scrollbar of the browser
+       only ever gets two: there is no selector for it being hovered - the mouse
+       over it is inside of the menu like the mouse over an entry is - so we take
+       the hovered colors here, as they are the ones that make us stand out.
+       the focus makes us show up for the keyboard, which never hovers us but
+       scrolls us with the cursor keys once it is inside of the menu */
+    scrollbar-color: var(--VARIABLE-SCROLLBAR-THUMB-HOVER-color) var(--VARIABLE-SCROLLBAR-TRACK-HOVER-color);
+  }
+}
+
+/* === classic scrollbar quirks ============================================ */
+/* everything down to the end marker only exists for browsers without overlay
+   scrollbars: a classic scrollbar takes away space and would clip the menu
+   border at the sidebars edge and the active entry bleeding into the content
+   area, so we hide the browsers scrollbar and draw our own rail instead.
+
+   one thing has to be true before we take over: our header script must have
+   measured a scrollbar that takes space - it sets `classic-scrollbars` for that.
+   whether the browser can hide its own we do not ask; every engine that gets
+   this far understands one of the two ways below, as the `:has()` and
+   `color-mix()` we use elsewhere ask for far newer versions than those do.
+
+   this block, the `#R-scrollbar` markup in menu.html and `initMenuThumb()` in
+   theme.js are the whole of it and can be dropped together once no supported
+   browser reports a space taking scrollbar anymore; as overlay scrollbars are a
+   user setting on every platform, that needs more than Chromium defaulting to
+   them - https://issues.chromium.org/issues/40280779 */
+
+.scrollbar-measure {
+  /* the probe our header script measures to decide `classic-scrollbars`, so it
+     can not be scoped to that class itself */
+  /* https://davidwalsh.name/detect-scrollbar-width */
+  height: 100px;
+  overflow: scroll;
+  position: absolute;
+  width: 100px;
+  top: -9999px;
+}
+
+#R-scrollbar {
+  /* unscoped as well: without the class we must never be seen */
+  display: none;
+}
+
+/* taking over means making the browsers own scrollbar go away, or we end up with
+   two of them; it understands either the standard property or the pseudo element,
+   and declaring both is harmless as each is ignored where it is not */
+.classic-scrollbars #R-content-wrapper {
+  scrollbar-width: none;
+}
+
+.classic-scrollbars #R-content-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.classic-scrollbars #R-scrollbar.scrollable {
+  display: block;
+}
+
+.classic-scrollbars #R-scrollbar {
+  /* we live inside of the menu, so the browser still scrolls it if the mouse is
+     over us, but stay in place and take no space of our own */
+  align-self: flex-end;
+  /* we are the track of the menu, the thumb below has colors of its own */
+  background-color: var(--VARIABLE-SCROLLBAR-TRACK-color);
+  flex-shrink: 0;
+  margin-bottom: calc(-1 * var(--INTERNAL-SCROLLBAR-height, 0px));
+  position: sticky;
+  top: 0;
+  height: var(--INTERNAL-SCROLLBAR-height, 0);
+  opacity: 0;
+  transition:
+    background-color 0.2s linear,
+    opacity 0.2s linear,
+    width 0.2s ease-in-out;
+  /* narrow until the mouse reaches us; we are no flex item of any row, so growing
+     us moves none of the menu entries; whatever our width is, we take the mouse
+     over all of it, so a click next to the thumb scrolls by a page instead of
+     hitting the menu entry below us */
+  width: 8px;
   z-index: 100;
 }
+
+@media (hover: none) {
+  .classic-scrollbars #R-scrollbar {
+    /* we can not be seen until a scroll happens, so a tap has to reach the menu
+       entry underneath us instead of us; scrolling is done by swiping the menu */
+    pointer-events: none;
+  }
+
+  .classic-scrollbars #R-scrollbar.scrolling {
+    /* show up while scrolling, as we can not be hovered here */
+    opacity: 1;
+  }
+}
+
+@media (hover: hover) {
+  .classic-scrollbars #R-sidebar:hover #R-scrollbar,
+  .classic-scrollbars #R-content-wrapper:focus-within > #R-scrollbar {
+    /* hovering the menu only lets us show up; our own colors and width wait for
+       the mouse to reach us. the focus does the same for the keyboard, which
+       scrolls us with the cursor keys once it is inside of the menu */
+    opacity: 1;
+  }
+}
+
+.classic-scrollbars #R-scrollbar:hover {
+  /* we tint and widen once the mouse reaches us, the thumb inside grows with us */
+  background-color: var(--VARIABLE-SCROLLBAR-TRACK-HOVER-color);
+  width: 15px;
+}
+
+.classic-scrollbars #R-scrollbar-thumb {
+  background-color: var(--VARIABLE-SCROLLBAR-THUMB-color);
+  border-radius: 6px;
+  height: calc(var(--INTERNAL-SCROLLBAR-THUMB-size, 0) * 100%);
+  inset-inline-end: 2px;
+  position: absolute;
+  top: calc(var(--INTERNAL-SCROLLBAR-THUMB-position, 0) * 100%);
+  transition:
+    background-color 0.2s linear,
+    width 0.2s ease-in-out;
+  width: 6px;
+}
+
+.classic-scrollbars #R-scrollbar:hover > #R-scrollbar-thumb,
+.classic-scrollbars #R-scrollbar-thumb.dragging {
+  /* gain contrast once the mouse is over us */
+  background-color: var(--VARIABLE-SCROLLBAR-THUMB-HOVER-color);
+  width: 11px;
+}
+
+@media (forced-colors: active) {
+  /* our translucent grays are overridden in forced colors, so we have to name
+     system colors to stay visible; a browsers scrollbar does this for us */
+  .classic-scrollbars #R-scrollbar,
+  .classic-scrollbars #R-scrollbar:hover {
+    background-color: Canvas;
+  }
+
+  .classic-scrollbars #R-scrollbar-thumb,
+  .classic-scrollbars #R-scrollbar:hover > #R-scrollbar-thumb,
+  .classic-scrollbars #R-scrollbar-thumb.dragging {
+    background-color: CanvasText;
+  }
+}
+/* === end of classic scrollbar quirks ===================================== */
 
 #R-sidebar .padding {
   padding: 0 1rem;
@@ -292,14 +626,6 @@ a:focus {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-#R-sidebar ul li {
-  padding: 0;
-}
-
-#R-sidebar ul li.visited + span {
-  margin-inline-end: 1rem;
 }
 
 #R-sidebar ul li .read-icon {
@@ -329,7 +655,6 @@ a:focus {
   margin: 1.25rem 0 -0.25rem 0;
   padding-inline-start: 1rem;
   text-rendering: optimizeLegibility;
-  text-transform: uppercase;
 }
 
 #R-sidebar hr {
@@ -426,9 +751,13 @@ than the ones in between, so they need to have privileged visibility; order is:
 
 article .R-taxonomy.tags {
   --VARIABLE-TAGS-color: var(--INTERNAL-MAIN-BG-color);
-  --VARIABLE-TAGS-BG-color: var(--VARIABLE-BOX-color);
+  --VARIABLE-TAGS-BG-color: var(--INTERNAL-TAG-BG-color);
   margin-left: 1rem;
-  margin-top: 1rem;
+}
+
+/* only a list given a style is a cstyle */
+article .R-taxonomy.tags.cstyle {
+  --VARIABLE-TAGS-BG-color: var(--VARIABLE-BOX-color);
 }
 
 article .R-taxonomy.tags i {
@@ -447,25 +776,26 @@ article .R-taxonomy.tags a.term-link {
   color: var(--VARIABLE-TAGS-color);
   display: inline-block;
   font-size: 0.8em;
-  font-weight: var(--INTERNAL-MAIN-TITLES-font-weight);
+  font-variation-settings: var(--INTERNAL-MAIN-MEDIUM-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-MEDIUM-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-MEDIUM-letter-spacing);
   line-height: 2em;
-  margin: 0 0 8px -1px;
+  margin: 0 0 8px 0;
   margin-inline-end: 16px;
   padding: 0 10px 0 12px;
   position: relative;
 }
 
+/* the tip reaches 1px below the label, so subpixel rounding can not open a gap between the two */
 article .R-taxonomy.tags a.term-link:before {
-  border-color: transparent;
-  border-right-color: var(--VARIABLE-TAGS-BG-color);
-  border-style: solid;
-  border-width: 1em 1em 1em 0;
+  background-color: var(--VARIABLE-TAGS-BG-color);
+  clip-path: polygon(0 50%, calc(100% - 1px) 0, 100% 0, 100% 100%, calc(100% - 1px) 100%);
   content: '';
   left: -1em;
-  height: 0;
+  height: 100%;
   position: absolute;
   top: 0;
-  width: 0;
+  width: calc(1em + 1px);
 }
 
 article .R-taxonomy.tags a.term-link:after {
@@ -479,10 +809,6 @@ article .R-taxonomy.tags a.term-link:after {
   width: 5px;
 }
 
-article .R-taxonomy.tags a.term-link:hover:after {
-  width: 5px;
-}
-
 #R-body {
   display: flex;
   flex-basis: 100%;
@@ -493,18 +819,15 @@ article .R-taxonomy.tags a.term-link:hover:after {
   margin-inline-start: var(--INTERNAL-MENU-L-width);
   min-height: 100%;
   overflow-wrap: break-word; /* avoid x-scrolling of body if it is to large to fit */
-  position: relative; /* PS */
+  position: relative;
   min-width: calc(100% - var(--INTERNAL-MENU-L-width));
   max-width: calc(100% - var(--INTERNAL-MENU-L-width));
   width: calc(100% - var(--INTERNAL-MENU-L-width));
   z-index: 70;
 }
 
-#R-body svg,
-#R-body img,
-#R-body figure > figcaption > h4,
-#R-body figure > figcaption > p,
-#R-body .video-container {
+#R-body :is(svg, img),
+#R-body figure > figcaption > :is(.figure-title, p) {
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -512,128 +835,264 @@ article .R-taxonomy.tags a.term-link:hover:after {
   text-align: center;
 }
 
-#R-body svg:not(.lightbox-image).left,
-#R-body img:not(.lightbox-image).left {
+/* an image follows its width; its `height` attribute only tells the browser the
+   space to reserve before it has loaded, and a height asked for in the image's
+   link comes as a style attribute, which wins over this */
+.figure-image {
+  height: auto;
+}
+
+#R-body :is(svg, img):not(.lightbox-image).left {
   margin-left: 0;
 }
 
-#R-body svg:not(.lightbox-image).right,
-#R-body img:not(.lightbox-image).right {
+#R-body :is(svg, img):not(.lightbox-image).right {
   margin-right: 0;
 }
 
-#R-body svg:not(.lightbox-image).border,
-#R-body img:not(.lightbox-image).border,
-#R-body .video-container.border {
+#R-body :is(svg, img):not(.lightbox-image).border {
   background-clip: padding-box;
-  border: 1px solid rgba(134, 134, 134, 0.333);
+  border: 1px solid color-mix(in srgb, var(--INTERNAL-MAIN-TEXT-color) 10%, transparent);
+  /* an image carries its own dimensions so a browser can reserve its space, and
+     those size the border box; the border would otherwise eat into the picture
+     and resample it, so here it goes outside instead */
+  box-sizing: content-box;
 }
 
-#R-body svg:not(.lightbox-image).shadow,
-#R-body img:not(.lightbox-image).shadow,
-#R-body .video-container.shadow {
-  box-shadow: 0 10px 30px rgba(176, 176, 176, 0.666);
+#R-body :is(svg, img):not(.lightbox-image).rounded {
+  border-radius: var(--block-radius);
 }
 
-#R-body svg:not(.lightbox-image).inline,
-#R-body img:not(.lightbox-image).inline {
+#R-body :is(svg, img):not(.lightbox-image).shadow {
+  /* the shadow is tinted by the background and inverts its lightness, so it is dark on a light
+     background and light on a dark one; a light one has to stand up to a bright image, so the
+     darker the background the denser it is; its chroma is strengthened, as a tinted dark
+     background holds too little of it to show in a light shadow, while a grey one has none to
+     strengthen; on a light background it takes the color of the neutral boxes instead, which
+     carries the tint of the variant, but never darker than a light grey, as some variants
+     darken their neutral boxes for contrast */
+  box-shadow: 0 3px 12px light-dark(oklch(from var(--INTERNAL-BOX-NEUTRAL-color) max(l, 0.85) c h / 0.9), oklch(from var(--INTERNAL-MAIN-BG-color) calc((1 - l) * 1.2) calc(c * 6) h / calc(0.2 + 0.6 * (1 - l))));
+}
+
+#R-body :is(svg, img):not(.lightbox-image).inline {
   display: inline;
   margin: 0;
   vertical-align: bottom;
 }
 
-#R-body figure > figcaption {
-  margin: 0;
-}
-
-#R-body figure > figcaption > h4 {
+#R-body figure > figcaption > .figure-title {
+  color: var(--INTERNAL-MAIN-TITLES-H4-TEXT-color);
+  font-family: var(--INTERNAL-MAIN-TITLES-H4-font);
+  font-variation-settings: var(--INTERNAL-MAIN-TITLES-H4-font-variation-settings);
+  letter-spacing: var(--INTERNAL-MAIN-TITLES-H4-letter-spacing);
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: var(--INTERNAL-MAIN-TITLES-H4-font-weight);
   margin: 0;
 }
 
 #R-body figure > figcaption > p {
   font-size: 0.85rem;
-  font-weight: 300;
+  font-variation-settings: var(--INTERNAL-MAIN-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-letter-spacing);
   margin-top: 0.15rem;
 }
-#R-body figure > figcaption > h4 + p {
+#R-body figure > figcaption > .figure-title + p {
   margin-top: 0;
 }
 
-#R-body-inner {
+#R-main {
   display: flex;
   flex: auto;
   flex-direction: column;
   overflow-y: auto;
   padding: 0 3.25rem 4rem 3.25rem;
-  position: relative; /* PS */
+  position: relative;
+  /* reserve the space of a classic scrollbar on both sides, so the content
+     stays horizontally centered regardless of whether it is scrollable;
+     overlay scrollbars don't create gutters, so this is a no-op for them */
+  scrollbar-gutter: stable both-edges;
 }
-@media screen and (max-width: 59.999rem) {
-  #R-body-inner {
-    padding: 0 2rem 1rem 2rem;
+
+/* the browser draws the scrollbars of the content, of topbar popover areas, of
+   the search suggestions, of the opened list of a select in the menu and of code
+   boxes, and we take whichever styling it offers us: the standard property knows
+   two colors but no state of its own, the webkit pseudo elements give us a hover
+   of the scrollbar itself; they are mutually exclusive, as naming a scrollbar-color
+   makes the pseudo elements be ignored. the colors are the ones of the area we
+   are in, see the `--VARIABLE-SCROLLBAR-*` properties; the search suggestions sit
+   on the background of the content, so they keep its colors */
+@supports not selector(::-webkit-scrollbar) {
+  :is(#R-main, .topbar-content-wrapper, #R-sidebar .autocomplete-suggestions, .menu-control select, pre:not(.mermaid), div.highlight > div:not(.actionbar) table) {
+    scrollbar-color: var(--VARIABLE-SCROLLBAR-THUMB-color) var(--VARIABLE-SCROLLBAR-TRACK-color);
+    transition: scrollbar-color 0.2s linear;
+
+    @media (hover: hover) {
+      &:hover {
+        /* the best we get here: the thumb reacts to us being hovered, not to itself */
+        scrollbar-color: var(--VARIABLE-SCROLLBAR-THUMB-HOVER-color) var(--VARIABLE-SCROLLBAR-TRACK-HOVER-color);
+      }
+    }
   }
 }
-@media screen and (max-width: 47.999rem) {
-  #R-body-inner {
+
+/* the list of a select we style ourselves is a part of the select, not an
+   element; a browser that draws the list on its own does not know how to name
+   it and drops every rule that does, so each rule naming it comes on its own,
+   right after the one it follows */
+@supports selector(::-webkit-scrollbar) {
+  :is(#R-main, .topbar-content-wrapper, #R-sidebar .autocomplete-suggestions, .menu-control select, pre:not(.mermaid), div.highlight > div:not(.actionbar) table) {
+    .classic-scrollbars &::-webkit-scrollbar {
+      /* the rules below stay dead until this one is here: only styling the scrollbar
+         itself makes Chrome draw its own instead of the platforms, and it then takes
+         its thickness from us; where the browser has an overlay scrollbar it keeps
+         drawing it and we let it, so this is the same width the classic one has */
+      height: var(--scrollbar-size);
+      width: var(--scrollbar-size);
+    }
+    .classic-scrollbars &::picker(select)::-webkit-scrollbar {
+      height: var(--scrollbar-size);
+      width: var(--scrollbar-size);
+    }
+
+    &::-webkit-scrollbar-button,
+    &::-webkit-scrollbar-corner {
+      /* drawing our own scrollbar also gets us the steppers of the platform, which
+         none of the browsers overlay scrollbars has */
+      display: none;
+    }
+    &::picker(select)::-webkit-scrollbar-button,
+    &::picker(select)::-webkit-scrollbar-corner {
+      display: none;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: var(--VARIABLE-SCROLLBAR-TRACK-color);
+    }
+    &::picker(select)::-webkit-scrollbar-track {
+      background-color: var(--VARIABLE-SCROLLBAR-TRACK-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      /* the thumb of a drawn scrollbar fills its full width with square corners, so
+         we have to give it a slim, rounded and inset shape ourselves, like the one
+         our menu rail gives its thumb; the transparent border does the insetting,
+         the background must not reach into it */
+      background-clip: padding-box;
+      background-color: var(--VARIABLE-SCROLLBAR-THUMB-color);
+      border: var(--scrollbar-thumb-inset) solid transparent;
+      border-radius: var(--scrollbar-thumb-radius);
+    }
+    &::picker(select)::-webkit-scrollbar-thumb {
+      background-clip: padding-box;
+      background-color: var(--VARIABLE-SCROLLBAR-THUMB-color);
+      border: var(--scrollbar-thumb-inset) solid transparent;
+      border-radius: var(--scrollbar-thumb-radius);
+    }
+
+    @media (hover: hover) {
+      &::-webkit-scrollbar-track:hover {
+        /* tints once the mouse reaches us, like the menu rail does */
+        background-color: var(--VARIABLE-SCROLLBAR-TRACK-HOVER-color);
+      }
+      &::picker(select)::-webkit-scrollbar-track:hover {
+        background-color: var(--VARIABLE-SCROLLBAR-TRACK-HOVER-color);
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        /* grows like the menu thumb does */
+        background-color: var(--VARIABLE-SCROLLBAR-THUMB-HOVER-color);
+        border-width: var(--scrollbar-thumb-hover-inset);
+      }
+      &::picker(select)::-webkit-scrollbar-thumb:hover {
+        background-color: var(--VARIABLE-SCROLLBAR-THUMB-HOVER-color);
+        border-width: var(--scrollbar-thumb-hover-inset);
+      }
+
+      &:hover {
+        /* Safari does not recompute the rules above once we are hovered unless a
+           custom property makes it; its value is never read */
+        --fix: ;
+      }
+    }
+
+    @media (forced-colors: active) {
+      /* our translucent grays are overridden in forced colors and would leave the
+         thumb in the color of its track, so we name system colors like the menu
+         rail does; the transparent border insetting the thumb is given a color of
+         its own here, so it has to become the one of the track */
+      &::-webkit-scrollbar-track,
+      &::-webkit-scrollbar-track:hover {
+        background-color: Canvas;
+      }
+      &::picker(select)::-webkit-scrollbar-track,
+      &::picker(select)::-webkit-scrollbar-track:hover {
+        background-color: Canvas;
+      }
+
+      &::-webkit-scrollbar-thumb,
+      &::-webkit-scrollbar-thumb:hover {
+        background-color: CanvasText;
+        border-color: Canvas;
+      }
+      &::picker(select)::-webkit-scrollbar-thumb,
+      &::picker(select)::-webkit-scrollbar-thumb:hover {
+        background-color: CanvasText;
+        border-color: Canvas;
+      }
+    }
+  }
+}
+@media screen {
+  :where(.menu-m-width) #R-main {
+    padding: 0 2rem 1rem 2rem;
+  }
+  :where(.menu-s-width) #R-main {
     padding: 0 1.25rem 0.375rem 1.25rem;
   }
 }
 
-#R-topbar a:hover:empty,
-#R-topbar a:active:empty,
-#R-topbar a:focus:empty,
-#R-topbar a:hover :not(i),
-#R-topbar a:active :not(i),
-#R-topbar a:focus :not(i),
-#R-topbar button:hover :not(i),
-#R-topbar button:active :not(i),
-#R-topbar button:focus :not(i),
-#R-topbar .title:hover,
-#R-topbar .title:active,
-#R-topbar .title:focus,
-.topbar-content a:hover,
-.topbar-content a:active,
-.topbar-content a:focus,
-article a:hover,
-article a:active,
-article a:focus,
-article a:hover .copy-to-clipboard,
-article a:active .copy-to-clipboard,
-article a:focus .copy-to-clipboard {
+/* option link.underline: links in the content are told apart from the text
+   around them by more than their color; what looks like a control of its own
+   stays as it is */
+.link-underline article a,
+.link-underline article a .copy-to-clipboard {
   text-decoration: underline;
 }
-.topbar-content a:hover,
-.topbar-content a:active,
-.topbar-content a:focus,
-article a:hover,
-article a:active,
-article a:focus,
-article a:hover .copy-to-clipboard,
-article a:active .copy-to-clipboard,
-article a:focus .copy-to-clipboard,
-article a.lightbox-back:hover > svg:only-child:empty,
-article a.lightbox-back:active > svg:only-child:empty,
-article a.lightbox-back:focus > svg:only-child:empty,
-article a.lightbox-back:hover > img:only-child:empty,
-article a.lightbox-back:active > img:only-child:empty,
-article a.lightbox-back:focus > img:only-child:empty,
-article .btn > button:hover,
-article .btn > button:active,
-article .btn > button:focus {
+.link-underline article :is(.btn, .card-title) > a,
+.link-underline article .R-taxonomy.tags a.term-link,
+.link-underline article a:is(.autocomplete-suggestion, .lightbox-link, .lightbox-close) {
+  text-decoration: none;
+}
+
+#R-topbar a:is(:hover, :active, :focus):empty,
+#R-topbar :is(a, button):is(:hover, :active, :focus) :not(i),
+#R-topbar .title:is(:hover, :active, :focus),
+.topbar-content a:is(:hover, :active, :focus),
+article a:is(:hover, :active, :focus),
+article a:is(:hover, :active, :focus) .copy-to-clipboard {
+  text-decoration: underline;
+}
+/* no outline for the pointer; who uses the keyboard keeps the one of the
+   browser to see where the focus is */
+.topbar-content a:focus:not(:focus-visible),
+article a:focus:not(:focus-visible),
+article a:focus:not(:focus-visible) .copy-to-clipboard,
+article a.lightbox-close:is(:hover, :active, :focus) > :is(svg, img):only-child:empty,
+article .btn > button:focus:not(:focus-visible),
+/* these show the focus on what they hold or on what holds them */
+article a:focus:has(> :is(img, svg):only-child:empty),
+.card-container .card-title > :is(a, button):focus {
   outline: none;
 }
-article a:hover > svg:only-child:empty,
-article a:active > svg:only-child:empty,
-article a:focus > svg:only-child:empty,
-article a:hover > img:only-child:empty,
-article a:active > img:only-child:empty,
-article a:focus > img:only-child:empty {
+article a:is(:hover, :active, :focus) > :is(svg, img):only-child:empty {
   outline: 0.15rem solid var(--VARIABLE-LINK-HOVER-color);
 }
 
-#R-body-inner:focus-visible {
-  /* remove focus indicator for programatically set focus */
+#R-main:focus-visible {
+  /* being a scroll container, the browser focuses us when the skip link is
+     followed; the tab key goes on from the start of the content, which needs
+     no ring around all of it */
   outline: none;
 }
 
@@ -645,36 +1104,64 @@ article a:focus > img:only-child:empty {
 #R-body .flex-block-wrapper {
   margin-left: auto;
   margin-right: auto;
+  /* the width grows us to whatever room we are given, the max-width caps us at the
+     configured one; that cap can not overflow us the way naming the width itself
+     would once the scrollbar gutter has taken its share of the room */
   max-width: calc(var(--INTERNAL-MAIN-MAX-width) - var(--INTERNAL-MENU-L-width) - 2 * 3.25rem);
   width: 100%;
 }
 #R-body .flex-block-wrapper:has(article.narrow) {
   max-width: calc(var(--INTERNAL-MAIN-MAX-width) - var(--INTERNAL-MENU-L-width) - 2 * 9.75rem);
 }
-.main-max-width #R-body .flex-block-wrapper {
-  width: calc(var(--INTERNAL-MAIN-MAX-width) - var(--INTERNAL-MENU-L-width) - 2 * 3.25rem);
-}
-.main-max-width #R-body .flex-block-wrapper:has(article.narrow) {
-  width: calc(var(--INTERNAL-MAIN-MAX-width) - var(--INTERNAL-MENU-L-width) - 2 * 9.75rem);
-}
 
-#R-body-inner:has(> .flex-block-wrapper article.narrow) {
+#R-main:has(> .flex-block-wrapper article.narrow) {
   padding: 0 9.75rem 2rem 9.75rem;
 }
-@media screen and (max-width: 59.999rem) {
-  #R-body-inner:has(> .flex-block-wrapper article.narrow) {
+@media screen {
+  :where(.menu-m-width) #R-main:has(> .flex-block-wrapper article.narrow) {
     padding: 0 6.5rem 1rem 6.5rem;
   }
-}
-@media screen and (max-width: 47.999rem) {
-  #R-body-inner:has(> .flex-block-wrapper article.narrow) {
+  :where(.menu-s-width) #R-main:has(> .flex-block-wrapper article.narrow) {
     padding: 0 3.25rem 0.375rem 3.25rem;
   }
 }
 
-#R-body-inner > .flex-block-wrapper article.narrow > p {
+#R-main > .flex-block-wrapper article.narrow > p {
   font-size: 1.2rem;
   text-align: justify;
+}
+
+/* a single underline is how a link is told apart from the text around it, so
+   inserted text is underlined twice */
+ins {
+  text-decoration: underline double;
+}
+
+/* a screen reader doesn't tell where inserted or deleted text starts and
+   ends, so this is written around the text for it alone; the texts depend on
+   the language and are set by the script */
+:is(ins, del)::before,
+:is(ins, del)::after {
+  clip-path: polygon(0 0, 1px 0, 1px 1px, 0 1px);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+  width: 1px;
+}
+ins::before {
+  content: var(--ins-start-text);
+}
+ins::after {
+  content: var(--ins-end-text);
+}
+del::before {
+  content: var(--del-start-text);
+}
+del::after {
+  content: var(--del-end-text);
 }
 
 mark {
@@ -684,26 +1171,24 @@ mark {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
   color: rgba(0, 0, 0, 1);
-  -webkit-print-color-adjust: exact;
-  color-adjust: exact;
   margin: 0 -0.25rem 0 -0.1rem;
   padding: 0.1rem 0.25rem 0.05rem 0.1rem;
+  print-color-adjust: exact;
 }
 
 kbd {
-  background-color: rgba(134, 134, 134, 0.166);
-  border-color: rgba(134, 134, 134, 0.5);
+  background-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 40%, transparent);
+  border-color: oklch(from var(--INTERNAL-BOX-GREY-color) calc(l * 0.94) c h / 0.5);
   border-radius: 0.25rem;
   border-style: solid;
   border-width: 1px;
-  box-shadow: 0 0.0625rem 0 0.0625rem rgba(134, 134, 134, 0.5);
+  box-shadow: 0 0.0625rem 0 0.0625rem oklch(from var(--INTERNAL-BOX-GREY-color) calc(l * 0.94) c h / 0.5);
   color: var(--INTERNAL-TEXT-color);
-  -webkit-print-color-adjust: exact;
-  color-adjust: exact;
   line-height: 1;
   min-width: 0.75rem;
   padding: 0.125rem 0.3125rem 0.125rem 0.3125rem;
   position: relative;
+  print-color-adjust: exact;
   text-align: center;
   top: -0.125rem;
 }
@@ -722,19 +1207,16 @@ h1 {
   overflow-x: hidden;
   text-align: center;
   text-rendering: optimizeLegibility;
-  text-transform: uppercase;
 }
 
-#R-body-inner > .flex-block-wrapper article.narrow h1 {
-  border-bottom: 4px solid rgba(134, 134, 134, 0.125);
+#R-main > .flex-block-wrapper article.narrow h1 {
+  border-bottom: 4px solid color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 30%, transparent);
 }
-@media only screen and (min-width: 48rem) and (max-width: 59.999rem) {
-  #R-body-inner > .flex-block-wrapper article h1 {
+@media screen {
+  :where(.menu-m-width) #R-main > .flex-block-wrapper article h1 {
     font-size: 2.8rem;
   }
-}
-@media only screen and (max-width: 47.999rem) {
-  #R-body-inner > .flex-block-wrapper article h1 {
+  :where(.menu-s-width) #R-main > .flex-block-wrapper article h1 {
     font-size: 2.5rem;
   }
 }
@@ -748,19 +1230,17 @@ h1 {
   letter-spacing: var(--INTERNAL-MAIN-TITLES-H1-letter-spacing);
   text-align: center;
 }
-#R-body-inner > .flex-block-wrapper article > .article-subheading {
+#R-main > .flex-block-wrapper article > .article-subheading {
   margin-top: 0;
 }
-#R-body-inner > .flex-block-wrapper article.narrow > .article-subheading {
+#R-main > .flex-block-wrapper article.narrow > .article-subheading {
   margin-top: 2rem;
 }
-@media screen and (max-width: 59.999rem) {
-  #R-body-inner > .flex-block-wrapper article.narrow > .article-subheading {
+@media screen {
+  :where(.menu-m-width) #R-main > .flex-block-wrapper article.narrow > .article-subheading {
     margin-top: 1rem;
   }
-}
-@media screen and (max-width: 47.999rem) {
-  #R-body-inner > .flex-block-wrapper article.narrow > .article-subheading {
+  :where(.menu-s-width) #R-main > .flex-block-wrapper article.narrow > .article-subheading {
     margin-top: 0.375rem;
   }
 }
@@ -786,7 +1266,7 @@ h3 {
 
 h4 {
   color: var(--INTERNAL-MAIN-TITLES-H4-TEXT-color);
-  font-size: 1.85rem;
+  font-size: 1.5rem;
   font-variation-settings: var(--INTERNAL-MAIN-TITLES-H4-font-variation-settings);
   font-weight: var(--INTERNAL-MAIN-TITLES-H4-font-weight);
   font-family: var(--INTERNAL-MAIN-TITLES-H4-font);
@@ -795,7 +1275,7 @@ h4 {
 
 h5 {
   color: var(--INTERNAL-MAIN-TITLES-H5-TEXT-color);
-  font-size: 1.6rem;
+  font-size: 1.25rem;
   font-variation-settings: var(--INTERNAL-MAIN-TITLES-H5-font-variation-settings);
   font-weight: var(--INTERNAL-MAIN-TITLES-H5-font-weight);
   font-family: var(--INTERNAL-MAIN-TITLES-H5-font);
@@ -804,7 +1284,7 @@ h5 {
 
 h6 {
   color: var(--INTERNAL-MAIN-TITLES-H6-TEXT-color);
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-variation-settings: var(--INTERNAL-MAIN-TITLES-H6-font-variation-settings);
   font-weight: var(--INTERNAL-MAIN-TITLES-H6-font-weight);
   font-family: var(--INTERNAL-MAIN-TITLES-H6-font);
@@ -835,22 +1315,59 @@ h6 {
   padding-inline-end: 2rem;
 }
 
-blockquote {
-  border-inline-start: 0.6rem solid rgba(134, 134, 134, 0.4);
+/* the bar of a quote is drawn instead of being a border, as a border can not
+   round the corners on its inner side */
+blockquote,
+figure.quote {
+  margin: 1.5rem 0;
+  padding-inline-start: 1.45rem;
+  position: relative;
+}
+blockquote::before,
+figure.quote::before {
+  background-color: oklch(from var(--INTERNAL-BOX-GREY-color) calc(l * 0.94) c h / 0.4);
+  border-radius: 3px;
+  bottom: 0;
+  content: '';
+  inset-inline-start: 0;
+  position: absolute;
+  print-color-adjust: exact;
+  top: 0;
+  width: 0.6rem;
 }
 
 blockquote p {
   font-size: 1.06640625rem;
   font-style: italic;
   opacity: 0.75;
-  text-align: justify;
 }
 
 blockquote cite {
   display: block;
+  font-size: 0.925rem;
   opacity: 0.5;
   padding-top: 0.5rem;
   text-align: end;
+}
+
+/* a quote with its attribution; the bar moves to the figure to span both */
+figure.quote > blockquote {
+  margin: 0;
+  padding-inline-start: 0;
+}
+figure.quote > blockquote::before {
+  content: none;
+}
+
+#R-body figure.quote > figcaption {
+  font-size: 0.925rem;
+  margin-top: 0.5rem;
+  opacity: 0.75;
+  text-align: end;
+}
+
+figure.quote > figcaption::before {
+  content: '\2014\00a0';
 }
 
 /* colored boxes */
@@ -858,33 +1375,40 @@ blockquote cite {
 .box {
   background-color: var(--VARIABLE-BOX-color);
   border-color: var(--VARIABLE-BOX-color);
+  border-radius: var(--block-radius);
   border-style: solid;
   border-width: 1px;
   margin: 1.5rem 0;
   outline: none;
-  pointer-events: none;
 }
 
 .box > .box-label {
   color: var(--VARIABLE-BOX-CAPTION-color);
-  font-weight: 500;
-  margin-left: 0.6rem;
-  margin-right: 0.6rem;
-  padding: 0.2rem 0;
+  /* the label fills the box up to its border, so its focus outline follows the inner edge of the box's corners */
+  border-radius: calc(var(--block-radius) - 1px) calc(var(--block-radius) - 1px) 0 0;
+  font-variation-settings: var(--INTERNAL-MAIN-MEDIUM-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-MEDIUM-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-MEDIUM-letter-spacing);
+  padding: 0.2rem 0.6rem;
 }
-.box > .box-label::-webkit-details-marker,
-.box > .box-label::marker {
+/* Safari draws its marker even for a summary that is no list item */
+.box > .box-label::-webkit-details-marker {
   display: none;
 }
 
 .box > .box-content {
   background-color: var(--VARIABLE-BOX-BG-color);
+  /* the content fills the box up to its border, so it follows the inner edge of the box's corners */
+  border-radius: 0 0 calc(var(--block-radius) - 1px) calc(var(--block-radius) - 1px);
   color: var(--VARIABLE-BOX-TEXT-color);
   padding-top: 1rem;
   padding-bottom: 1rem;
   padding-left: 1rem;
   padding-right: 1rem;
-  pointer-events: auto;
+}
+/* without a visible label, the content reaches the top of the box as well */
+.box > .box-label.a11y-only + .box-content {
+  border-radius: calc(var(--block-radius) - 1px);
 }
 /* remove margin if only a single code block is contained in the tab */
 #R-body .box-content:not(:has(> p)):has(> div[class*='highlight']:only-of-type),
@@ -896,6 +1420,13 @@ blockquote cite {
 #R-body .box-content:has(> p:empty) > div[class*='highlight']:only-of-type > pre {
   border: 0;
 }
+/* such a code block fills the content, so it takes over its corners */
+#R-body .box-content:not(:has(> p)) > div[class*='highlight']:only-of-type,
+#R-body .box-content:has(> p:empty) > div[class*='highlight']:only-of-type,
+#R-body .box-content:not(:has(> p)) > div[class*='highlight']:only-of-type > pre,
+#R-body .box-content:has(> p:empty) > div[class*='highlight']:only-of-type > pre {
+  border-radius: inherit;
+}
 
 p:empty {
   /* in case of image render hook, Hugo may generate empty <p>s that we want to ignore */
@@ -903,71 +1434,53 @@ p:empty {
 }
 
 /* in case of image render hook, Hugo may generate empty <p>s that we want to ignore as well, so a simple :first-child or :last-child is not enough */
-#R-body table th > :nth-child(1 of :not(:empty)),
-#R-body table th > :nth-child(1 of :not(:empty)) :nth-child(1 of :not(:empty)),
-#R-body table td > :nth-child(1 of :not(:empty)),
-#R-body table td > :nth-child(1 of :not(:empty)) :nth-child(1 of :not(:empty)),
-#R-body .box > .box-content > :nth-child(1 of :not(:empty)),
-#R-body .box > .box-content > :nth-child(1 of :not(:empty)) :nth-child(1 of :not(:empty)),
-#R-body .card-content > .card-content-text > :nth-child(1 of :not(:empty)),
-#R-body .card-content > .card-content-text > :nth-child(1 of :not(:empty)) :nth-child(1 of :not(:empty)),
-#R-body .tab-content > .tab-content-text > :nth-child(1 of :not(:empty)),
-#R-body .tab-content > .tab-content-text > :nth-child(1 of :not(:empty)) :nth-child(1 of :not(:empty)) {
+#R-body table :is(th, td) > :nth-child(1 of :not(:empty)),
+#R-body table :is(th, td) > :nth-child(1 of :not(:empty)) :nth-child(1 of :not(:empty)),
+#R-body :is(.box > .box-content, .card-content > .card-content-text, .tab-content > .tab-content-text) > :nth-child(1 of :not(:empty)),
+#R-body :is(.box > .box-content, .card-content > .card-content-text, .tab-content > .tab-content-text) > :nth-child(1 of :not(:empty)) :nth-child(1 of :not(:empty)) {
   margin-top: 0;
 }
 
-#R-body table th > :nth-last-child(1 of :not(:empty)),
-#R-body table th > :nth-last-child(1 of :not(:empty)) :nth-last-child(1 of :not(:empty)),
-#R-body table th > div.highlight:last-child pre:not(.mermaid),
-#R-body table td > :nth-last-child(1 of :not(:empty)),
-#R-body table td > :nth-last-child(1 of :not(:empty)) :nth-last-child(1 of :not(:empty)),
-#R-body table td > div:last-child pre:not(.mermaid),
-#R-body .box > .box-content > :nth-last-child(1 of :not(:empty)),
-#R-body .box > .box-content > :nth-last-child(1 of :not(:empty)) :nth-last-child(1 of :not(:empty)),
-#R-body .box > .box-content > div:last-child pre:not(.mermaid),
-#R-body .card-content > .card-content-text > :nth-last-child(1 of :not(:empty)),
-#R-body .card-content > .card-content-text > :nth-last-child(1 of :not(:empty)) :nth-last-child(1 of :not(:empty)),
-#R-body .card-content > .card-content-text > div:last-child pre:not(.mermaid),
-#R-body .tab-content > .tab-content-text > :nth-last-child(1 of :not(:empty)),
-#R-body .tab-content > .tab-content-text > :nth-last-child(1 of :not(:empty)) :nth-last-child(1 of :not(:empty)),
-#R-body .tab-content > .tab-content-text > div:last-child pre:not(.mermaid) {
+#R-body table :is(th, td) > :nth-last-child(1 of :not(:empty)),
+#R-body table :is(th, td) > :nth-last-child(1 of :not(:empty)) :nth-last-child(1 of :not(:empty)),
+#R-body table :is(th, td) > div:last-child pre:not(.mermaid),
+#R-body :is(.box > .box-content, .card-content > .card-content-text, .tab-content > .tab-content-text) > :nth-last-child(1 of :not(:empty)),
+#R-body :is(.box > .box-content, .card-content > .card-content-text, .tab-content > .tab-content-text) > :nth-last-child(1 of :not(:empty)) :nth-last-child(1 of :not(:empty)),
+#R-body :is(.box > .box-content, .card-content > .card-content-text, .tab-content > .tab-content-text) > div:last-child pre:not(.mermaid) {
   margin-bottom: 0;
 }
 
-/* Children shortcode */
-.children-type-group li > p + p {
+/* Pages and children shortcode */
+.columnize li > p + p {
+  /* a narrow column has no room for more than a line of description */
   overflow: hidden;
   text-overflow: ellipsis;
   text-wrap-mode: nowrap;
 }
-.children-type-group li > p + p,
-.children-type-tree li > p + p,
-.children-type-flat li > p {
+:is(.pages-tree, .pages-sections, .children-type-group, .children-type-tree) li > p + p,
+:is(.pages-list, .children-type-flat) li > p {
   font-size: 0.859625rem;
   font-style: italic;
 }
 
-.children-type-group p,
-.children-type-tree p,
-.children-type-flat p,
-.children-type-list p {
+:is(.pages-tree, .pages-sections, .pages-list, .pages-headings, .children-type-group, .children-type-tree, .children-type-flat, .children-type-list) p {
   margin-bottom: 0;
   margin-top: 0;
-  padding-bottom: 0;
-  padding-top: 0;
 }
 
+:is(.pages-tree, .pages-sections, .pages-list, .pages-headings, .children-type-group, .children-type-tree, .children-type-flat, .children-type-list) p + p {
+  margin-top: 0.125em;
+}
+
+.pages-list,
+.pages-headings,
 .children-type-flat,
 .children-type-list {
   list-style: none;
   padding-inline-start: 0;
 }
 
-.children-type-flat li,
-.children-type-list li {
-  margin-inline-start: 0;
-}
-
+.pages-headings :is(h1, h2, h3, h4, h5, h6),
 .children-type-list :is(h1, h2, h3, h4, h5, h6) {
   margin-bottom: 0;
   margin-top: 1rem;
@@ -982,44 +1495,47 @@ samp {
   font-weight: var(--INTERNAL-CODE-font-weight);
   font-family: var(--INTERNAL-CODE-font);
   letter-spacing: var(--INTERNAL-CODE-letter-spacing);
-  vertical-align: baseline;
 }
 
 code {
   background-color: var(--INTERNAL-CODE-INLINE-BG-color);
   border-color: var(--INTERNAL-CODE-INLINE-BORDER-color);
-  border-radius: 0.125em;
+  border-radius: 3px;
   border-style: solid;
   border-width: 1px;
   color: var(--INTERNAL-CODE-INLINE-color);
-  -webkit-print-color-adjust: economy;
-  color-adjust: economy;
   padding-left: 0.125em;
   padding-right: 0.125em;
+  print-color-adjust: economy;
+}
+
+/* inline code in a link is a link first, so it is told apart from other
+   inline code the same way a link is told apart from the text around it; what
+   looks like a control of its own stays as it is */
+article :not(.btn, .card-title) > a:not(.term-link, .autocomplete-suggestion, .lightbox-link, .lightbox-close) code {
+  color: inherit;
 }
 
 pre:not(.mermaid) {
   background-color: var(--INTERNAL-CODE-BLOCK-BG-color);
   border-color: var(--INTERNAL-CODE-BLOCK-BORDER-color);
-  border-radius: 2px;
+  border-radius: var(--block-radius);
   border-style: solid;
   border-width: 1px;
   color: var(--INTERNAL-CODE-BLOCK-color);
-  -webkit-print-color-adjust: economy;
-  color-adjust: economy;
   line-height: 1.15;
+  margin: 1.5rem 0;
+  overflow: auto;
   padding: 1rem;
   position: relative;
+  print-color-adjust: economy;
 }
 
 pre:not(.mermaid) code {
   background-color: inherit;
   border: 0;
   color: inherit;
-  -webkit-print-color-adjust: economy;
-  color-adjust: economy;
   font-size: 0.9375rem;
-  margin: 0;
   padding: 0;
 }
 
@@ -1030,14 +1546,21 @@ div.highlight {
 div.highlight > div:not(.actionbar) {
   background-color: var(--INTERNAL-CODE-BLOCK-BG-color);
   border-color: var(--INTERNAL-CODE-BLOCK-BORDER-color);
+  border-radius: var(--block-radius);
   border-style: solid;
   border-width: 1px;
+  /* the cells bring their own background, which must not cover our corners */
+  overflow: clip;
 }
 /* remove default style for usual markdown tables */
 div.highlight > div:not(.actionbar) table {
   background-color: transparent;
+  border-radius: 0;
   border-width: 0;
   margin: 0;
+}
+div.highlight > div:not(.actionbar) table::after {
+  content: none;
 }
 table {
   color: var(--INTERNAL-MAIN-TEXT-color);
@@ -1073,8 +1596,12 @@ div.highlight > div:not(.actionbar) table {
   display: block;
   overflow: auto;
 }
-div.highlight:not(.wrap-code) pre:not(.mermaid) {
-  overflow: auto;
+pre:not(.mermaid),
+div.highlight > div:not(.actionbar) table {
+  --VARIABLE-SCROLLBAR-THUMB-color: var(--INTERNAL-CODE-BLOCK-SCROLLBAR-THUMB-color);
+  --VARIABLE-SCROLLBAR-THUMB-HOVER-color: var(--INTERNAL-CODE-BLOCK-SCROLLBAR-THUMB-HOVER-color);
+  --VARIABLE-SCROLLBAR-TRACK-color: var(--INTERNAL-CODE-BLOCK-SCROLLBAR-TRACK-color);
+  --VARIABLE-SCROLLBAR-TRACK-HOVER-color: var(--INTERNAL-CODE-BLOCK-SCROLLBAR-TRACK-HOVER-color);
 }
 div.highlight:not(.wrap-code) pre:not(.mermaid) code {
   white-space: pre;
@@ -1104,36 +1631,228 @@ div.highlight > div:not(.actionbar) td:not(:first-child):last-child pre:not(.mer
 }
 
 hr {
-  border-bottom: 4px solid rgba(134, 134, 134, 0.125);
+  border-bottom: 4px solid color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 30%, transparent);
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  margin: 1.5rem 0;
+}
+#R-body hr {
+  /* a radius too large is cut down to half the height, whatever that is, so the ends are round
+     https://www.w3.org/TR/css-backgrounds-3/#corner-overlap */
+  border-radius: 9999px;
 }
 
-#R-body-inner pre:not(.mermaid) {
+#R-main pre:not(.mermaid) {
   white-space: pre-wrap;
 }
 
 table {
   background-color: var(--INTERNAL-MAIN-BG-color);
-  border: 1px solid rgba(134, 134, 134, 0.333);
+  /* Firefox paints the sticky header row over collapsed borders; so each cell
+     draws the borders at its end and bottom, the corners are cut off and the
+     frame is drawn on top, covering those along the edges of the table; the
+     corners are cut by overflow, as a clip path cuts off the frame at an edge
+     between two device pixels */
+  border-collapse: separate;
+  border-radius: var(--block-radius);
+  border-spacing: 0;
   margin-bottom: 1rem;
   margin-top: 1rem;
-  table-layout: auto;
+  overflow: clip;
+  width: 100%;
+}
+table::after {
+  border: 1px solid var(--INTERNAL-BOX-NEUTRAL-color);
+  border-radius: var(--block-radius);
+  content: '';
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  /* above the sticky header row */
+  z-index: 111;
+}
+
+th {
+  text-align: start;
 }
 
 th,
 thead td {
-  background-color: rgba(134, 134, 134, 0.166);
-  border: 1px solid rgba(134, 134, 134, 0.333);
-  -webkit-print-color-adjust: exact;
-  color-adjust: exact;
+  background-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 30%, transparent);
+  border-bottom: 1px solid var(--INTERNAL-BOX-NEUTRAL-color);
+  border-inline-end: 1px solid var(--INTERNAL-BOX-NEUTRAL-color);
   padding: 0.5rem;
+  print-color-adjust: exact;
 }
 
 td {
-  border: 1px solid rgba(134, 134, 134, 0.333);
+  border-bottom: 1px solid var(--INTERNAL-BOX-NEUTRAL-color);
+  border-inline-end: 1px solid var(--INTERNAL-BOX-NEUTRAL-color);
   padding: 0.5rem;
 }
+
+/* the alignment of a Markdown table column, which render-table.html gives as a class */
+:is(th, td).align-left {
+  text-align: left;
+}
+:is(th, td).align-center {
+  text-align: center;
+}
+:is(th, td).align-right {
+  text-align: right;
+}
+
 tbody > tr:nth-child(even) > td {
-  background-color: rgba(134, 134, 134, 0.045);
+  background-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 15%, transparent);
+}
+
+/* the actionbar sticks together with the header row, so the wrapper takes the
+   margins of the table to let both start at the same height; the wrapper must
+   never scroll on its own, or the header row sticks to it instead of the page */
+.sortable-table {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  /* as wide as a table too wide for the page, so the actionbar stays at its end */
+  min-width: 100%;
+  width: fit-content;
+}
+.sortable-table > table {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+.sortable-table > .actionbar {
+  /* it takes no space, its buttons hang down over the end of the header row */
+  align-items: flex-start;
+  height: 0;
+  inset-inline-end: auto;
+  justify-content: flex-end;
+  /* it follows the table for the keyboard, but a sticky element only moves down from where it is */
+  order: -1;
+  padding-inline-end: 4px;
+  position: sticky;
+  /* stuck at the same height as the header row; the distance to the top is the
+     one of any other actionbar, moved by transform as a sticky offset only
+     applies once stuck */
+  top: -1px;
+  transform: translateY(4px);
+  /* above the frame of the table */
+  z-index: 112;
+}
+/* rows joined by merged cells are sorted as one, so they are striped as one */
+.sortable-table > table > tbody > tr > td {
+  background-color: transparent;
+}
+.sortable-table > table > tbody:nth-of-type(even) > tr > td {
+  background-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 15%, transparent);
+}
+/* the whole header cell is the button */
+.sortable-table th:has(> button) {
+  padding: 0;
+  /* the sort icons stay at the height of the reset button, also if another
+     header of the row spans more lines */
+  vertical-align: top;
+}
+/* a header that is no button looks like one that is, its first line at the
+   height of the caption beside a sort icon; the size of that icon is the one of
+   an action button, its font of 0.9em times its padding and icon of 1.95em plus
+   its border */
+.sortable-table th:not(:has(> button)) {
+  padding: calc(4px + (0.9em * 1.95 + 2px - 1lh) / 2) 0.5rem 4px;
+  vertical-align: top;
+}
+.sortable-table th > button {
+  /* the sort icon follows the caption, but stays in its first line once the
+     caption breaks into more, which is centered on it */
+  align-items: flex-start;
+  background-color: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  /* the square of the sort icon keeps the distance of a button in an actionbar
+     to the edges, the same as the reset button */
+  padding: 4px 0.5rem;
+  text-align: inherit;
+  width: 100%;
+}
+/* room for the reset button at the end of the header row, so it never covers a
+   sort icon: its distance to the edge, its width as an action button like above
+   and the gap of the actionbar */
+.sortable-table thead > tr:first-child > :last-child:not(:has(> button)),
+.sortable-table thead > tr:first-child > :last-child > button {
+  padding-inline-end: calc(4px + 0.9em * 1.95 + 2px + 4px);
+}
+.sortable-table .sort-indicator > .btn {
+  vertical-align: middle;
+}
+/* the alignment of the column moves caption and icon together; it is physical
+   like the class, the lines of the caption follow it by inheritance */
+.sortable-table th.align-left > button {
+  justify-content: left;
+}
+.sortable-table th.align-center > button {
+  justify-content: center;
+}
+.sortable-table th.align-right > button {
+  justify-content: right;
+}
+.sortable-table th > button:focus:not(:focus-visible) {
+  outline: none;
+}
+.sortable-table th > button:focus-visible {
+  /* inside of the cell, or the clipped corners of the table cut it off */
+  outline-offset: -2px;
+}
+.sortable-table .sort-caption {
+  padding-top: calc((0.9em * 1.95 + 2px - 1lh) / 2);
+}
+.sortable-table .sort-indicator {
+  flex: none;
+  margin-inline-start: 0.25rem;
+}
+/* the icon looks like an action button and is highlighted like one, but for
+   the whole cell, which is the button */
+.sortable-table th > button:is(:hover, :active, :focus) .sort-indicator > .btn > * {
+  background-color: var(--VARIABLE-BOX-BG-color);
+  color: var(--VARIABLE-BOX-TEXT-color);
+}
+/* the number of a sort key is shown in the half of the square its arrow leaves free */
+.sortable-table .sort-indicator > .btn > * {
+  position: relative;
+}
+.sortable-table .sort-rank {
+  font-size: 0.7em;
+  font-variation-settings: var(--INTERNAL-MAIN-BOLD-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-BOLD-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-BOLD-letter-spacing);
+  inset-inline: 0;
+  line-height: 1;
+  position: absolute;
+  text-align: center;
+}
+/* the arrow is centered in the square, so the number is placed from its middle,
+   not from the edges, which move with the padding of the button; above the
+   arrow, the box of the number may reach into its half, as the part of the box
+   below the baseline stays empty */
+.sortable-table .fa-sort-up + .sort-rank {
+  top: 50%;
+}
+.sortable-table .fa-sort-down + .sort-rank {
+  bottom: calc(50% - 0.1em);
+}
+.sort-reset-button.btn {
+  display: none;
+}
+.sort-reset-button.btn.sorted {
+  display: inline-block;
+}
+/* a sorted table shows that it can be reset, also when not hovered */
+.sortable-table > .actionbar:has(.sort-reset-button.sorted) {
+  opacity: 1;
 }
 
 /* Toast Notification System */
@@ -1153,11 +1872,13 @@ tbody > tr:nth-child(even) > td {
 .toast {
   animation: toast-slide-in 0.3s ease-out;
   background-color: var(--INTERNAL-PRIMARY-color);
-  border-radius: 4px;
+  border-radius: var(--block-radius);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   color: var(--MAIN-BG-color);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-variation-settings: var(--INTERNAL-MAIN-MEDIUM-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-MEDIUM-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-MEDIUM-letter-spacing);
   max-width: 90vw;
   padding: 0.75rem 1.25rem;
   pointer-events: auto;
@@ -1209,6 +1930,9 @@ tbody > tr:nth-child(even) > td {
 
 .topbar-button {
   display: inline-block;
+  /* a title may shrink to nothing for its animation, so the button must not
+     give in to its neighbours instead */
+  flex-shrink: 0;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   position: relative;
@@ -1224,9 +1948,24 @@ tbody > tr:nth-child(even) > td {
   border-inline-start: 1px solid var(--INTERNAL-TOPBAR-SEPARATOR-color);
 }
 
+/* in an overlay, all buttons are as wide as the widest of them; the area
+   takes the width the buttons need with their titles as shown at the current
+   width, as a title's column could otherwise shrink to nothing */
+.topbar-content-wrapper > .topbar-area {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+}
 .topbar-content-wrapper > .topbar-area > .topbar-button {
   padding: 0.5rem 0;
   margin: -0.25rem;
+}
+.topbar-content-wrapper > .topbar-area > .topbar-button > .btn {
+  display: flex;
+}
+.topbar-content-wrapper > .topbar-area > .topbar-button > .btn > * {
+  flex-grow: 1;
+  text-align: start;
 }
 
 .topbar-button > .btn {
@@ -1237,9 +1976,51 @@ tbody > tr:nth-child(even) > td {
   --VARIABLE-LINK-HOVER-color: var(--INTERNAL-TOPBAR-BUTTON-HOVER-color);
 }
 
-.topbar-button > .btn > button:disabled i,
-.topbar-button > .btn > span i {
-  color: rgba(134, 134, 134, 0.333);
+.topbar-button > .btn > button:disabled :is(i, .title),
+.topbar-button > .btn > span :is(i, .title) {
+  color: oklch(from var(--INTERNAL-BOX-GREY-color) calc(l * 0.94) c h / 0.333);
+}
+
+/* the title sits in a column of its own, so hiding it can shrink that column
+   to nothing over time; the columns are packed at the start, so the title
+   stays next to the icon and the shrinking column only covers its text; the
+   grid drops the space in front of the title, so the title brings its own */
+.topbar-button > .btn > * {
+  align-items: baseline;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  justify-content: start;
+  transition:
+    grid-template-columns 0.35s ease,
+    padding 0.35s ease;
+}
+.topbar-button > .btn > * > .title {
+  /* even without an icon, the title keeps to its own column */
+  grid-column: 2;
+  min-width: 0;
+  overflow-x: clip;
+  transition: padding 0.35s ease;
+}
+.topbar-button > .btn > * > i + .title::before {
+  content: ' ';
+  /* an underline of the title does not reach into an inline-block */
+  display: inline-block;
+  white-space: pre;
+}
+
+/* a hidden title still names the button for assistive technology, while the
+   button is spaced like one without title; the width classes are the ones
+   theme.js moves the buttons by, so both change together */
+:where(.menu-s-width) .topbar-button[data-title-width-s='hide'] > .btn > *,
+:where(.menu-m-width) .topbar-button[data-title-width-m='hide'] > .btn > *,
+:where(.menu-l-width) .topbar-button[data-title-width-l='hide'] > .btn > * {
+  grid-template-columns: auto 0fr;
+  padding: 0.4em;
+}
+:where(.menu-s-width) .topbar-button[data-title-width-s='hide'] > .btn > * > .title,
+:where(.menu-m-width) .topbar-button[data-title-width-m='hide'] > .btn > * > .title,
+:where(.menu-l-width) .topbar-button[data-title-width-l='hide'] > .btn > * > .title {
+  padding-inline-start: 0;
 }
 
 .topbar-sidebar-divider {
@@ -1252,8 +2033,8 @@ tbody > tr:nth-child(even) > td {
   position: relative;
   width: 1px;
 }
-@media screen and (max-width: 47.999rem) {
-  .topbar-sidebar-divider {
+@media screen {
+  :where(.menu-s-width) .topbar-sidebar-divider {
     border-inline-start-color: transparent;
   }
 }
@@ -1261,15 +2042,19 @@ tbody > tr:nth-child(even) > td {
   content: '\00a0';
 }
 
-.topbar-wrapper > .topbar-area-start {
+.topbar-wrapper > .topbar-area {
   display: flex;
   flex-direction: row;
   flex-shrink: 0;
 }
 .topbar-wrapper > .topbar-area-end {
-  display: flex;
-  flex-direction: row;
-  flex-shrink: 0;
+  /* at the end, even if nothing in the middle area takes the remaining space */
+  margin-inline-start: auto;
+}
+/* the elements of the middle area are laid out as if they were written
+   directly into the topbar, so the breadcrumbs take the remaining space */
+.topbar-wrapper > .topbar-area-middle {
+  display: contents;
 }
 .topbar-wrapper > .topbar-hidden {
   display: none;
@@ -1283,7 +2068,7 @@ html[dir='rtl'] .topbar-button-next i {
 .topbar-content {
   top: 1rem;
 }
-.topbar-wrapper > .topbar-area-start .topbar-content {
+.topbar-wrapper > .topbar-area:not(.topbar-area-end) .topbar-content {
   inset-inline-start: 1.5rem;
 }
 .topbar-wrapper > .topbar-area-end .topbar-content {
@@ -1293,16 +2078,22 @@ html[dir='rtl'] .topbar-button-next i {
   /* we don't allow flyouts in flyouts; come on, don't get funny... */
   display: none;
 }
+.topbar-content .default-animation {
+  /* visibility is inherited; animating it here as well would leave the
+     contents out of reach at the moment the flyout opens */
+  transition:
+    all 0.35s ease,
+    visibility 0s;
+}
 
 .topbar-breadcrumbs {
-  margin: 0;
   padding: 0 calc(0.9em - 2px);
 }
-@media screen and (max-width: 47.999rem) {
-  .topbar-breadcrumbs {
+@media screen {
+  :where(.menu-s-width) .topbar-breadcrumbs {
     text-align: center;
   }
-  .topbar-breadcrumbs li:has(> a) {
+  :where(.menu-s-width) .topbar-breadcrumbs li:has(> a) {
     /* same as .a11y-only */
     /* idea taken from https://www.filamentgroup.com/lab/a11y-form-labels.html */
     clip-path: polygon(0 0, 1px 0, 1px 1px, 0 1px);
@@ -1317,7 +2108,6 @@ html[dir='rtl'] .topbar-button-next i {
     width: 1px;
   }
 }
-
 .breadcrumbs {
   min-width: 0;
   overflow: hidden;
@@ -1326,12 +2116,19 @@ html[dir='rtl'] .topbar-button-next i {
   white-space: nowrap;
 }
 
-.breadcrumbs meta {
-  display: none;
+.breadcrumbs > ol {
+  display: inline;
+  margin: 0;
+  padding: 0;
 }
 
 .breadcrumbs li {
   display: inline-block;
+}
+.breadcrumbs li.topbar-breadcrumbs-divider {
+  /* only shown where the logo leads the topbar, on paper and in the print
+     version */
+  display: none;
 }
 
 #R-body a[aria-disabled='true'] {
@@ -1340,49 +2137,61 @@ html[dir='rtl'] .topbar-button-next i {
   text-decoration: none;
 }
 
-@media screen and (max-width: 59.999rem) {
-  #R-sidebar {
+@media screen {
+  :where(.menu-s-width, .menu-m-width) #R-sidebar {
     min-width: var(--INTERNAL-MENU-M-width);
     max-width: var(--INTERNAL-MENU-M-width);
     width: var(--INTERNAL-MENU-M-width);
   }
-  #R-body {
+  :where(.menu-s-width, .menu-m-width) #R-body {
     margin-inline-start: var(--INTERNAL-MENU-M-width);
     min-width: calc(100% - var(--INTERNAL-MENU-M-width));
     max-width: calc(100% - var(--INTERNAL-MENU-M-width));
     width: calc(100% - var(--INTERNAL-MENU-M-width));
   }
-}
-@media screen and (max-width: 47.999rem) {
   /* we don't support sidebar flyout in mobile */
-  .mobile-support #R-sidebar {
+  :where(.menu-s-width) .mobile-support #R-sidebar {
     inset-inline-start: calc(-1 * var(--INTERNAL-MENU-S-width));
     min-width: var(--INTERNAL-MENU-S-width);
     max-width: var(--INTERNAL-MENU-S-width);
+    /* out of reach for the keyboard and screen readers as long as it is out of
+       sight; so only once it has left and as soon as it enters */
+    transition:
+      all 0.35s ease,
+      visibility 0s 0.35s;
+    visibility: hidden;
     width: var(--INTERNAL-MENU-S-width);
   }
-  .mobile-support #navshow {
-    display: inline;
+  :where(.menu-s-width) .mobile-support #R-sidebar .default-animation {
+    /* visibility is inherited; animating it here as well would leave the
+       contents out of reach at the moment the sidebar enters */
+    transition:
+      all 0.35s ease,
+      visibility 0s;
   }
-  .mobile-support #R-body {
+  :where(.menu-s-width) .mobile-support #R-body {
     margin-inline-start: 0;
     min-width: 100%;
     max-width: 100%;
     width: 100%;
   }
-  .mobile-support.sidebar-flyout {
+  :where(.menu-s-width) .mobile-support.sidebar-flyout {
     overflow: hidden;
   }
-  .mobile-support.sidebar-flyout #R-sidebar {
+  :where(.menu-s-width) .mobile-support.sidebar-flyout #R-sidebar {
     inset-inline-start: 0;
+    transition:
+      all 0.35s ease,
+      visibility 0s;
+    visibility: visible;
     z-index: 90;
   }
-  .mobile-support.sidebar-flyout #R-body {
+  :where(.menu-s-width) .mobile-support.sidebar-flyout #R-body {
     margin-inline-start: var(--INTERNAL-MENU-S-width);
     overflow: hidden;
   }
-  .mobile-support.sidebar-flyout #R-body-overlay {
-    background-color: rgba(134, 134, 134, 0.5);
+  :where(.menu-s-width) .mobile-support.sidebar-flyout #R-body-overlay {
+    background-color: oklch(from var(--INTERNAL-BOX-GREY-color) calc(l * 0.94) c h / 0.5);
     bottom: 0;
     cursor: pointer;
     height: 100vh;
@@ -1395,7 +2204,6 @@ html[dir='rtl'] .topbar-button-next i {
 }
 
 span.copy-to-clipboard {
-  display: inline;
   position: relative;
 }
 
@@ -1406,8 +2214,13 @@ code.copy-to-clipboard-code:has(+ .inline-copy-to-clipboard-button):after {
 }
 
 .inline-copy-to-clipboard-button.btn.cstyle {
+  /* the font of the code gives the button the very line of the code, so both boxes share their top and bottom edges */
   font: initial;
+  font-family: var(--INTERNAL-CODE-font);
   font-size: 0.934375em;
+  font-variation-settings: var(--INTERNAL-CODE-font-variation-settings);
+  font-weight: var(--INTERNAL-CODE-font-weight);
+  letter-spacing: var(--INTERNAL-CODE-letter-spacing);
   margin-inline-start: calc(-1 * (1.375em - var(--bpx1) * 0.125em));
   position: relative;
   z-index: 10;
@@ -1415,47 +2228,47 @@ code.copy-to-clipboard-code:has(+ .inline-copy-to-clipboard-button):after {
 
 .inline-copy-to-clipboard-button.btn.cstyle > * {
   border-start-start-radius: 0;
-  border-start-end-radius: 0.125em;
+  border-start-end-radius: 3px;
   border-end-start-radius: 0;
-  border-end-end-radius: 0.125em;
+  border-end-end-radius: 3px;
   border-color: var(--INTERNAL-CODE-INLINE-BORDER-color);
   padding: 0;
 }
 
 .inline-copy-to-clipboard-button.btn.cstyle > * > i {
   font-size: 0.859625em;
-  line-height: 1.375em;
+  /* the icon is smaller than the code, so it sits on the baseline of the code instead of filling the line of the button */
+  height: auto;
+  /* the icon must not stretch the line of the button */
+  line-height: 1;
+  vertical-align: baseline;
   width: 1.375em;
 }
 
 .actionbar {
-  display: none;
+  display: flex;
+  gap: 4px;
   inset-inline-end: 4px;
+  /* out of sight but not hidden, to keep it a stop for the tab key */
+  opacity: 0;
   position: absolute;
   top: 4px;
 }
 
 .disableHoverBlockCopyToClipBoard .actionbar {
-  display: block;
+  opacity: 1;
 }
 
-.actionbar-wrapper:hover .actionbar,
-.actionbar-wrapper:focus-within .actionbar,
-.actionbar:has(:hover),
-.actionbar:has(:active),
-.actionbar:has(:focus) {
-  display: block;
+.actionbar-wrapper:is(:hover, :focus-within) .actionbar,
+.actionbar:has(:hover, :active, :focus) {
+  opacity: 1;
 }
 
 @media (any-hover: none) {
   /* if at least one input device does not support hover, force actionbar to be visible */
   .actionbar {
-    display: block;
+    opacity: 1;
   }
-}
-
-.force-display {
-  display: block !important;
 }
 
 option {
@@ -1463,34 +2276,83 @@ option {
 }
 
 .expand {
-  margin-bottom: 1.5rem;
-  margin-top: 1.5rem;
-  outline: initial;
-  pointer-events: initial;
   position: relative;
 }
 
+/* a summary is a list item, whose marker would stand next to our own icon */
 .expand > .box-label {
   cursor: pointer;
+  display: block;
 }
-.expand > .box-label:hover,
-.expand > .box-label:active,
-.expand > .box-label:focus {
+/* without its content, the label reaches the bottom of the box as well */
+.expand:not([open]) > .box-label {
+  border-radius: calc(var(--block-radius) - 1px);
+}
+.expand > .box-label:is(:hover, :active, :focus) {
   text-decoration: underline;
 }
 
 .expand > .box-label > .expander-icon {
   font-size: 0.8rem;
-  width: 0.6rem;
+  /* as wide as it is high, so the chevron has the room to turn in it */
+  /* the icon itself stays in place and holds what turns in it, so the focus
+     outline of the label has nothing to follow */
+  overflow: clip;
+  width: 0.8rem;
 }
-.expand[open] > .box-label > i.expander-icon {
+.expand > .box-label > i.expander-icon::before {
+  display: inline-block;
+  transition: transform 0.175s ease;
+}
+.expand[open] > .box-label > i.expander-icon::before {
   transform: rotate(90deg);
 }
-html[dir='rtl'] .expand > .box-label > i.expander-icon {
-  transform: scaleX(-1);
+/* the mirroring stays in the open state as well, so the chevron turns instead
+   of flipping over; pointing down, it looks the same mirrored or not */
+html[dir='rtl'] .expand > .box-label > i.expander-icon::before {
+  transform: scaleX(-1) rotate(0deg);
 }
-html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
-  transform: rotate(90deg);
+html[dir='rtl'] .expand[open] > .box-label > i.expander-icon::before {
+  transform: scaleX(-1) rotate(90deg);
+}
+
+/* the content is the only row of what the box discloses and rolls out from
+   below the label as that row grows; it hangs on the lower edge of the row, so
+   it moves along with what it pushes down */
+@supports selector(::details-content) {
+  .expand::details-content {
+    /* while it grows, the row is shorter than the room there is for it; what
+       is left must not end up below the content */
+    align-content: end;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 0fr;
+    /* cut off at the height of the row but not to the sides */
+    overflow-y: clip;
+    /* the content stays to be seen until it is rolled in */
+    transition:
+      content-visibility 0.175s allow-discrete,
+      grid-template-rows 0.175s ease;
+  }
+  .expand[open]::details-content {
+    grid-template-rows: 1fr;
+  }
+  .expand > .box-content {
+    align-self: end;
+    min-height: 0;
+    transition: padding 0.175s ease;
+  }
+  /* the row can only collapse completely if nothing of the content is left */
+  #R-body .expand:not([open]) > .box-content {
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+}
+
+/* the header may be left without content, so it only takes room if it has
+   some; the partial's surrounding whitespace keeps :empty from matching */
+#R-body header.headline:has(*) {
+  margin-top: 1rem;
 }
 
 #R-body footer.footline {
@@ -1514,14 +2376,19 @@ html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
 .mermaid {
   display: inline-block;
   border: 1px solid transparent;
-  padding: 0.5rem 0.5rem 0 0.5rem;
+  border-radius: var(--block-radius);
+  padding: 0.25rem 0.25rem 0 0.25rem;
   position: relative;
   /* don't use display: none, as this will cause no renderinge by Mermaid */
   visibility: hidden;
   width: 100%;
 }
+/* a graph not drawn yet still holds its source, whose long lines must not widen the page */
+.mermaid:not([data-processed]) {
+  overflow: hidden;
+}
 .mermaid-container.zoomable > .mermaid:hover {
-  border-color: rgba(134, 134, 134, 0.333);
+  border-color: var(--INTERNAL-BOX-NEUTRAL-color);
 }
 .mermaid.mermaid-render {
   visibility: visible;
@@ -1534,35 +2401,54 @@ html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
 .mermaid-container.zoomable > .mermaid > svg {
   cursor: grab;
 }
+/* the graph shows its focus on the box that holds it */
+.mermaid-container.zoomable > .mermaid > svg:focus {
+  outline: none;
+}
+.mermaid-container.zoomable > .mermaid:has(> svg:focus-visible) {
+  outline: auto;
+}
 
 .svg-reset-button.btn {
   display: none;
 }
 
 .svg-reset-button.btn.zoomed {
-  display: block;
+  display: inline-block;
+}
+
+/* the graph itself is enlarged instead of a copy of it, so it keeps its pan and zoom */
+.mermaid.lightbox {
+  border-width: 0;
+  inset: 2.5%;
+  padding: 0;
+  position: fixed;
+  width: auto;
+  z-index: 1999;
+}
+.mermaid.lightbox::before {
+  background: rgba(0, 0, 0, 0.8);
+  content: '';
+  inset: 0;
+  position: fixed;
+  z-index: -1;
+}
+.mermaid.lightbox > svg {
+  background-color: var(--INTERNAL-MAIN-BG-color);
+  box-sizing: border-box;
+  height: 100% !important;
+  /* the graph limits itself to its natural size */
+  max-height: none !important;
+  max-width: none !important;
+  padding: min(2vh, 2vw);
+  width: 100%;
+}
+.mermaid.lightbox > .actionbar {
+  opacity: 1;
 }
 
 .mermaid-code {
   display: none;
-}
-
-.include.hide-first-heading h1 ~ h2:first-of-type,
-.include.hide-first-heading h1 ~ h3:first-of-type,
-.include.hide-first-heading h2 ~ h3:first-of-type,
-.include.hide-first-heading h1 ~ h4:first-of-type,
-.include.hide-first-heading h2 ~ h4:first-of-type,
-.include.hide-first-heading h3 ~ h4:first-of-type,
-.include.hide-first-heading h1 ~ h5:first-of-type,
-.include.hide-first-heading h2 ~ h5:first-of-type,
-.include.hide-first-heading h3 ~ h5:first-of-type,
-.include.hide-first-heading h4 ~ h5:first-of-type,
-.include.hide-first-heading h1 ~ h6:first-of-type,
-.include.hide-first-heading h2 ~ h6:first-of-type,
-.include.hide-first-heading h3 ~ h6:first-of-type,
-.include.hide-first-heading h4 ~ h6:first-of-type,
-.include.hide-first-heading h5 ~ h6:first-of-type {
-  display: block;
 }
 
 /* Table of contents */
@@ -1579,8 +2465,9 @@ html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
 
 .topbar-content {
   background: var(--INTERNAL-TOPBAR-OVERLAY-BG-color);
-  border: 0 solid rgba(134, 134, 134, 0.166);
-  box-shadow: 1px 2px 5px 1px rgba(134, 134, 134, 0.2);
+  border: 0 solid var(--overlay-border-color);
+  border-radius: var(--block-radius);
+  box-shadow: var(--overlay-box-shadow);
   height: 0;
   opacity: 0;
   overflow: hidden;
@@ -1598,21 +2485,16 @@ html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
   width: auto;
 }
 
-.topbar-content .topbar-content-wrapper {
-  background-color: rgba(134, 134, 134, 0.066);
-}
-
 .topbar-content-wrapper {
-  --ps-rail-hover-color: rgba(176, 176, 176, 0.25);
   max-height: 90vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0.5rem 1rem;
-  position: relative; /* PS */
-}
-
-.topbar-content .topbar-button {
-  border-width: 0;
-  padding: 0.5rem 0;
+  --VARIABLE-SCROLLBAR-THUMB-color: var(--INTERNAL-TOPBAR-SCROLLBAR-THUMB-color);
+  --VARIABLE-SCROLLBAR-THUMB-HOVER-color: var(--INTERNAL-TOPBAR-SCROLLBAR-THUMB-HOVER-color);
+  --VARIABLE-SCROLLBAR-TRACK-color: var(--INTERNAL-TOPBAR-SCROLLBAR-TRACK-color);
+  --VARIABLE-SCROLLBAR-TRACK-HOVER-color: var(--INTERNAL-TOPBAR-SCROLLBAR-TRACK-HOVER-color);
 }
 
 #TableOfContents,
@@ -1638,7 +2520,9 @@ html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
 
 #TableOfContents > ul > li > a,
 .TableOfContents > ul > li > a {
-  font-weight: 500;
+  font-variation-settings: var(--INTERNAL-MAIN-MEDIUM-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-MEDIUM-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-MEDIUM-letter-spacing);
 }
 
 /* tree shortcode */
@@ -1656,14 +2540,9 @@ html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
 
 .list-tree li {
   color: var(--INTERNAL-MAIN-TEXT-color);
-  margin-bottom: 0;
-  margin-inline-end: 0;
   margin-inline-start: 0.5rem;
-  margin-top: 0;
-  padding-bottom: 0;
   padding-inline-end: 0.75rem;
   padding-inline-start: 1rem;
-  padding-top: 0;
   position: relative;
 }
 .list-tree > ul > li {
@@ -1681,7 +2560,6 @@ html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
 
 .list-tree li::before {
   border-top: 2px solid var(--INTERNAL-MAIN-TEXT-color);
-  height: 0;
   top: 0.75rem;
   width: 0.75rem;
 }
@@ -1692,7 +2570,6 @@ html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
   border-left: 2px solid var(--INTERNAL-MAIN-TEXT-color);
   height: 100%;
   top: -0.5rem;
-  width: 0;
 }
 
 .list-tree ul:last-child li:last-child:after {
@@ -1702,6 +2579,84 @@ html[dir='rtl'] .expand[open] > .box-label > i.expander-icon {
 .list-tree i {
   color: var(--INTERNAL-PRIMARY-color);
   margin-inline-end: 0.25rem;
+}
+
+/* the stylesheet of Font Awesome arrives after the first paint, so until then
+   an icon is an empty inline without any size; we reserve its box up front
+   with the very values of that stylesheet, so nothing moves once it is there;
+   `:where()` keeps this without specificity, so every other rule wins over it */
+
+:where(.fa, .fa-brands, .fa-classic, .fa-regular, .fa-solid, .fab, .far, .fas) {
+  display: var(--fa-display, inline-block);
+  line-height: 1;
+  width: var(--fa-width, 1.25em);
+}
+/* the box only gains its height from a line, which needs content to exist */
+:where(.fa, .fa-brands, .fa-classic, .fa-regular, .fa-solid, .fab, .far, .fas)::before {
+  content: '\200b';
+}
+:where(.fa-1x) {
+  font-size: 1em;
+}
+:where(.fa-2x) {
+  font-size: 2em;
+}
+:where(.fa-3x) {
+  font-size: 3em;
+}
+:where(.fa-4x) {
+  font-size: 4em;
+}
+:where(.fa-5x) {
+  font-size: 5em;
+}
+:where(.fa-6x) {
+  font-size: 6em;
+}
+:where(.fa-7x) {
+  font-size: 7em;
+}
+:where(.fa-8x) {
+  font-size: 8em;
+}
+:where(.fa-9x) {
+  font-size: 9em;
+}
+:where(.fa-10x) {
+  font-size: 10em;
+}
+:where(.fa-2xs) {
+  font-size: 0.625em;
+  line-height: 0.1em;
+  vertical-align: 0.225em;
+}
+:where(.fa-xs) {
+  font-size: 0.75em;
+  line-height: 0.08333em;
+  vertical-align: 0.125em;
+}
+:where(.fa-sm) {
+  font-size: 0.875em;
+  line-height: 0.07143em;
+  vertical-align: 0.05357em;
+}
+:where(.fa-lg) {
+  font-size: 1.25em;
+  line-height: 0.05em;
+  vertical-align: -0.075em;
+}
+:where(.fa-xl) {
+  font-size: 1.5em;
+  line-height: 0.04167em;
+  vertical-align: -0.125em;
+}
+:where(.fa-2xl) {
+  font-size: 2em;
+  line-height: 0.03125em;
+  vertical-align: -0.1875em;
+}
+:where(.fa-width-auto) {
+  --fa-width: auto;
 }
 
 /* icons with style attribute */
@@ -1715,7 +2670,9 @@ i.cstyle {
   border-radius: 4px;
   display: inline-block;
   font-size: 0.9em;
-  font-weight: 500;
+  font-variation-settings: var(--INTERNAL-MAIN-MEDIUM-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-MEDIUM-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-MEDIUM-letter-spacing);
   line-height: 1.1;
   margin-bottom: 0;
   touch-action: manipulation;
@@ -1732,10 +2689,6 @@ i.cstyle {
   cursor: pointer;
 }
 
-.btn > button {
-  letter-spacing: var(--INTERNAL-MAIN-letter-spacing);
-}
-
 .btn > span,
 .btn > a {
   display: block;
@@ -1744,9 +2697,6 @@ i.cstyle {
 .btn > :where(button) {
   -webkit-appearance: none;
   appearance: none;
-  border-width: 0;
-  margin: 0;
-  padding: 0;
 }
 
 .btn > * {
@@ -1759,8 +2709,6 @@ i.cstyle {
   padding: 0.4em 0.5em;
   text-align: center;
   touch-action: manipulation;
-  -webkit-user-select: none;
-  user-select: none;
   white-space: nowrap;
 }
 
@@ -1769,19 +2717,28 @@ i.cstyle {
 }
 
 .btn > * > i.fa-fw {
-  /* fa-fw makes rectangles instead of squares, so we adjust back, hopefully no icon exceeds that area */
-  line-height: 1.15em;
-  width: 1.15em;
+  /* fa-fw makes rectangles instead of squares, so we adjust back to the height of the button's line, hopefully no icon exceeds that area; the icon fills that line instead of sitting on the text's baseline, and centers its glyph as a box without leading, as browsers round leading to the pixel, always off to the top */
+  align-items: center;
+  align-self: center;
+  display: inline-flex;
+  height: 1.1em;
+  justify-content: center;
+  line-height: normal;
+  vertical-align: top;
+  width: 1.1em;
 }
 
 .btn > * > i.fa-fw.fa-lg {
   /* fa-lg makes rectangles instead of squares, so we adjust back, hopefully no icon exceeds that area */
-  line-height: 1.375em;
+  height: 1.375em;
   width: 1.375em;
 }
 
 .btn > * > i + .title {
-  padding-inline-start: 0.1em;
+  padding-inline-start: 0.2em;
+}
+.btn > * > .title:has(+ i) {
+  padding-inline-end: 0.2em;
 }
 
 .btn.noborder > * {
@@ -1795,33 +2752,22 @@ i.cstyle {
   /* avoid breakage if no content is given */
   content: '\200b';
   display: block;
-  min-height: 1.15em;
-  min-width: 1.15em;
+  min-height: 1.1em;
+  min-width: 1.1em;
 }
 
-#R-body #R-body-inner .btn > *.highlight:after {
+#R-body #R-main .btn > *.highlight:after {
   background-color: transparent;
 }
 
-.btn.interactive > *:hover,
-.btn.interactive > *:active,
-.btn.interactive > *:focus {
+.btn.interactive > :is(:hover, :active, :focus) {
   background-color: var(--VARIABLE-BOX-BG-color);
   color: var(--VARIABLE-BOX-TEXT-color);
   text-decoration: none;
 }
 
 .btn.cstyle.transparent {
-  --VARIABLE-BOX-BG-color: var(--INTERNAL-BOX-BG-color);
-}
-
-.btn.interactive.cstyle.transparent:hover,
-.btn.interactive.cstyle.transparent:focus,
-.btn.interactive.cstyle.transparent:active,
-.btn.interactive.cstyle.transparent:has(a:hover),
-.btn.interactive.cstyle.transparent:has(a:focus),
-.btn.interactive.cstyle.transparent:has(a:active) {
-  background-color: var(--INTERNAL-BOX-NEUTRAL-color);
+  --VARIABLE-BOX-BG-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 50%, transparent);
 }
 
 .btn.cstyle.transparent > * {
@@ -1840,118 +2786,212 @@ i.cstyle {
   font-size: 0.5em;
   margin-inline-start: 0.3em;
   margin-top: 0.55em;
+  /* out of sight but not hidden, to keep it a stop for the tab key */
+  opacity: 0;
   position: absolute;
-  visibility: hidden;
 }
 @media (any-hover: none) {
   /* if there is at least one input device that does not support hover, we want to force the copy button */
   .anchor {
-    visibility: visible;
+    opacity: 1;
   }
 }
-h2:hover .anchor,
-h3:hover .anchor,
-h4:hover .anchor,
-h5:hover .anchor,
-h6:hover .anchor {
-  visibility: visible;
+.anchor:focus-within,
+:is(h2, h3, h4, h5, h6):hover .anchor {
+  opacity: 1;
 }
 
 /* Redfines headers style */
 
-h1 a,
-h2 a,
-h3 a,
-h4 a,
-h5 a,
-h6 a {
-  font-weight: inherit;
-}
-
-#R-body h1 + h2,
-#R-body h1 + h3,
-#R-body h1 + h4,
-#R-body h1 + h5,
-#R-body h1 + h6,
-#R-body h2 + h3,
-#R-body h2 + h4,
-#R-body h2 + h5,
-#R-body h2 + h6,
-#R-body h3 + h4,
-#R-body h3 + h5,
-#R-body h3 + h6,
-#R-body h4 + h5,
-#R-body h4 + h6,
+/* a heading right below a heading of a higher level */
+#R-body h1 + :is(h2, h3, h4, h5, h6),
+#R-body h2 + :is(h3, h4, h5, h6),
+#R-body h3 + :is(h4, h5, h6),
+#R-body h4 + :is(h5, h6),
 #R-body h5 + h6 {
   margin-top: 1rem;
 }
 
 .menu-control .control-style {
   cursor: pointer;
+  display: flow-root;
   height: 1.574em;
-  overflow: hidden;
+  overflow-x: visible;
+  overflow-y: clip;
 }
 
 .menu-control i {
   padding-top: 0.25em;
 }
 
+/* the control reaches below the icon, so a click on the icon has to fall
+   through to it */
 .menu-control i,
 .menu-control span {
-  cursor: pointer;
-  display: block;
   float: left;
+  pointer-events: none;
 }
 html[dir='rtl'] .menu-control i,
 html[dir='rtl'] .menu-control span {
   float: right;
 }
 
-.menu-control :hover,
-.menu-control i:hover,
-.menu-control span:hover {
-  cursor: pointer;
-}
-
 .menu-control select,
 .menu-control button {
   -webkit-appearance: none;
   appearance: none;
+  cursor: pointer;
+  display: block;
   height: 1.33rem;
+  /* shifting the box by what it is padded with keeps the text in place; the
+     list of a select opens as wide as that box, so it reaches out to both
+     sides to be as far from one edge of the menu as from the other */
+  margin-inline: -2em -0.5em;
   outline: none;
-  width: 100%;
+  padding-inline: 2em 0.5em;
+  width: calc(100% + 2.5em);
 }
-.menu-control button:active,
-.menu-control button:focus,
-.menu-control select:active,
-.menu-control select:focus {
-  outline-style: solid;
+/* the control is cut off by its wrapper and so would be its focus outline;
+   the row shows it instead, same as the entries of the menu do */
+.menu-control:has(:is(button, select):focus-visible) {
+  outline: auto;
 }
 
 .menu-control select {
+  /* the background of the select is only painted underneath its text, where
+     the text covers it; see below for why it has one at all */
+  background-clip: text;
   background-color: transparent;
   background-image: none;
   border: none;
-  box-shadow: none;
-  padding-left: 0;
-  padding-right: 0;
+  /* a select whose list we style ourselves lays out its content in a way of
+     its own; these are the values of the one the browser draws, so both look
+     the same */
+  min-block-size: 0;
+  overflow: clip;
+  padding-block: 0;
+  white-space: pre;
+  /* the opened list pops up over the page like the search suggestions do, so
+     it takes their colors, which are the ones of the content */
+  --VARIABLE-SCROLLBAR-THUMB-color: var(--INTERNAL-MAIN-SCROLLBAR-THUMB-color);
+  --VARIABLE-SCROLLBAR-THUMB-HOVER-color: var(--INTERNAL-MAIN-SCROLLBAR-THUMB-HOVER-color);
+  --VARIABLE-SCROLLBAR-TRACK-color: var(--INTERNAL-MAIN-SCROLLBAR-TRACK-color);
+  --VARIABLE-SCROLLBAR-TRACK-HOVER-color: var(--INTERNAL-MAIN-SCROLLBAR-TRACK-HOVER-color);
 }
 
+/* a browser that draws the list on its own frames the entries in the
+   background of the select, and falls back to its own one if that is
+   transparent; it reads it once the select is open, so that is when we hand it
+   the one of the list. while closed, the background underneath the text would
+   lighten the edges of the letters and make them look bolder than the ones of
+   the menu next to it */
+.menu-control select:open {
+  background-color: var(--INTERNAL-MAIN-BG-color);
+}
+
+/* where the browser lets us, we style the opened list ourselves; it is then
+   part of the page and takes all of our scrollbar styling. a browser that
+   draws the list on its own does not know how to name it and drops every rule
+   naming it, so it keeps showing its own list */
+.menu-control select,
+.menu-control select::picker(select) {
+  appearance: base-select;
+}
+
+.menu-control select::picker-icon {
+  /* the select the browser draws has no arrow either */
+  display: none;
+}
+
+.menu-control select::picker(select) {
+  background-color: var(--INTERNAL-MAIN-BG-color);
+  border: 1px solid var(--overlay-border-color);
+  border-radius: var(--block-radius);
+  box-shadow: var(--overlay-box-shadow);
+  color: var(--INTERNAL-MAIN-TEXT-color);
+  padding: 0.25rem 0.5rem;
+  /* the menu names colors for its own scrollbar, which we inherit and which
+     would make the pseudo elements of ours be ignored */
+  scrollbar-color: auto;
+}
+
+/* the browsers disagree on the background of the opened list, so each entry
+   brings its own */
+.menu-control optgroup,
 .menu-control option {
-  color: rgba(0, 0, 0, 1);
+  background-color: var(--INTERNAL-MAIN-BG-color);
   padding: 0;
-  margin: 0;
+}
+
+.menu-control optgroup {
+  color: var(--INTERNAL-MAIN-TEXT-color);
+}
+
+/* the entries are the links of the list, like the search suggestions; the
+   chosen one is where we already are, so it is no link */
+.menu-control option {
+  /* the highlighted entry is a small element inside the list, like inline code
+     or a badge is inside the text, so it takes their corners */
+  border-radius: 3px;
+  color: var(--INTERNAL-MAIN-LINK-color);
+  /* the entries of a group would inherit the font settings of its bold title */
+  font-variation-settings: var(--INTERNAL-MAIN-MEDIUM-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-MEDIUM-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-MEDIUM-letter-spacing);
+}
+
+/* opening the list focuses the chosen entry, so it is marked from the start */
+.menu-control option:focus {
+  color: var(--INTERNAL-MAIN-LINK-HOVER-color);
+  background-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 32%, transparent);
+}
+
+.menu-control option:hover {
+  color: var(--INTERNAL-MAIN-LINK-HOVER-color);
+  background-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 48%, transparent);
+  text-decoration: underline;
+}
+
+.menu-control option:checked {
+  color: var(--INTERNAL-MAIN-TEXT-color);
+  font-variation-settings: var(--INTERNAL-MAIN-BOLD-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-BOLD-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-BOLD-letter-spacing);
+  text-decoration: none;
+}
+
+.menu-control option::checkmark {
+  /* the tick of a task list, without its box */
+  box-shadow: inset 1em 1em var(--INTERNAL-MAIN-TEXT-color);
+  clip-path: var(--tick-clip-path);
+  content: '';
+  height: 0.65em;
+  /* the browser keeps a gap of 0.5em between the tick and the text; the tick
+     moves into the middle of its slot while the text stays in place */
+  margin-inline: 0.25em -0.25em;
+  width: 0.65em;
+  /* Windows High Contrast Mode fallback must be last */
+  background-color: CanvasText;
 }
 
 .menu-control button {
   background-color: transparent;
-  cursor: pointer;
-  display: block;
+  border: none;
+  overflow: hidden;
   text-align: start;
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
 }
 
 .clear {
   clear: both;
+}
+
+/* Chrome and Safari give a search input a look of their own unless it is a plain text field */
+input[type='search'] {
+  -webkit-appearance: textfield;
+  appearance: textfield;
 }
 
 /* clears the 'X' from Chrome's search input */
@@ -1962,45 +3002,59 @@ input[type='search']::-webkit-search-results-decoration {
   display: none;
 }
 
-span.math:has(> mjx-container[display]) {
+span.math:has(math[display='block'], .katex-display) {
   display: block;
 }
 
-@supports selector(.math:has(> mjx-container)) {
-  .math {
-    visibility: hidden;
-  }
-  .math:has(> mjx-container) {
-    visibility: visible;
-  }
-}
-.math.align-left > mjx-container {
-  text-align: left !important;
+/* a formula without an alignment of its own inherits the one of an enclosing formula */
+.math.align-left {
+  --VARIABLE-MATH-align: left;
+  --VARIABLE-MATH-MARGIN-left: 0;
+  --VARIABLE-MATH-MARGIN-right: auto;
 }
 
-.math.align-center > mjx-container {
-  text-align: center !important;
+.math.align-center {
+  --VARIABLE-MATH-align: center;
+  --VARIABLE-MATH-MARGIN-left: auto;
+  --VARIABLE-MATH-MARGIN-right: auto;
 }
 
-.math.align-right > mjx-container {
-  text-align: right !important;
+.math.align-right {
+  --VARIABLE-MATH-align: right;
+  --VARIABLE-MATH-MARGIN-left: auto;
+  --VARIABLE-MATH-MARGIN-right: 0;
 }
 
-.scrollbar-measure {
-  /* https://davidwalsh.name/detect-scrollbar-width */
-  height: 100px;
-  overflow: scroll;
+/* MathML output */
+.math > .katex > math[display='block'] {
+  margin-left: var(--VARIABLE-MATH-MARGIN-left, auto);
+  margin-right: var(--VARIABLE-MATH-MARGIN-right, auto);
+  width: fit-content;
+}
+
+/* HTML output */
+.math > .katex-display > .katex {
+  text-align: var(--VARIABLE-MATH-align, center);
+}
+
+.copy-to-clipboard-fake {
+  /* the element needs to be selectable and focusable to copy from it, so it
+  can only be moved out of the viewport horizontally; its vertical position
+  is set to the current scroll offset by JS to not scroll on focus */
+  border: 0;
+  /* prevent zooming on iOS */
+  font-size: 12pt;
+  inset-inline-start: -9999px;
+  padding: 0;
   position: absolute;
-  width: 100px;
-  top: -9999px;
 }
 
-.include.hide-first-heading h1:first-of-type,
-.include.hide-first-heading h2:first-of-type,
-.include.hide-first-heading h3:first-of-type,
-.include.hide-first-heading h4:first-of-type,
-.include.hide-first-heading h5:first-of-type,
-.include.hide-first-heading h6:first-of-type,
+/* the hidden heading can not show a focus, so its anchor button must not take one */
+.include.hide-first-heading > :is(h1, h2, h3, h4, h5, h6):not(:is(h1, h2, h3, h4, h5, h6) ~ *) .anchor {
+  display: none;
+}
+
+.include.hide-first-heading > :is(h1, h2, h3, h4, h5, h6):not(:is(h1, h2, h3, h4, h5, h6) ~ *),
 .a11y-only {
   /* idea taken from https://www.filamentgroup.com/lab/a11y-form-labels.html */
   clip-path: polygon(0 0, 1px 0, 1px 1px, 0 1px);
@@ -2059,16 +3113,21 @@ span.math:has(> mjx-container[display]) {
 .searchform input {
   flex: 1 0 60%;
   border-radius: 4px;
-  border: 2px solid rgba(134, 134, 134, 0.125);
-  background: rgba(134, 134, 134, 0.125);
-  display: block;
-  margin: 0;
+  border: 2px solid color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 30%, transparent);
+  background: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 30%, transparent);
   margin-inline-end: 0.5rem;
+  /* an input does not shrink below its natural width otherwise, so it would
+     reach out of a narrow form */
+  min-width: 0;
+  padding: 0.425rem;
 }
 
-.searchform input::-webkit-input-placeholder,
+.searchform input:focus-visible {
+  outline: auto;
+}
+
 .searchform input::placeholder {
-  color: rgba(134, 134, 134, 1);
+  color: oklch(from var(--INTERNAL-BOX-GREY-color) calc(l * 0.94) c h);
   opacity: 0.666;
 }
 
@@ -2083,8 +3142,10 @@ span.math:has(> mjx-container[display]) {
 
 #R-sidebar .autocomplete-suggestions {
   background-color: var(--INTERNAL-MAIN-BG-color);
-  border: 0 solid rgba(134, 134, 134, 0.166);
-  box-shadow: 1px 2px 5px 1px rgba(134, 134, 134, 0.333);
+  border: 0 solid color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 40%, transparent);
+  /* it hangs from the search box, so only its lower corners are free */
+  border-radius: 0 0 var(--block-radius) var(--block-radius);
+  box-shadow: 1px 2px 5px 1px oklch(from var(--INTERNAL-BOX-GREY-color) calc(l * 0.94) c h / 0.333);
 }
 
 #R-sidebar .autocomplete-suggestion {
@@ -2099,9 +3160,15 @@ span.math:has(> mjx-container[display]) {
 }
 
 #R-searchresults .autocomplete-suggestion {
+  /* a result stands in the content like a box, so its highlight takes the
+     corners of one; the suggestions of the search box fill their overlay
+     edge to edge and stay square */
+  border-radius: var(--block-radius);
   display: block;
   font-size: 1.3rem;
-  font-weight: 500;
+  font-variation-settings: var(--INTERNAL-MAIN-MEDIUM-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-MEDIUM-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-MEDIUM-letter-spacing);
   line-height: 1.5rem;
   padding: 1rem;
   text-decoration: none;
@@ -2112,7 +3179,9 @@ span.math:has(> mjx-container[display]) {
 
 #R-searchresults .autocomplete-suggestion > .breadcrumbs {
   font-size: 0.9rem;
-  font-weight: 400;
+  font-variation-settings: var(--INTERNAL-MAIN-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-letter-spacing);
   margin-top: 0.167em;
   padding-left: 0.2em;
   padding-right: 0.2em;
@@ -2120,7 +3189,9 @@ span.math:has(> mjx-container[display]) {
 
 #R-searchresults .autocomplete-suggestion > .context {
   font-size: 1rem;
-  font-weight: 300;
+  font-variation-settings: var(--INTERNAL-MAIN-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-letter-spacing);
   margin-top: 0.66em;
   padding-left: 0.1em;
   padding-right: 0.1em;
@@ -2132,18 +3203,17 @@ span.math:has(> mjx-container[display]) {
 #R-html .autocomplete-suggestion.selected,
 #R-html .autocomplete-suggestion:focus {
   color: var(--VARIABLE-LINK-HOVER-color);
-  background-color: rgba(134, 134, 134, 0.133);
+  background-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 32%, transparent);
 }
 #R-html .autocomplete-suggestion:hover {
   color: var(--VARIABLE-LINK-HOVER-color);
-  background-color: rgba(134, 134, 134, 0.2);
+  background-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 48%, transparent);
 }
-#R-html .autocomplete-suggestion .link {
+#R-html .autocomplete-suggestion .link,
+#R-html .autocomplete-suggestion .title > span {
   color: inherit;
 }
-#R-html .autocomplete-suggestion.selected .link,
-#R-html .autocomplete-suggestion:focus .link,
-#R-html .autocomplete-suggestion:hover .link {
+#R-html .autocomplete-suggestion:is(.selected, :focus, :hover) .link {
   color: inherit;
   text-decoration: underline;
 }
@@ -2160,7 +3230,9 @@ span.math:has(> mjx-container[display]) {
   border-radius: 3px;
   display: inline-block;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-variation-settings: var(--INTERNAL-MAIN-MEDIUM-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-MEDIUM-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-MEDIUM-letter-spacing);
   vertical-align: middle;
 }
 
@@ -2174,13 +3246,21 @@ span.math:has(> mjx-container[display]) {
 }
 
 .badge > .badge-title {
-  background-color: rgba(16, 16, 16, 1);
+  /* a dark grey on either background, darker than the page on a dark one; like
+     every fill taken from the color of the neutral boxes and its text from the one
+     of the grey boxes, so both carry the tint of the variant; on a light page the
+     text takes the color of the page, as no grey is white */
+  background-color: light-dark(oklch(from var(--INTERNAL-BOX-NEUTRAL-color) 0.37 c h), oklch(from var(--INTERNAL-BOX-NEUTRAL-color) 0.14 c h));
   border-inline-end: 0;
   border-start-end-radius: 0;
   border-end-end-radius: 0;
-  color: rgba(240, 240, 240, 1);
-  filter: contrast(2);
-  opacity: 0.75;
+  color: light-dark(var(--INTERNAL-MAIN-BG-color), oklch(from var(--INTERNAL-BOX-GREY-color) 0.84 c h));
+}
+
+.badge i {
+  /* an icon sits on the baseline, which leaves it above the middle of the badge; an offset moves it without changing the height of the line */
+  position: relative;
+  top: 0.056em;
 }
 
 .badge.badge-with-title > .badge-content {
@@ -2197,29 +3277,26 @@ span.math:has(> mjx-container[display]) {
   content: '\200b';
 }
 
-.badge.cstyle.transparent {
-  --VARIABLE-BOX-BG-color: var(--INTERNAL-BOX-BG-color);
-}
-
 /* task list and its checkboxes */
 /*  move start of list to left to adjust for missing list-style */
 article :not(li) > ul > li:has(> input[type='checkbox']),
-article :not(li) > ul > li:has(> span > input[type='checkbox']) {
+article :not(li) > ul > li:has(> :is(label, span) > input[type='checkbox']) {
   margin-inline-start: -1.5rem;
 }
 
-article ul > li:has(> input[type='checkbox']) {
+article ul > li:has(> input[type='checkbox']),
+article ul > li:has(> :is(label, span) > input[type='checkbox']) {
   list-style: none;
 }
 
 article ul > li:has(> input[type='checkbox'])::before,
-article ul > li:has(> span > input[type='checkbox'])::before {
+article ul > li:has(> :is(label, span) > input[type='checkbox'])::before {
   content: '\200B'; /* accessibilty for Safari https://developer.mozilla.org/en-US/docs/Web/CSS/list-style */
 }
 
 /* https://moderncss.dev/pure-css-custom-checkbox-style/ */
 article ul > li > input[type='checkbox'],
-article ul > li > span > input[type='checkbox'] {
+article ul > li > :is(label, span) > input[type='checkbox'] {
   -webkit-appearance: none;
   appearance: none;
   background-color: var(--INTERNAL-MAIN-BG-color); /* box background */
@@ -2230,16 +3307,15 @@ article ul > li > span > input[type='checkbox'] {
   display: inline-grid;
   font: inherit;
   height: 1.15em;
-  margin: 0;
   place-content: center;
   transform: translateY(-0.075em);
   width: 1.15em;
 }
 
 article ul > li > input[type='checkbox']::before,
-article ul > li > span > input[type='checkbox']::before {
+article ul > li > :is(label, span) > input[type='checkbox']::before {
   box-shadow: inset 1em 1em var(--INTERNAL-PRIMARY-color);
-  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  clip-path: var(--tick-clip-path);
   content: '';
   height: 0.65em;
   transform: scale(0);
@@ -2251,28 +3327,39 @@ article ul > li > span > input[type='checkbox']::before {
 }
 
 article ul > li > input[type='checkbox']:checked::before,
-article ul > li > span > input[type='checkbox']:checked::before {
+article ul > li > :is(label, span) > input[type='checkbox']:checked::before {
   transform: scale(1);
 }
 
 /* CSS Lightbox https://codepen.io/gschier/pen/kyRXVx */
 .lightbox-back {
-  align-items: center;
   background: rgba(0, 0, 0, 0.8);
   bottom: 0;
   display: none;
-  justify-content: center;
   left: 0;
   position: fixed;
   right: 0;
-  text-align: center;
   top: 0;
-  white-space: nowrap;
   z-index: 1999;
 }
 
 .lightbox-back:target {
+  display: block;
+}
+
+.lightbox-back:focus {
+  /* it covers the whole viewport, where an outline tells nothing */
+  outline: none;
+}
+
+.lightbox-close {
+  align-items: center;
   display: flex;
+  height: 100%;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  width: 100%;
 }
 
 .lightbox-back svg,
@@ -2286,14 +3373,12 @@ article ul > li > span > input[type='checkbox']:checked::before {
 
 /* basic menu list styles (non-collapsible) */
 
-#R-sidebar select,
 #R-sidebar .collapsible-menu label,
 #R-sidebar .menu-control,
 #R-sidebar :is(a, span) {
   color: var(--INTERNAL-MENU-SECTIONS-LINK-color);
 }
 
-#R-sidebar select:hover,
 #R-sidebar .collapsible-menu li:not(.active) > label:hover,
 #R-sidebar .menu-control:hover,
 #R-sidebar a:hover {
@@ -2307,6 +3392,9 @@ article ul > li > span > input[type='checkbox']:checked::before {
 
 #R-sidebar li.active > a {
   background-color: var(--INTERNAL-MENU-SECTION-ACTIVE-CATEGORY-BG-color);
+  /* only on the side of the menu; the other one merges into the content */
+  border-end-start-radius: 4px;
+  border-start-start-radius: 4px;
 }
 
 #R-sidebar ul > li > :is(a, span) {
@@ -2358,34 +3446,54 @@ article ul > li > span > input[type='checkbox']:checked::before {
   position: relative;
 }
 
-#R-sidebar ul.collapsible-menu > li > input {
+#R-sidebar ul.collapsible-menu > li > label > input {
   -webkit-appearance: none;
   appearance: none;
   cursor: pointer;
-  display: inline-block;
-  margin-left: 0;
-  margin-right: 0;
-  margin-top: 0.65rem;
+  /* nothing to see but the focus outline: a square around the chevron, in the
+     middle of the height of the entry */
+  height: 1rem;
+  inset-inline-start: 0;
+  margin-inline-start: 0.25rem;
+  margin-top: 0.25rem;
   position: absolute;
+  top: 0;
   width: 1rem;
   z-index: 1;
 }
-#R-sidebar ul.collapsible-menu.enlarge > li > input {
-  margin-top: 0.9rem;
+#R-sidebar .R-sidebarmenu > ul.collapsible-menu > li > label > input {
+  margin-inline-start: -0.075rem;
+}
+#R-sidebar ul.space.collapsible-menu li > label > input {
+  margin-top: 0.375rem;
+}
+#R-sidebar ul.morespace.collapsible-menu li > label > input {
+  margin-top: 0.5rem;
+}
+#R-sidebar ul.collapsible-menu.enlarge > li > label > input {
+  margin-top: 0.75rem;
 }
 
+/* the label is the area to click, wide enough to be a target of its own and
+   as high as the entry; it reaches into the indentation, which the outermost
+   level has none of, and its padding keeps the chevron and the underline of
+   the hover where they are */
 #R-sidebar ul.collapsible-menu > li > label {
   cursor: pointer;
-  display: inline-block;
   inset-inline-start: 0;
-  margin-bottom: 0; /* nucleus */
-  padding-inline-start: 0.125rem;
+  margin-inline-start: -0.325rem;
+  padding-inline-end: 0.175rem;
+  padding-inline-start: 0.45rem;
   position: absolute;
-  width: 1rem;
+  width: 1.5rem;
   z-index: 2;
 }
+#R-sidebar .R-sidebarmenu > ul.collapsible-menu > li > label {
+  margin-inline-start: 0;
+  padding-inline-end: 0.5rem;
+  padding-inline-start: 0.125rem;
+}
 #R-sidebar ul.collapsible-menu.enlarge > li > label {
-  font-size: 1.1rem;
   line-height: 2rem;
 }
 
@@ -2417,77 +3525,162 @@ article ul > li > span > input[type='checkbox']:checked::before {
   display: none;
 }
 
-#R-sidebar ul > li.parent > ul,
-#R-sidebar ul > li.active > ul,
-#R-sidebar ul > li.alwaysopen > ul {
+#R-sidebar ul > li:is(.parent, .active, .alwaysopen) > ul {
   display: block;
+}
+
+/* the submenu is the second row of its entry and rolls out from below the
+   entry as that row grows; it hangs on the lower edge of the row, so it moves
+   along with the entries it pushes down */
+
+#R-sidebar ul.collapsible-menu > li:has(> label > input) {
+  /* while it grows, the row of the submenu is shorter than the room the entry
+     has for it; what is left must neither stretch the row of the entry itself
+     nor end up below the submenu */
+  align-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 0fr;
+  transition: grid-template-rows 0.175s ease;
+}
+
+#R-sidebar ul.collapsible-menu > li > label:has(> input) ~ ul {
+  align-self: end;
+  display: block;
+  min-height: 0;
+}
+
+#R-sidebar ul.collapsible-menu .default-animation {
+  /* visibility is inherited; animating it here as well would leave the
+     contents in reach after the submenu has closed */
+  transition:
+    all 0.35s ease,
+    visibility 0s;
 }
 
 /* closed menu */
 
-#R-sidebar ul.collapsible-menu > li > input + label ~ ul {
-  display: none;
+#R-sidebar ul.collapsible-menu > li > label:has(> input:not(:checked)) ~ ul {
+  /* the submenu reaches out of the row at the top, so it is cut off from there
+     by as much as the row is short of it; never to the sides, where the active
+     entry leaves the submenu */
+  clip-path: inset(100% -100vw -1rem);
+  /* the row can only collapse completely if nothing of the submenu is left */
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-bottom: 0;
+  padding-top: 0;
+  /* out of reach for the keyboard and screen readers as long as it is out of
+     sight; so only once it is rolled in and as soon as it rolls out */
+  transition:
+    clip-path 0.175s ease,
+    margin 0.175s ease,
+    padding 0.175s ease,
+    visibility 0s 0.175s;
+  visibility: hidden;
+}
+#R-sidebar #R-homelinks ul.collapsible-menu > li > label:has(> input:not(:checked)) ~ ul {
+  margin-bottom: 0;
+  margin-top: 0;
 }
 
-#R-sidebar ul.collapsible-menu > li > input + label > .fa-chevron-right {
+/* the closed chevron keeps a bit of distance to the border of the browser; in
+   RTL it is the mirroring that takes it to the other side of its box */
+#R-sidebar ul.collapsible-menu > li > label:has(> input) > .fa-chevron-right {
   display: inline-block;
-  text-align: end;
+  text-align: right;
+  transition: transform 0.175s ease;
 }
 
 /* open menu  */
 
-#R-sidebar ul.collapsible-menu > li > input:checked + label ~ ul {
-  display: block;
+#R-sidebar ul.collapsible-menu > li:has(> label > input:checked) {
+  grid-template-rows: auto 1fr;
 }
 
-#R-sidebar ul.collapsible-menu > li > input:checked + label > .fa-chevron-right {
-  transform: rotate(90deg);
+#R-sidebar ul.collapsible-menu > li > label:has(> input:checked) ~ ul {
+  /* there is room for the focus outline of the entries at its edges, just a
+     bit at the top, as that much shows above the row while rolling out; its
+     visibility stays inherited, as it may sit in a closed menu */
+  clip-path: inset(-0.25rem -100vw -1rem);
+  transition:
+    clip-path 0.175s ease,
+    margin 0.175s ease,
+    padding 0.175s ease,
+    visibility 0s;
 }
 
-/* adjust menu for RTL reading direction */
-
-html[dir='rtl'] #R-sidebar ul.collapsible-menu > li > input + label > i.fa-chevron-right {
-  transform: scaleX(-1);
+/* the chevron is not in the middle of the box we rotate, so it is taken down
+   by the rotation and we bring it back up */
+#R-sidebar ul.collapsible-menu > li > label:has(> input:checked) > .fa-chevron-right {
+  transform: translateY(-0.125em) rotate(90deg);
 }
-html[dir='rtl'] #R-sidebar ul.collapsible-menu > li > input:checked + label > i.fa-chevron-right {
-  transform: rotate(90deg);
+
+/* adjust menu for RTL reading direction; the mirroring stays in the open state
+   as well, so the chevron turns instead of flipping over; pointing down, it
+   looks the same mirrored or not */
+
+html[dir='rtl'] #R-sidebar ul.collapsible-menu > li > label:has(> input) > i.fa-chevron-right {
+  transform: scaleX(-1) translateY(0) rotate(0deg);
+}
+html[dir='rtl'] #R-sidebar ul.collapsible-menu > li > label:has(> input:checked) > i.fa-chevron-right {
+  transform: scaleX(-1) translateY(-0.125em) rotate(90deg);
 }
 
 /* common logo */
 
+/* only recolor parts of an inlined SVG that are black or don't define a color
+   of their own; a part that inherits its color from an ancestor - like a
+   `fill="none"` on the root element - has to keep it, otherwise the theme
+   would paint areas the logo wants to leave blank */
+
 body #R-logo svg,
-body #R-logo svg :not([color]),
-body #R-logo svg [color='black'],
-body #R-logo svg [color='#000000'] {
+body #R-logo svg :is([color='black'], [color='#000'], [color='#000000']) {
   color: var(--INTERNAL-LOGO-IMAGE-color);
 }
 
 body #R-logo:hover svg,
-body #R-logo:hover svg :not([color]),
-body #R-logo:hover svg [color='black'],
-body #R-logo:hover svg [color='#000000'] {
+body #R-logo:hover svg :is([color='black'], [color='#000'], [color='#000000']) {
   color: var(--INTERNAL-LOGO-IMAGE-HOVER-color);
 }
 
-body #R-logo svg :not([fill]),
-body #R-logo svg [fill='black'],
-body #R-logo svg [fill='#000000'] {
+body #R-logo svg :not([fill]):not([fill] *),
+body #R-logo svg:is([fill='black'], [fill='#000'], [fill='#000000']),
+body #R-logo svg :is([fill='black'], [fill='#000'], [fill='#000000']) {
   fill: var(--INTERNAL-LOGO-IMAGE-color);
 }
 
-body #R-logo:hover svg :not([fill]),
-body #R-logo:hover svg [fill='black'],
-body #R-logo:hover svg [fill='#000000'] {
+body #R-logo:hover svg :not([fill]):not([fill] *),
+body #R-logo:hover svg:is([fill='black'], [fill='#000'], [fill='#000000']),
+body #R-logo:hover svg :is([fill='black'], [fill='#000'], [fill='#000000']) {
   fill: var(--INTERNAL-LOGO-IMAGE-HOVER-color);
 }
 
+/* the initial value of `stroke` is `none` and not black, so unlike for `fill`
+   there must be no blanket rule for parts without a `stroke` - that would draw
+   an outline around every filled logo */
+
+body #R-logo svg:is([stroke='black'], [stroke='#000'], [stroke='#000000']),
+body #R-logo svg :is([stroke='black'], [stroke='#000'], [stroke='#000000']) {
+  stroke: var(--INTERNAL-LOGO-IMAGE-color);
+}
+
+body #R-logo:hover svg:is([stroke='black'], [stroke='#000'], [stroke='#000000']),
+body #R-logo:hover svg :is([stroke='black'], [stroke='#000'], [stroke='#000000']) {
+  stroke: var(--INTERNAL-LOGO-IMAGE-HOVER-color);
+}
+
+/* the link color must not reach into an inlined SVG, otherwise it would win
+   over the rules above and `--LOGO-IMAGE-color` could not color the parts
+   drawn with `currentColor` */
+
 body a#R-logo,
-body a#R-logo * {
+body a#R-logo *:not(svg, svg *) {
   color: var(--INTERNAL-LOGO-LINK-color);
 }
 
 body a#R-logo:hover,
-body a#R-logo:hover * {
+body a#R-logo:hover *:not(svg, svg *) {
   color: var(--INTERNAL-LOGO-LINK-HOVER-color);
 }
 
@@ -2500,21 +3693,28 @@ body a#R-logo:hover * {
   flex-direction: row;
   font-family: var(--INTERNAL-LOGO-font);
   font-size: var(--INTERNAL-LOGO-font-size);
+  font-variation-settings: var(--INTERNAL-LOGO-font-variation-settings);
+  font-weight: var(--INTERNAL-LOGO-font-weight);
   justify-content: center;
-  line-height: 1;
-  overflow: hidden;
-  margin-block: 0.5rem;
+  letter-spacing: var(--INTERNAL-LOGO-letter-spacing);
+  /* must not be smaller than the glyph box of the used font, otherwise
+  ascenders and descenders reach out of the line box and the title looks
+  cramped for scripts with stacked diacritics (eg. Turkish İ, Ğ) */
+  line-height: 1.25;
+  /* clip an overlong title horizontally but never vertically, as glyphs may
+  still exceed the line box for scripts we don't know about */
+  overflow-x: clip;
+  overflow-y: visible;
+  margin-block: 0.5rem 0.625rem;
   row-gap: 0.1em;
   width: 100%;
 }
-#R-logo.R-default.direction-column {
+#R-logo.R-default.layout-sidebar-column {
   flex-direction: column;
 }
-@media only all and (max-width: 59.999rem) {
-  #R-logo.R-default {
-    font-size: calc(var(--INTERNAL-LOGO-font-size) * 0.8);
-    margin-block: 0.9rem;
-  }
+:where(.menu-s-width, .menu-m-width) #R-logo.R-default {
+  font-size: calc(var(--INTERNAL-LOGO-font-size) * 0.8);
+  margin-block: 0.9rem;
 }
 
 #R-logo.R-default .logo-image {
@@ -2525,6 +3725,9 @@ body a#R-logo:hover * {
 }
 
 #R-logo.R-default .logo-image > * {
+  /* don't let the image sit on the text baseline, as it would add the
+  descender of the line box below the image */
+  display: block;
   max-width: var(--INTERNAL-LOGO-IMAGE-width);
 }
 
@@ -2532,30 +3735,76 @@ body a#R-logo:hover * {
   font-size: 2em;
   flex-shrink: 1;
   min-width: 0;
+  /* centered next to the image by its capitals, not by the room its font
+     keeps above and below them, which a script font with its swashes makes
+     lopsided; what is trimmed of that room is given back evenly, so the title
+     keeps the full height of its lines, whatever their number */
+  padding-block: calc((1lh - 1cap) / 2);
+  text-box: trim-both cap alphabetic;
   text-align: start;
   text-wrap: auto;
   word-break: break-word;
 }
-#R-logo.R-default.direction-column .logo-title {
+#R-logo.R-default.layout-sidebar-column .logo-title {
   text-align: center;
 }
 #R-logo.R-default.manual-wrap .logo-title {
   white-space: pre;
 }
 
+/* a variant may come with a logo and a title font of its own, so switching it
+   may move the logo and what follows it. the page fades from one variant to
+   the other; what is named here is led from its old place and size to its new
+   one instead of fading out there and in here */
+#R-logo.R-default > .logo-image {
+  view-transition-name: R-logo-image;
+}
+#R-logo.R-default > .logo-title {
+  view-transition-name: R-logo-title;
+}
+/* a named element is a stacking context; the suggestions are a child of the
+   search and would end up below the menu, so it is the box that is named */
+#R-header-wrapper > search > :is(form, .searchbox) {
+  view-transition-name: R-search;
+}
+
+@media screen {
+  /* the copy of the logo the topbar of a page gets for the time it is printed
+     is meant for paper only */
+  :root:not([data-r-output-format='print']) #R-topbar > #R-logo {
+    display: none;
+  }
+}
+
 /* columnize content */
 
 .columnize {
-  column-count: 2;
-}
-@media screen and (min-width: 79.25rem) {
-  .columnize {
-    column-count: 3;
-  }
+  /* the requested count is the most we show, as a column is never narrower */
+  column-width: 12rem;
 }
 
 .columnize > * {
   break-inside: avoid-column;
+}
+
+.columnize-1 {
+  column-count: 1;
+}
+
+.columnize-2 {
+  column-count: 2;
+}
+
+.columnize-3 {
+  column-count: 3;
+}
+
+.columnize-4 {
+  column-count: 4;
+}
+
+.columnize-5 {
+  column-count: 5;
 }
 
 #R-body .tab-panel {
@@ -2568,9 +3817,16 @@ body a#R-logo:hover * {
   flex-wrap: wrap;
 }
 
+/* the tabs are laid out as if they were written directly into the nav */
+#R-body .tab-nav-list {
+  display: contents;
+}
+
 #R-body .tab-nav-title {
   font-size: 0.9rem;
-  font-weight: 400;
+  font-variation-settings: var(--INTERNAL-MAIN-MEDIUM-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-MEDIUM-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-MEDIUM-letter-spacing);
   line-height: 1.42857143;
   padding: 0.2rem 0;
   margin-inline-start: 0.6rem;
@@ -2582,23 +3838,25 @@ body a#R-logo:hover * {
   background-color: transparent;
   border: 1px solid transparent;
   color: var(--VARIABLE-LINK-color);
-  display: block;
   font-size: 0.9rem;
-  font-weight: 300;
+  font-variation-settings: var(--INTERNAL-MAIN-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-letter-spacing);
   line-height: 1.42857143;
   margin-inline-start: 0.6rem;
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
 }
 
 #R-body .tab-nav-button.active {
   background-color: var(--VARIABLE-BOX-color);
   border-bottom-color: var(--VARIABLE-BOX-BG-color);
-  border-radius: 2px 2px 0 0;
+  border-radius: 4px 4px 0 0;
   color: var(--VARIABLE-BOX-TEXT-color);
   cursor: default;
 }
-#R-body .tab-nav-button:not(.active):hover,
-#R-body .tab-nav-button:not(.active):active,
-#R-body .tab-nav-button:not(.active):focus {
+#R-body .tab-nav-button:not(.active):is(:hover, :active, :focus) {
   color: var(--VARIABLE-LINK-HOVER-color);
 }
 
@@ -2613,31 +3871,32 @@ body a#R-logo:hover * {
 #R-body .tab-nav-button.active > .tab-nav-text {
   background-color: var(--VARIABLE-BOX-BG-color);
   border-bottom-color: transparent;
-  border-radius: 1px 1px 0 0;
-  text-shadow: -0.08ex 0 0 currentColor, 0.08ex 0 0 currentColor;
+  border-radius: 3px 3px 0 0;
+  text-shadow:
+    -0.06ex 0 0 currentColor,
+    0.06ex 0 0 currentColor;
+  -webkit-text-stroke-width: 0.07ex;
 }
-@supports (-webkit-text-stroke-width: 0.09ex) {
-  #R-body .tab-nav-button.active > .tab-nav-text {
-    text-shadow: -0.08ex 0 0 currentColor, 0.08ex 0 0 currentColor;
-    -webkit-text-stroke-width: 0.09ex;
-  }
-}
-#R-body .tab-nav-button:not(.active):hover > .tab-nav-text,
-#R-body .tab-nav-button:not(.active):active > .tab-nav-text,
-#R-body .tab-nav-button:not(.active):focus > .tab-nav-text {
+#R-body .tab-nav-button:not(.active):is(:hover, :active, :focus) > .tab-nav-text {
   border-bottom-color: var(--VARIABLE-LINK-HOVER-color);
 }
 
 #R-body .tab-content {
   background-color: var(--VARIABLE-BOX-color);
   border-color: var(--VARIABLE-BOX-color);
+  border-radius: var(--block-radius);
   border-style: solid;
   border-width: 1px;
   display: none;
+  z-index: 10;
+}
+
+/* the shift sits on the container, as a tab panel nested first into a box would
+  reset the margin of its first tab content */
+#R-body .tab-content-container {
   /* if setting a border to 1px, a browser instead sets it to 1dppx which is not
     usable as a unit yet, so we have to calculate it ourself */
   margin-top: calc(var(--bpx1) * -1px);
-  z-index: 10;
 }
 
 #R-body .tab-content.active {
@@ -2646,6 +3905,7 @@ body a#R-logo:hover * {
 
 #R-body .tab-content-text {
   background-color: var(--VARIABLE-BOX-BG-color);
+  border-radius: calc(var(--block-radius) - 1px);
   color: var(--VARIABLE-BOX-TEXT-color);
   padding: 1rem;
 }
@@ -2664,6 +3924,13 @@ body a#R-logo:hover * {
 #R-body .tab-content-text > pre:not(.mermaid).pre-code:only-child {
   border-width: 0;
 }
+/* such a code block fills the tab, so it takes over its corners */
+#R-body .tab-content-text > div.highlight:only-child,
+#R-body .tab-content-text > div.highlight:only-child > div:not(.actionbar),
+#R-body .tab-content-text > div.highlight:only-child > pre:not(.mermaid),
+#R-body .tab-content-text > pre:not(.mermaid).pre-code:only-child {
+  border-radius: inherit;
+}
 
 .tab-panel-style.cstyle.initial,
 .tab-panel-style.cstyle.default {
@@ -2671,13 +3938,11 @@ body a#R-logo:hover * {
 }
 
 .tab-panel-style.cstyle.transparent {
-  --VARIABLE-BOX-color: rgba(134, 134, 134, 0.4);
+  --VARIABLE-BOX-color: var(--INTERNAL-BOX-NEUTRAL-color);
   --VARIABLE-BOX-BG-color: transparent;
 }
 
-#R-body .tab-panel-style.cstyle.initial.tab-nav-button.active,
-#R-body .tab-panel-style.cstyle.default.tab-nav-button.active,
-#R-body .tab-panel-style.cstyle.transparent.tab-nav-button.active {
+#R-body .tab-panel-style.cstyle:is(.initial, .default, .transparent).tab-nav-button.active {
   background-color: var(--VARIABLE-BOX-BG-color);
   border-left-color: var(--VARIABLE-BOX-color);
   border-right-color: var(--VARIABLE-BOX-color);
@@ -2688,9 +3953,7 @@ body a#R-logo:hover * {
   --VARIABLE-BOX-color: var(--INTERNAL-BOX-NEUTRAL-color);
 }
 
-#R-body .tab-panel-style.cstyle.initial.tab-content,
-#R-body .tab-panel-style.cstyle.default.tab-content,
-#R-body .tab-panel-style.cstyle.transparent.tab-content {
+#R-body .tab-panel-style.cstyle:is(.initial, .default, .transparent).tab-content {
   background-color: var(--VARIABLE-BOX-BG-color);
 }
 
@@ -2713,14 +3976,13 @@ body a#R-logo:hover * {
 }
 
 :has(~ #R-content-wrapper),
-#R-content-wrapper > * {
+#R-content-wrapper > *:not(#R-scrollbar) {
   border-inline-end-color: var(--INTERNAL-MENU-BORDER-color);
   border-inline-end-style: solid;
   border-inline-end-width: 1px;
 }
 
 #R-header-topbar {
-  background-color: transparent;
   border-bottom-color: transparent;
   border-bottom-style: solid;
   border-bottom-width: 1px;
@@ -2734,8 +3996,8 @@ body a#R-logo:hover * {
   width: 100%;
   z-index: 1;
 }
-@media screen and (max-width: 47.999rem) {
-  .mobile-support #R-header-topbar {
+@media screen {
+  :where(.menu-s-width) .mobile-support #R-header-topbar {
     border-inline-end-color: var(--INTERNAL-MENU-BORDER-color);
   }
 }
@@ -2755,6 +4017,13 @@ body a#R-logo:hover * {
   padding-right: calc(1rem - var(--bpx1) * 1px);
   width: calc(100% + var(--bpx1) * 1px);
 }
+/* more room between the edge of the box and the expander; the box grows into
+   the indentation, which the outermost level has none of */
+#R-sidebar ul.collapsible-menu ul li.active > a {
+  margin-inline-start: -0.3rem;
+  padding-inline-start: calc(1.3rem - var(--bpx1) * 1px);
+  width: calc(100% + 0.3rem + var(--bpx1) * 1px);
+}
 #R-sidebar ul.morespace.collapsible-menu li.active > a {
   padding-bottom: calc(0.25rem - var(--bpx1) * 1px);
   padding-top: calc(0.25rem - var(--bpx1) * 1px);
@@ -2770,7 +4039,6 @@ body a#R-logo:hover * {
   background-color: var(--INTERNAL-MENU-HEADER-BORDER-color);
   color: var(--INTERNAL-MENU-HOME-LINK-color);
   overflow: hidden;
-  padding: 0;
 }
 
 #R-sidebar #R-homelinks ul {
@@ -2789,7 +4057,6 @@ body a#R-logo:hover * {
 
 /* override for the menu header */
 
-#R-homelinks select,
 #R-homelinks .collapsible-menu label,
 #R-homelinks .menu-control,
 #R-homelinks :is(a, span) {
@@ -2803,7 +4070,6 @@ body a#R-logo:hover * {
   border-inline-end-color: transparent;
 }
 
-#R-homelinks select:hover,
 #R-homelinks :is(.collapsible-menu, :not(.collapsible-menu)) li:not(.active) > label:hover,
 #R-homelinks .menu-control:hover,
 #R-homelinks :is(.collapsible-menu, :not(.collapsible-menu)) a:hover {
@@ -2849,7 +4115,9 @@ article.notfound h1 {
 }
 article.notfound h1 span {
   font-size: 6.5rem;
-  font-weight: 500;
+  font-variation-settings: var(--INTERNAL-MAIN-BOLD-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-BOLD-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-BOLD-letter-spacing);
 }
 article.notfound h1 i {
   font-size: 5rem;
@@ -2858,15 +4126,15 @@ article.notfound h1 i {
 article.notfound h2 {
   color: var(--MAIN-TEXT-color);
   font-size: 2.5rem;
-  font-weight: 500;
+  font-variation-settings: var(--INTERNAL-MAIN-BOLD-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-BOLD-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-BOLD-letter-spacing);
   padding: 0;
   text-align: center;
 }
 article.notfound #shrug svg,
 article.notfound #shrug svg * {
-  color: #000000;
   color: var(--MAIN-TEXT-color);
-  fill: #000000 !important;
   fill: var(--MAIN-TEXT-color) !important;
 }
 article.notfound #shrug svg {
@@ -2877,16 +4145,12 @@ article.notfound #shrug svg {
 /* transparent boxes have different margins and - apperantly - different coloring */
 
 .box.cstyle.transparent > .box-label {
-  margin: 0;
-  padding-bottom: 0;
-  padding-top: 0;
+  padding: 0;
 }
 .box.expand.cstyle.transparent > .box-label {
   color: var(--VARIABLE-LINK-color);
 }
-.box.expand.cstyle.transparent > .box-label:hover,
-.box.expand.cstyle.transparent > .box-label:active,
-.box.expand.cstyle.transparent > .box-label:focus {
+.box.expand.cstyle.transparent > .box-label:is(:hover, :active, :focus) {
   color: var(--VARIABLE-LINK-HOVER-color);
 }
 
@@ -2903,10 +4167,11 @@ article.notfound #shrug svg {
 /* cards */
 
 .card-container {
+  --card-gap: 1.5rem;
   align-items: start;
   display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(3, 1fr);
+  gap: var(--card-gap);
+  grid-template-columns: repeat(1, 1fr);
   list-style: none;
   margin: 1.5rem 0;
   padding: 0;
@@ -2920,9 +4185,8 @@ article.notfound #shrug svg {
 
 .card-container .card {
   background: var(--INTERNAL-BOX-BG-color);
-  border: 1px solid color-mix(in srgb, var(--INTERNAL-MAIN-TEXT-color) 10%, transparent);
+  border: 1px solid var(--INTERNAL-BOX-NEUTRAL-color);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   color: var(--INTERNAL-MAIN-TEXT-color);
   display: flex;
   flex-direction: column;
@@ -2932,52 +4196,49 @@ article.notfound #shrug svg {
   overflow: hidden;
   overflow-wrap: break-word;
   position: relative;
-  transition: all 0.3s ease;
+  /* the card is lifted by its position, as a transform would confine a
+     lightbox opened from it to the card */
+  top: 0;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    top 0.3s ease;
   word-break: break-word;
 }
 
-.card-container .card:focus-within:has(.card-title > a:focus) {
+.card-container .card:focus-within:has(.card-title > a:focus, .card-title > button:focus) {
   outline: auto;
 }
 
-.card-container > .card.card-popout {
-  border: 1px solid color-mix(in srgb, var(--VARIABLE-LINK-color) 33%, transparent);
-}
-
-/* top handle */
-.card-container .card::before {
-  background: linear-gradient(90deg, var(--VARIABLE-LINK-color) 0%, color-mix(in srgb, var(--VARIABLE-LINK-color) 60%, white) 100%);
-  content: '';
-  height: 3px;
-  left: 0;
-  opacity: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  transition: opacity 0.3s ease;
-}
-
 .card-container .card.card-popout:hover {
-  border-color: color-mix(in srgb, var(--VARIABLE-LINK-color) 40%, transparent);
-  box-shadow: 0 8px 25px color-mix(in srgb, var(--VARIABLE-LINK-color) 25%, transparent);
-  transform: translateY(-4px) translateX(4px);
+  background-color: color-mix(in srgb, var(--VARIABLE-LINK-color) 10%, var(--INTERNAL-BOX-BG-color));
+  border-color: var(--VARIABLE-LINK-color);
+  /* a grey shadow does not show on a dark background, one in the color of the
+     text shows on any */
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--INTERNAL-MAIN-TEXT-color) 33%, transparent);
+  top: -2px;
 }
 
-.card-container .card.card-popout:hover::before {
-  opacity: 1;
+.card-container .card.card-popout:hover .card-title {
+  color: var(--VARIABLE-LINK-HOVER-color);
 }
 
 .card-container .card-image {
-  background: transparent;
   height: 300px;
   order: -1;
   overflow: hidden;
-  position: relative;
 }
 
 .card-container .card-content + .card-image {
   min-height: 160px;
   height: 160px;
+}
+
+.card-container .card-image button {
+  display: block;
+  height: 100%;
+  width: 100%;
 }
 
 .card-container .card-image img {
@@ -2999,22 +4260,46 @@ article.notfound #shrug svg {
   color: var(--INTERNAL-MAIN-TITLES-TEXT-color);
   flex: 0 0 auto;
   font-size: 1.2rem;
-  font-weight: 700;
+  font-variation-settings: var(--INTERNAL-MAIN-BOLD-font-variation-settings);
+  font-weight: var(--INTERNAL-MAIN-BOLD-font-weight);
+  letter-spacing: var(--INTERNAL-MAIN-BOLD-letter-spacing);
   line-height: 1.3;
   margin-top: 0;
 }
 
-.card-container .card-title a {
+.card-container .card-title a,
+.card-container .card-title button {
   color: inherit;
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
-.card-container .card-title a:before {
+/* a card running code is a button, which is dressed like the link of any other card */
+.card-container .card-title button,
+.card-container .card-image button {
+  -webkit-appearance: none;
+  appearance: none;
+  background: none;
+  border: 0;
+  text-align: inherit;
+}
+
+.card-container .card-title a:before,
+.card-container .card-title button:before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
+}
+
+/* the link or button of a card covers all of it, so what can be used on its
+   own is lifted above, where the mouse reaches it; only what is used is lifted
+   and never what holds other content, as a lightbox opened from inside would
+   be confined to it; whatever positions itself, like a graph enlarged into a
+   lightbox, keeps its own position */
+:where(.card-container .card-popout :is(.actionbar-wrapper, .card-content-text :is(a, audio, button, embed, iframe, input, label, select, summary, textarea, video))) {
+  position: relative;
+  z-index: 2;
 }
 
 .card-container .card-content-text {
@@ -3024,44 +4309,46 @@ article.notfound #shrug svg {
   overflow: hidden;
 }
 
-/* Responsive: 2 columns on tablet */
-@media screen and (max-width: 59.999rem) {
-  article:not(.narrow) .card-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media screen and (max-width: 74.999rem) {
-  article.narrow .card-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+/* card-columnize column count */
 
-/* Responsive: 1 column on mobile */
-@media screen and (max-width: 47.999rem) {
-  article.narrow .card-container,
-  article:not(.narrow) .card-container {
-    gap: 1.25rem;
-    grid-template-columns: 1fr;
+@media screen {
+  :where(.menu-s-width) .card-container.card-columnize {
+    --card-gap: 1.25rem;
   }
 
-  .card-container .card-content {
+  :where(.menu-s-width) .card-container .card-content {
     padding: 1rem;
   }
 
-  .card-container .card-content + .card-image {
+  :where(.menu-s-width) .card-container .card-content + .card-image {
     height: 140px;
   }
 }
 
-/* Dark theme compatibility */
-body[data-theme='dark'] .card-container .card,
-.relearn-dark .card-container .card {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+.card-columnize {
+  /* the requested count is the most we show, as a column is never narrower
+     than 12rem - unless we are narrower ourselves */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, max(12rem, (100% - (var(--card-columns) - 1) * var(--card-gap)) / var(--card-columns))), 1fr));
 }
 
-body[data-theme='dark'] .card-container .card:hover,
-.relearn-dark .card-container .card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+.card-columnize-1 {
+  --card-columns: 1;
+}
+
+.card-columnize-2 {
+  --card-columns: 2;
+}
+
+.card-columnize-3 {
+  --card-columns: 3;
+}
+
+.card-columnize-4 {
+  --card-columns: 4;
+}
+
+.card-columnize-5 {
+  --card-columns: 5;
 }
 
 /* color style definitions */
@@ -3071,20 +4358,36 @@ body[data-theme='dark'] .card-container .card:hover,
   --VARIABLE-BOX-TEXT-color: var(--INTERNAL-BOX-NEUTRAL-TEXT-color);
   --VARIABLE-BOX-CAPTION-color: var(--INTERNAL-BOX-CAPTION-color);
   --VARIABLE-BOX-BG-color: var(--INTERNAL-BOX-BG-color);
-  -webkit-print-color-adjust: exact;
-  color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .cstyle.link {
   --VARIABLE-BOX-color: transparent;
   --VARIABLE-BOX-TEXT-color: var(--VARIABLE-LINK-HOVER-color);
   --VARIABLE-BOX-CAPTION-color: var(--VARIABLE-LINK-color);
-  --VARIABLE-BOX-BG-color: rgba(160, 160, 160, 0.2);
+  --VARIABLE-BOX-BG-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 50%, transparent);
 }
 
 .cstyle.action {
-  --VARIABLE-BOX-color: rgba(160, 160, 160, 0.2);
+  --VARIABLE-BOX-color: color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 50%, transparent);
   --VARIABLE-BOX-TEXT-color: var(--INTERNAL-MAIN-BG-color);
   --VARIABLE-BOX-CAPTION-color: var(--VARIABLE-LINK-color);
   --VARIABLE-BOX-BG-color: var(--VARIABLE-LINK-color);
+}
+
+.btn.cstyle.action {
+  /* the resting square takes the color of the neutral boxes, but never lighter
+     than a dark grey on a dark page nor darker than a light grey on a light one,
+     as some variants accent their neutral boxes for contrast, which would leave
+     the icon too little of it */
+  --VARIABLE-BOX-color: light-dark(oklch(from var(--INTERNAL-BOX-NEUTRAL-color) max(l, 0.75) c h / 0.5), oklch(from var(--INTERNAL-BOX-NEUTRAL-color) min(l, 0.4) c h / 0.5));
+}
+
+div.highlight .btn.cstyle.action {
+  /* a code block may be dark on a light page or the other way round, so its
+     buttons take the lightness of their square from its own text color laid
+     faintly over it, like its scrollbar; hue and chroma come from the neutral
+     boxes laid over it as a hovered topbar button does, so the square carries
+     the same tint */
+  --VARIABLE-BOX-color: color-mix(in oklch, oklch(from color-mix(in srgb, var(--INTERNAL-CODE-BLOCK-color) 9%, var(--INTERNAL-CODE-BLOCK-BG-color)) l none none), oklch(from color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 50%, var(--INTERNAL-CODE-BLOCK-BG-color)) none c h));
 }

@@ -1,10 +1,16 @@
-+++
-categories = ['howto']
-description = 'What formats can a page be displayed in'
-outputs = ['html', 'rss', 'print', 'markdown', 'source']
-title = 'Available Output Formats'
-weight = 7
-+++
+---
+categories:
+- howto
+description: What formats can a page be displayed in
+outputs:
+- html
+- rss
+- print
+- markdown
+- source
+title: Available Output Formats
+weight: 5
+---
 
 The Relearn theme by default comes with templates for HTML and RSS for each page.
 
@@ -14,7 +20,7 @@ If this is not enough, learn how to [create your own output formats](configurati
 
 ## Print Support
 
-Enable print support to print entire chapters or the whole site. Add the `print` output format to your home, section, and page in `hugo.toml`:
+Enable print support to print entire chapters or the whole site. Add the `print` output format to your home, section, and page in your project configuration:
 
 {{< multiconfig file=hugo >}}
 [outputs]
@@ -23,11 +29,21 @@ Enable print support to print entire chapters or the whole site. Add the `print`
   page = ['html', 'print']
 {{< /multiconfig >}}
 
+If you want to print the lists of your taxonomies and their terms as well, add it to these, too:
+
+{{< multiconfig file=hugo >}}
+[outputs]
+  taxonomy = ['html', 'rss', 'print']
+  term = ['html', 'rss', 'print']
+{{< /multiconfig >}}
+
+The results of the dedicated search page [can be printed](configuration/sidebar/search#printing-the-search-results) if your home page can.
+
 By default this adds a printer icon in the topbar but [can be deactived](authoring/frontmatter/topbar/#print-button). Clicking it switches to print preview, showing the page and its [visible subpages](configuration/content/hidden) in a printer-friendly format. Use your browser's print function to print or save as PDF.
 
-The URL won't be [configured ugly](https://gohugo.io/configuration/output-formats/) for [Hugo's URL handling](https://gohugo.io/content-management/urls/#ugly-urls), even with `uglyURLs=true` in `hugo.toml`. This is because each mime type can only have one suffix.
+The URL won't be [configured ugly](https://gohugo.io/configuration/output-formats/) for [Hugo's URL handling](https://gohugo.io/content-management/urls/#ugly-urls), even with `uglyURLs` set to `true` in your project configuration. This is because each mime type can only have one suffix.
 
-If you don't like the URLs, you can reconfigure `outputFormats.print` in your `hugo.toml` to something other than the default of:
+If you don't like the URLs, you can reconfigure `outputFormats.print` in your project configuration to something other than the default of:
 
 {{< multiconfig file=hugo >}}
 [outputFormats]
@@ -42,7 +58,7 @@ If you don't like the URLs, you can reconfigure `outputFormats.print` in your `h
 
 ## Markdown Support
 
-Enable support to show the Markdown source of a page. Add the `markdown` output format to your home, section, and page in `hugo.toml`:
+Enable support to show the Markdown source of a page. Add the `markdown` output format to your home, section, and page in your project configuration:
 
 {{< multiconfig file=hugo >}}
 [outputs]
@@ -57,7 +73,7 @@ The `markdown` output format configuration is [provided by Hugo](https://gohugo.
 
 ## Source Support
 
-Enable support to show the source code of a page if it was generated from a file. Add the `source` output format to your home, section, and page in `hugo.toml`:
+Enable support to show the source code of a page if it was generated from a file. Add the `source` output format to your home, section, and page in your project configuration:
 
 {{< multiconfig file=hugo >}}
 [outputs]
@@ -70,9 +86,9 @@ By default this adds a Source icon in the topbar but [can be deactived](authorin
 
 The Source output format differs from the Markdown format, as it prints the source code _as is_ including the front matter.
 
-The URL won't be [configured ugly](https://gohugo.io/configuration/output-formats/) for [Hugo's URL handling](https://gohugo.io/content-management/urls/#ugly-urls), even with `uglyURLs=true` in `hugo.toml`. This is because each mime type can only have one suffix.
+The URL won't be [configured ugly](https://gohugo.io/configuration/output-formats/) for [Hugo's URL handling](https://gohugo.io/content-management/urls/#ugly-urls), even with `uglyURLs` set to `true` in your project configuration. This is because each mime type can only have one suffix.
 
-If you don't like the URLs, you can reconfigure `outputFormats.source` in your `hugo.toml` to something other than the default of:
+If you don't like the URLs, you can reconfigure `outputFormats.source` in your project configuration to something other than the default of:
 
 {{< multiconfig file=hugo >}}
 [outputFormats]

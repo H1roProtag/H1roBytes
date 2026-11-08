@@ -1,8 +1,10 @@
-+++
-categories = ['explanation']
-description = 'What to know if you want to contribute'
-title = 'Contributing'
-+++
+---
+categories:
+- explanation
+description: What to know if you want to contribute
+title: Contributing
+weight: 1
+---
 
 ## Code Quality
 
@@ -26,23 +28,49 @@ Check for unnecessary whitespace and correct indention of your resulting HTML.
 
 ## Conventional Commits
 
-Write commit messages in the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) format.
+Write commit messages in the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) format: a type, the affected part of the theme as scope in parentheses and a short description, followed by the number of the related issue.
 
-Following is an incomplete list of some of the used conventional commit types. Be creative.
+````text
+feat(table): make columns sortable #1339
+````
+
+The scope is never left out. Release commits are the only exception; the release workflow writes them as `Release <version>`.
+
+The type tells what kind of change it is. Ask the questions in order; the first one you answer with yes gives the type.
+
+| Question                                             | If Yes → Type |
+|------------------------------------------------------|---------------|
+| Reverts a previous commit?                           | revert        |
+| Bug fix (incl. security dependency patches)?         | fix           |
+| New, changed, or removed behavior in API/UI?         | feat          |
+| Performance improvement?                             | perf          |
+| Code restructuring without behavior change?          | refactor      |
+| Deployment, infrastructure, or backups?              | ops           |
+| CI pipeline config only?                             | ci            |
+| Build tooling, dependencies, versions?               | build         |
+| Tests only?                                          | test          |
+| Documentation only?                                  | docs          |
+| Code formatting only (not CSS)?                      | style         |
+| Anything else                                        | chore         |
+| _Breaks existing consumers?_                         | _add `!` to any type_ |
+
+Following is an incomplete list of some of the used scopes. Be creative.
 
 | Common     | Feature    | Structure       | Shortcodes  |
 |------------|------------|-----------------|-------------|
-| build      | a11y       | favicon         | attachments |
-| browser    | archetypes | search          | badge       |
-| chore      | alias      | menu            | button      |
-| docs       | generator  | history         | children    |
-| shortcodes | i18n       | scrollbar       | expand      |
-| theme      | mobile     | nav             | icon        |
-|            | print      | toc             | include     |
-|            | rss        | clipboard       | math        |
-|            | variant    | syntaxhighlight | mermaid     |
-|            |            | boxes           | notice      |
-|            |            |                 | openapi     |
+| browser    | a11y       | favicon         | attachments |
+| shortcodes | archetypes | search          | badge       |
+| theme      | alias      | menu            | button      |
+|            | generator  | history         | callout     |
+|            | i18n       | scrollbar       | children    |
+|            | mobile     | nav             | details     |
+|            | print      | toc             | icon        |
+|            | rss        | clipboard       | include     |
+|            | variant    | syntaxhighlight | math        |
+|            |            | boxes           | mermaid     |
+|            |            | table           | openapi     |
 |            |            |                 | piratify    |
 |            |            |                 | siteparam   |
 |            |            |                 | tabs        |
+
+Issue titles are not written in the conventional commit format. They start with the affected part, like `table: make columns sortable` or `docs: write commit messages with type and scope`.

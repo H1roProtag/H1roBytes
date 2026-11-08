@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {{- .Store.Set "relearnOutputFormat" "html" }}
-<html id="R-html" lang="{{ .Page.Language.LanguageCode }}" dir="{{ .Page.Language.LanguageDirection | default (T "Reading-direction") | default "ltr" }}" itemscope itemtype="http://schema.org/Article" data-r-output-format="{{ with .Store.Get "relearnOutputFormat" }}{{ . }}{{ else }}html{{ end }}">
+<html id="R-html" lang="{{ .Page.Language.Locale }}" dir="{{ .Page.Language.Direction | default (T "Reading-direction") | default "ltr" }}" itemscope itemtype="http://schema.org/Article" data-r-output-format="{{ with .Store.Get "relearnOutputFormat" }}{{ . }}{{ else }}html{{ end }}">
   <head>
     {{- partial "meta.html" . }}
     {{- $title := partial "title.gotmpl" (dict "page" . "fullyQualified" true "reverse" true) }}
@@ -13,24 +13,21 @@
     {{- partial "dependencies.html" (dict "page" . "location" "header") }}
     {{- partial "custom-header.html" . }}
   </head>
-  <body class="mobile-support {{ with .Store.Get "relearnOutputFormat" }}{{ . }}{{ else }}html{{ end }}" data-origin="{{ partial "permalink.gotmpl" (dict "to" .) }}">
+  <body class="mobile-support {{ with .Store.Get "relearnOutputFormat" }}{{ . }}{{ else }}html{{ end }}{{- if site.Params.link.underline }} link-underline{{ end }}" data-origin="{{ partial "permalink.gotmpl" (dict "to" .) }}">
     <div id="R-body" class="default-animation">
-      <main id="R-body-inner" class="highlightable chapter" tabindex="-1">
+      <main id="R-main" class="highlightable chapter">
         <div class="flex-block-wrapper">
           <article class="notfound">
-            <h1 id="404"><span>4</span>{{ partial "shortcodes/icon.html" (dict "page" . "icon" "far fa-frown" )}}<span>4</span></h1>
+            <h1 id="404"><span class="a11y-only">404</span><span aria-hidden="true">4</span>{{ partial "shortcodes/icon.html" (dict "page" . "icon" "far fa-frown" )}}<span aria-hidden="true">4</span></h1>
             <h2 id="{{ T "title-404" | plainify | anchorize }}">{{ T "title-404" }}</h2>
-            <p></p>
             <p>{{ T "message-404" }}</p>
-            <p></p>
             <p><a href="{{ partial "permalink.gotmpl" (dict "to" site.Home) }}">{{ T "Go-to-homepage" }}</a></p>
             <p id="shrug">
-              <svg xmlns="http://www.w3.org/2000/svg"
+              <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
  viewBox="0 0 512.000000 512.000000"
  preserveAspectRatio="xMidYMid meet">
 
-<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-style="fill:#000000;stroke:none;">
+<g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)">
 <path d="M2359 4821 c-330 -72 -613 -312 -803 -681 -53 -102 -74 -133 -105
 -154 -46 -32 -103 -113 -121 -170 -7 -23 -11 -72 -8 -120 3 -65 10 -91 33
 -134 36 -66 91 -117 161 -149 30 -13 54 -30 54 -38 0 -33 56 -199 94 -281 54

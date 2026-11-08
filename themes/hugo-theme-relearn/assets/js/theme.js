@@ -5,61 +5,31 @@ var isPrint = document.querySelector('body').classList.contains('print');
 var isPrintPreview = false;
 
 var isRtl = document.querySelector('html').getAttribute('dir') == 'rtl';
-var lang = document.querySelector('html').getAttribute('lang');
-var dir_padding_start = 'padding-left';
-var dir_padding_end = 'padding-right';
-var dir_key_start = 37;
-var dir_key_end = 39;
+var dir_key_start = 'ArrowLeft';
+var dir_key_end = 'ArrowRight';
 var dir_scroll = 1;
 if (isRtl) {
-  dir_padding_start = 'padding-right';
-  dir_padding_end = 'padding-left';
-  dir_key_start = 39;
-  dir_key_end = 37;
+  dir_key_start = 'ArrowRight';
+  dir_key_end = 'ArrowLeft';
   dir_scroll = -1;
 }
 
-var touchsupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+var touchsupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+var reducedmotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+var hovernone = window.matchMedia('(hover: none)');
 
 var formelements = 'button, datalist, fieldset, input, label, legend, meter, optgroup, option, output, progress, select, textarea';
 
-// PerfectScrollbar
-var psc;
-var psm;
-var pst = new Map();
-var elc = document.querySelector('#R-body-inner');
+// how far a cursor key scrolls one of our scroll containers; the browsers
+// default for this is neither exposed to us nor the same in all of them
+var LINE_SCROLL = 40;
+// the keys a browser scrolls with
+var SCROLL_KEYS = [' ', 'PageUp', 'PageDown', 'End', 'Home', 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'];
+
+var elc = document.querySelector('#R-main');
 
 function regexEscape(s) {
   return s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-}
-
-function documentFocus() {
-  elc.focus();
-  psc && psc.scrollbarY.focus();
-}
-
-function scrollbarWidth() {
-  // https://davidwalsh.name/detect-scrollbar-width
-  // Create the measurement node
-  var scrollDiv = document.createElement('div');
-  scrollDiv.className = 'scrollbar-measure';
-  document.body.appendChild(scrollDiv);
-  // Get the scrollbar width
-  var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
-  // Delete the DIV
-  document.body.removeChild(scrollDiv);
-  return scrollbarWidth;
-}
-
-var scrollbarSize = scrollbarWidth();
-function adjustContentWidth() {
-  var start = parseFloat(getComputedStyle(elc).getPropertyValue(dir_padding_start));
-  var end = start;
-  if (elc.scrollHeight > elc.clientHeight) {
-    // if we have a scrollbar reduce the end margin by the scrollbar width
-    end = Math.max(0, start - scrollbarSize);
-  }
-  elc.style[dir_padding_end] = '' + end + 'px';
 }
 
 let debounceTimeout;
@@ -74,7 +44,7 @@ function debounce(func, delay) {
 function showToast(message) {
   if (!message) return;
 
-  var container = document.getElementById('toast-container');
+  var container = document.querySelector('#toast-container');
   if (!container) return;
 
   var toast = document.createElement('div');
@@ -97,94 +67,80 @@ function showToast(message) {
 
 window.relearn.showToast = showToast;
 
-function fixCodeTabs() {
-  /* if only a single code block is contained in the tab and no style was selected, treat it like style=code */
-  var codeTabContents = Array.from(document.querySelectorAll('.tab-content.tab-panel-style')).filter(function (tabContent) {
-    return tabContent.querySelector('*:scope > .tab-content-text > div.highlight:only-child, *:scope > .tab-content-text > pre:not(.mermaid).pre-code:only-child');
-  });
+// the latest hold is the one that keeps its element in place
+var holds = 0;
 
-  codeTabContents.forEach(function (tabContent) {
-    var tabId = tabContent.dataset.tabItem;
-    var tabPanel = tabContent.parentNode.parentNode;
-    var tabButton = tabPanel.querySelector('.tab-nav-button.tab-panel-style[data-tab-item="' + tabId + '"]');
-    if (tabContent.classList.contains('initial')) {
-      tabButton.classList.remove('initial');
-      tabButton.classList.add('code');
-      tabContent.classList.remove('initial');
-      tabContent.classList.add('code');
+// keeps `element` where it is in the viewport by scrolling the content against
+// whatever moves it. `isMoving` is asked once the caller is done with its changes
+// and from then on with every step of what it has set off, until it denies; the
+// element is put back each time, so once more after the last step
+function holdInPlace(element, isMoving) {
+  var ypos = element.getBoundingClientRect().top;
+  var hold = ++holds;
+  var step = function () {
+    if (hold != holds) {
+      return;
     }
-    // mark code blocks for FF without :has()
-    tabContent.classList.add('codify');
-  });
+    var yposDiff = element.getBoundingClientRect().top - ypos;
+    if (yposDiff && elc) {
+      elc.scrollTop += yposDiff;
+    }
+    isMoving() && requestAnimationFrame(step);
+  };
+  return step;
 }
 
-function switchTab(tabGroup, tabId) {
-  var tabs = Array.from(document.querySelectorAll('.tab-panel[data-tab-group="' + tabGroup + '"]')).filter(function (e) {
-    return !!e.querySelector('[data-tab-item="' + tabId + '"]');
+function switchTab(tabGroup, tabId, button) {
+  var holdButton = holdInPlace(button, function () {
+    return animations.some(function (animation) {
+      return animation.playState == 'running';
+    });
   });
-  var allTabItems =
-    tabs &&
-    tabs.reduce(function (a, e) {
-      return a.concat(
-        Array.from(e.querySelectorAll('[data-tab-item]')).filter(function (es) {
-          return es.parentNode.parentNode == e;
-        })
-      );
-    }, []);
-  var targetTabItems =
-    tabs &&
-    tabs.reduce(function (a, e) {
-      return a.concat(
-        Array.from(e.querySelectorAll('[data-tab-item="' + tabId + '"]')).filter(function (es) {
-          return es.parentNode.parentNode == e;
-        })
-      );
-    }, []);
 
-  // if event is undefined then switchTab was called from restoreTabSelection
-  // so it's not a button event and we don't need to safe the selction or
-  // prevent page jump
-  var isButtonEvent = event && event.target && event.target.getBoundingClientRect;
-  if (isButtonEvent) {
-    // save button position relative to viewport
-    var yposButton = event.target.getBoundingClientRect().top;
-  }
+  var activeText = function (panel) {
+    return panel.querySelector(':scope > .tab-content-container > .tab-content.active > .tab-content-text');
+  };
+  var areas = Array.from(document.querySelectorAll('.tab-panel[data-tab-group="' + tabGroup + '"]')).map(function (panel) {
+    var text = activeText(panel);
+    return { panel: panel, text: text, height: text ? text.getBoundingClientRect().height : 0 };
+  });
 
-  allTabItems &&
-    allTabItems.forEach(function (e) {
-      e.classList.remove('active');
-      e.setAttribute('aria-expanded', 'false');
-      e.removeAttribute('tabindex');
-    });
-  targetTabItems &&
-    targetTabItems.forEach(function (e) {
-      e.classList.add('active');
-      e.setAttribute('aria-expanded', 'true');
-      e.setAttribute('tabindex', '-1');
-    });
+  window.relearn.selectTab(tabGroup, tabId);
+  initMermaid(true);
 
-  if (isButtonEvent) {
-    initMermaid(true);
-
-    // reset screen to the same position relative to clicked button to prevent page jump
-    var yposButtonDiff = event.target.getBoundingClientRect().top - yposButton;
-    window.scrollTo(window.scrollX, window.scrollY + yposButtonDiff);
-
-    // Store the selection to make it persistent
-    if (window.localStorage) {
-      var selectionsJSON = window.localStorage.getItem(window.relearn.absBaseUri + '/tab-selections');
-      if (selectionsJSON) {
-        var tabSelections = JSON.parse(selectionsJSON);
-      } else {
-        var tabSelections = {};
-      }
-      tabSelections[tabGroup] = tabId;
-      window.localStorage.setItem(window.relearn.absBaseUri + '/tab-selections', JSON.stringify(tabSelections));
+  // the new content is there at once and stays at the upper edge, while the area
+  // grows or shrinks from the height of the former content to its own
+  var animations = [];
+  areas.forEach(function (area) {
+    var text = activeText(area.panel);
+    if (!text || !area.text || text == area.text || reducedmotion.matches) {
+      return;
     }
-  }
-}
+    // a content still on its way from an earlier switch would report the height
+    // it has reached by now instead of its own
+    text.getAnimations().forEach(function (animation) {
+      animation.cancel();
+    });
+    var height = text.getBoundingClientRect().height;
+    if (height == area.height) {
+      return;
+    }
+    // cut off at the height of the area but not to the sides
+    animations.push(
+      text.animate(
+        [
+          { height: area.height + 'px', overflowY: 'clip' },
+          { height: height + 'px', overflowY: 'clip' },
+        ],
+        { duration: 175, easing: 'ease' }
+      )
+    );
+  });
 
-function restoreTabSelections() {
+  // the areas above the button move it with every step they take
+  holdButton();
+
+  // Store the selection to make it persistent
   if (window.localStorage) {
     var selectionsJSON = window.localStorage.getItem(window.relearn.absBaseUri + '/tab-selections');
     if (selectionsJSON) {
@@ -192,11 +148,423 @@ function restoreTabSelections() {
     } else {
       var tabSelections = {};
     }
-    Object.keys(tabSelections).forEach(function (tabGroup) {
-      var tabItem = tabSelections[tabGroup];
-      switchTab(tabGroup, tabItem);
-    });
+    tabSelections[tabGroup] = tabId;
+    window.localStorage.setItem(window.relearn.absBaseUri + '/tab-selections', JSON.stringify(tabSelections));
   }
+}
+
+function handleTabs() {
+  // one listener for all tabs, also those added later; the innermost panel is the
+  // one a button belongs to
+  document.addEventListener('click', function (event) {
+    var button = event.target.closest('.tab-nav-button[data-tab-item]');
+    if (!button) {
+      return;
+    }
+    var tabPanel = button.closest('.tab-panel[data-tab-group]');
+    tabPanel && switchTab(tabPanel.dataset.tabGroup, button.dataset.tabItem, button);
+  });
+
+  // inside of a list of tabs the arrow keys move on to the neighbouring tab,
+  // which is selected right away
+  document.addEventListener('keydown', function (event) {
+    if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
+    var button = event.target.closest('.tab-nav-button[data-tab-item]');
+    var list = button && button.parentNode;
+    if (!list) {
+      return;
+    }
+    var buttons = Array.from(list.querySelectorAll(':scope > .tab-nav-button[data-tab-item]'));
+    var index = buttons.indexOf(button);
+    if (event.key == dir_key_start) {
+      index = (index + buttons.length - 1) % buttons.length;
+    } else if (event.key == dir_key_end) {
+      index = (index + 1) % buttons.length;
+    } else if (event.key == 'Home') {
+      index = 0;
+    } else if (event.key == 'End') {
+      index = buttons.length - 1;
+    } else {
+      return;
+    }
+    event.preventDefault();
+    buttons[index].focus();
+    buttons[index].click();
+  });
+}
+
+function handleExpanders() {
+  // opening an expander closes the open one of its group; if that sits above, the
+  // pressed label moves with every step it rolls in. the expander only changes
+  // after the click is through, so we look at it with the next frame
+  document.addEventListener('click', function (event) {
+    var label = event.target.closest('details.expand[name] > summary');
+    if (!label) {
+      return;
+    }
+    // the browser does not tell of the transition of the disclosed content, so we
+    // take the time it is given by the stylesheet; without one the label is put
+    // back just once
+    var duration = getComputedStyle(label.parentNode, '::details-content')
+      .transitionDuration.split(',')
+      .reduce(function (max, duration) {
+        return Math.max(max, parseFloat(duration) * 1000 || 0);
+      }, 0);
+    var end = 0;
+    var holdLabel = holdInPlace(label, function () {
+      // a frame may be late, so there is some time to spare
+      end = end || performance.now() + duration + 50;
+      return performance.now() < end;
+    });
+    requestAnimationFrame(holdLabel);
+  });
+}
+
+function mermaidLightbox(box, show) {
+  // the graph itself is enlarged instead of a copy of it, so it stays the
+  // one graph the reader pans and zooms; returns the button that toggles it
+  box.classList.toggle('lightbox', show);
+  if (show) {
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+  } else {
+    box.removeAttribute('role');
+    box.removeAttribute('aria-modal');
+  }
+  var button = box.querySelector('.svg-lightbox-button button');
+  if (button) {
+    var label = show ? window.T_Close_graph : window.T_Enlarge_graph;
+    button.setAttribute('title', label);
+    button.setAttribute('aria-label', label);
+    button.querySelector('i').className = 'fa-fw fas ' + (show ? 'fa-compress' : 'fa-expand');
+  }
+  return button;
+}
+
+// whether the enlarged graph was opened from this page, which leaves a history
+// entry to return to; a page loaded with the graph already enlarged has none
+var mermaidLightboxOpenedHere = false;
+
+function openMermaidLightbox(box) {
+  mermaidLightbox(box, true);
+  if (box.id) {
+    // the enlarged graph has its own URL, so it can be linked to and is left by going back
+    mermaidLightboxOpenedHere = true;
+    window.history.pushState(window.history.state, '', '#' + box.id);
+  }
+}
+
+function closeMermaidLightbox() {
+  var shown = document.querySelector('.mermaid.lightbox');
+  if (!shown) {
+    return;
+  }
+  // return to the button it was opened from
+  var button = mermaidLightbox(shown, false);
+  button && button.focus();
+  if (!shown.id || window.location.hash != '#' + shown.id) {
+    return;
+  }
+  if (mermaidLightboxOpenedHere) {
+    // leave the lightbox the way we came instead of adding another history entry
+    window.history.back();
+  } else {
+    // going back would leave the page, so its entry is replaced instead
+    window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+  }
+}
+
+function syncMermaidLightbox() {
+  // the graph named by the URL is the enlarged one; a graph that is not shown in
+  // the page, like in a collapsed expander, would cover it with nothing to see
+  var id = window.location.hash.slice(1);
+  var target = !isPrint && id ? document.getElementById(id) : null;
+  if (target && !target.matches('.mermaid-container > .mermaid.mermaid-render')) {
+    target = null;
+  }
+  var shown = document.querySelector('.mermaid.lightbox');
+  if (shown == target) {
+    return;
+  }
+  var button = shown && mermaidLightbox(shown, false);
+  if (target) {
+    // a graph not drawn yet takes the focus once it has its button
+    button = mermaidLightbox(target, true);
+  }
+  button && button.focus();
+}
+
+function mermaidLightboxKeyHandler(event) {
+  // an enlarged graph lies above everything else, so no key reaches the page below it
+  var shown = document.querySelector('.mermaid.lightbox');
+  if (!shown) {
+    return;
+  }
+  if (event.key == 'Escape') {
+    event.stopPropagation();
+    closeMermaidLightbox();
+  } else if (event.key == 'Tab') {
+    // the focus stays inside
+    event.preventDefault();
+    event.stopPropagation();
+    var stops = Array.from(shown.querySelectorAll(':scope > svg[tabindex], .actionbar button')).filter(function (e) {
+      return e.getClientRects().length;
+    });
+    var index = stops.indexOf(document.activeElement);
+    if (index == -1) {
+      index = event.shiftKey ? 0 : -1;
+    }
+    var next = stops[(index + (event.shiftKey ? -1 : 1) + stops.length) % stops.length];
+    next && next.focus();
+  } else if (!shown.contains(event.target)) {
+    event.stopPropagation();
+  }
+}
+
+function mermaidLightboxClickHandler(event) {
+  // the backdrop is drawn by the box, so a click on it has the box as its target
+  var shown = document.querySelector('.mermaid.lightbox');
+  if (!shown || (event.target != shown && shown.contains(event.target))) {
+    return;
+  }
+  event.preventDefault();
+  event.stopPropagation();
+  closeMermaidLightbox();
+}
+
+function mermaidPostRender(id) {
+  var svgs = d3.selectAll('body:not(.print) .mermaid-container > .mermaid > #' + id);
+  svgs.each(function () {
+    var parent = this.parentElement;
+    var reset = '<span class="btn cstyle svg-reset-button action noborder notitle interactive"><button type="button" title="' + window.T_Reset_view + '" aria-label="' + window.T_Reset_view + '"><i class="fa-fw fas fa-undo-alt" aria-hidden="true"></i></button></span>';
+    var enlarge = '<span class="btn cstyle svg-lightbox-button action noborder notitle interactive"><button type="button" title="' + window.T_Enlarge_graph + '" aria-label="' + window.T_Enlarge_graph + '"><i class="fa-fw fas fa-expand" aria-hidden="true"></i></button></span>';
+    parent.insertAdjacentHTML('beforeend', '<div class="actionbar">' + reset + enlarge + '</div>');
+    var enlargeButton = parent.querySelector('.svg-lightbox-button button');
+    enlargeButton.addEventListener('click', function () {
+      if (parent.classList.contains('lightbox')) {
+        closeMermaidLightbox();
+      } else {
+        openMermaidLightbox(parent);
+      }
+    });
+    if (parent.classList.contains('lightbox')) {
+      // enlarged by its URL before it was drawn
+      mermaidLightbox(parent, true);
+      enlargeButton.focus();
+    }
+    // the keys the enlarged graph has no use for must not reach the page below it
+    var keepKey = function (event) {
+      if (parent.classList.contains('lightbox')) {
+        event.stopPropagation();
+      }
+    };
+    this.addEventListener('keydown', keepKey);
+    parent.querySelector('.actionbar').addEventListener('keydown', keepKey);
+  });
+
+  // zoom for Mermaid
+  // https://github.com/mermaid-js/mermaid/issues/1860#issuecomment-1345440607
+  svgs = d3.selectAll('body:not(.print) .mermaid-container.zoomable > .mermaid > #' + id);
+  svgs.each(function () {
+    var parent = this.parentElement;
+    var svg = d3.select(this);
+    // the graph is panned across the whole box instead of vanishing at its own edges;
+    // so it spans the box and is kept from growing by its natural height instead
+    var viewBox = this.viewBox.baseVal;
+    var naturalWidth = this.style.maxWidth || this.getAttribute('width') || '';
+    if (viewBox && viewBox.width && parseFloat(naturalWidth) && !naturalWidth.endsWith('%')) {
+      this.style.maxHeight = (parseFloat(naturalWidth) * viewBox.height) / viewBox.width + 'px';
+      this.style.maxWidth = 'none';
+      this.style.width = '100%';
+      var container = parent.parentElement;
+      var align = container.classList.contains('align-left') ? 'xMin' : container.classList.contains('align-right') ? 'xMax' : 'xMid';
+      this.setAttribute('preserveAspectRatio', align + 'YMid meet');
+    }
+    svg.html('<g>' + svg.html() + '</g>');
+    var inner = svg.select('*:scope > g');
+    var wrapper = parent.querySelector('.svg-reset-button');
+    var button = wrapper.querySelector('button');
+    var zoom = d3.zoom().on('zoom', function (e) {
+      inner.attr('transform', e.transform);
+      if (e.transform.k == 1 && e.transform.x == 0 && e.transform.y == 0) {
+        // the button is about to vanish, so the focus it holds goes back to the graph
+        if (document.activeElement == button) {
+          svg.node().focus();
+        }
+        wrapper.classList.remove('zoomed');
+      } else {
+        wrapper.classList.add('zoomed');
+      }
+    });
+    button.addEventListener('click', function () {
+      svg.transition().duration(350).call(zoom.transform, d3.zoomIdentity);
+      showToast(window.T_View_reset);
+    });
+    svg.call(zoom);
+    // the keyboard has neither a wheel nor can it drag, so the graph is a stop
+    // for the tab key and takes the keys a browser scrolls and zooms with
+    this.setAttribute('tabindex', '0');
+    var panZoomKey = function (event) {
+      if (event.altKey || event.ctrlKey || event.metaKey) {
+        return;
+      }
+      // a step is as far on the screen no matter how far we are zoomed in
+      var step = LINE_SCROLL / d3.zoomTransform(svg.node()).k;
+      if (event.key == 'ArrowLeft') {
+        svg.call(zoom.translateBy, step, 0);
+      } else if (event.key == 'ArrowRight') {
+        svg.call(zoom.translateBy, -step, 0);
+      } else if (event.key == 'ArrowUp') {
+        svg.call(zoom.translateBy, 0, step);
+      } else if (event.key == 'ArrowDown') {
+        svg.call(zoom.translateBy, 0, -step);
+      } else if (event.key == '+' || event.key == '=') {
+        svg.call(zoom.scaleBy, 1.25);
+      } else if (event.key == '-') {
+        svg.call(zoom.scaleBy, 0.8);
+      } else {
+        return;
+      }
+      // the key is used up; otherwise the page would scroll or be left for its neighbour
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    this.addEventListener('keydown', panZoomKey);
+    // the buttons belong to the graph, so its keys work from them as well
+    parent.querySelector('.actionbar').addEventListener('keydown', panZoomKey);
+  });
+  // we have to mark again once a graph was drawn, to mark terms inside its SVG
+  mark();
+}
+
+// drawing a graph is by far the most expensive thing we do - a page full of them
+// freezes the browser for seconds if we draw them in one go - so we draw what the
+// reader is about to see first and hand the thread back between two of them
+var mermaidObserver = null;
+var mermaidQueue = [];
+var mermaidIsDrawing = false;
+// hands the thread back between two graphs; unlike a timer, a message is not
+// throttled while the tab is hidden
+var mermaidChannel = null;
+var mermaidIds = 0;
+
+// draws a graph from the source kept beside it; what the graph shows stays until
+// the new drawing is done, as Firefox and Safari print the page as it is when
+// printing starts and would put a gap on paper instead
+function drawMermaidGraph(element) {
+  var code = element.parentElement.querySelector(':scope > .mermaid-code');
+  var source = code.textContent;
+  element.dataset.processed = 'true';
+  var id = 'mermaid-' + Date.now() + '-' + ++mermaidIds;
+  // some diagrams, like GANTT, take their width from the box they are drawn in;
+  // left to Mermaid, that box is put into the body, where it gets no width
+  var box = document.createElement('div');
+  box.style.cssText = 'position: absolute; top: 0; inset-inline-start: 0; visibility: hidden; width: ' + element.offsetWidth + 'px;';
+  document.body.appendChild(box);
+  return mermaid
+    .render(id, source, box)
+    .then(function (result) {
+      // the source was changed while we were drawing, e.g. as printing began or
+      // ended; its own drawing takes care of it and must not be overwritten
+      if (code.textContent != source) {
+        return;
+      }
+      element.innerHTML = result.svg;
+      mermaidPostRender(id);
+      if (result.bindFunctions) {
+        result.bindFunctions(element);
+      }
+    })
+    .finally(function () {
+      box.remove();
+    });
+}
+
+// draws the next graph and calls `then` once it is done; false if there is
+// nothing left to draw
+function drawMermaidNext(then) {
+  var element = mermaidQueue.shift();
+  while (element && element.dataset.processed) {
+    // somebody queued us twice, e.g. by printing while we came into view
+    element = mermaidQueue.shift();
+  }
+  if (!element) {
+    // the rest follows once what the reader sees is drawn; Firefox and Safari
+    // print only what is drawn by the time printing starts
+    element = document.querySelector('.mermaid.mermaid-render:not([data-processed])');
+  }
+  if (!element) {
+    return false;
+  }
+  drawMermaidGraph(element)
+    // a graph we can not draw must not stop the ones behind it
+    .catch(function () {})
+    .then(then);
+  return true;
+}
+
+function drawMermaidQueue() {
+  if (mermaidIsDrawing) {
+    return;
+  }
+  mermaidIsDrawing = true;
+  if (!mermaidChannel) {
+    mermaidChannel = new MessageChannel();
+  }
+  var next = function () {
+    mermaidIsDrawing = drawMermaidNext(function () {
+      // hand the thread back, so the page stays usable while we work through the rest
+      mermaidChannel.port2.postMessage(null);
+    });
+  };
+  mermaidChannel.port1.onmessage = next;
+  next();
+}
+
+function drawMermaidRest() {
+  // everything not drawn yet, as we are about to be printed; the browser lays out
+  // the printout right after us, so we draw it in one go instead of handing back
+  // the thread in between
+  mermaidObserver && mermaidObserver.disconnect();
+  mermaidQueue.length = 0;
+  (function next() {
+    drawMermaidNext(next);
+  })();
+}
+
+function drawMermaid() {
+  if (document.readyState != 'complete') {
+    // the graphs are the last thing the reader needs, so let the page load first
+    window.addEventListener('load', drawMermaid, { once: true });
+    return;
+  }
+  if (isPrint || !window.IntersectionObserver) {
+    // a page made for the printer is drawn from top to bottom, not as it comes into
+    // view; still one graph at a time, so the page stays usable while it is drawn
+    drawMermaidQueue();
+    return;
+  }
+  mermaidObserver && mermaidObserver.disconnect();
+  mermaidObserver = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) {
+          return;
+        }
+        mermaidObserver.unobserve(entry.target);
+        mermaidQueue.push(entry.target);
+      });
+      drawMermaidQueue();
+    },
+    // a viewport ahead of time, so scrolling and jumps to an anchor usually find
+    // the graph drawn instead of having it grow into place under the reader
+    { rootMargin: '100% 0px' }
+  );
+  document.querySelectorAll('.mermaid.mermaid-render:not([data-processed])').forEach(function (element) {
+    mermaidObserver.observe(element);
+  });
 }
 
 function initMermaid(update, attrs) {
@@ -279,6 +647,11 @@ function initMermaid(update, attrs) {
       new_element.classList.add('mermaid-container');
       new_element.classList.remove('mermaid');
       new_element.classList.remove('actionbar-wrapper');
+      if (new_element.dataset.lightboxId) {
+        // the box is what is enlarged, so the URL of the enlarged graph names it
+        element.id = new_element.dataset.lightboxId;
+        delete new_element.dataset.lightboxId;
+      }
       element.classList.add('mermaid');
       if (hasActionbarWrapper) {
         element.classList.add('actionbar-wrapper');
@@ -320,8 +693,8 @@ function initMermaid(update, attrs) {
 
       parse.yaml.theme = theme;
       var graph = encodeHTML(serializeGraph(parse));
+      // the graph keeps showing what it shows until it is drawn anew
       element.removeAttribute('data-processed');
-      element.innerHTML = graph;
       code.innerHTML = graph;
     });
     return is_initialized;
@@ -337,20 +710,41 @@ function initMermaid(update, attrs) {
 
   if (!state.is_initialized) {
     state.is_initialized = true;
+    // capturing, to be asked before anyone else
+    document.addEventListener('keydown', mermaidLightboxKeyHandler, true);
+    document.addEventListener('click', mermaidLightboxClickHandler, true);
+    window.addEventListener('hashchange', function () {
+      syncMermaidLightbox();
+      mermaidLightboxOpenedHere = !!document.querySelector('.mermaid.lightbox');
+    });
     window.addEventListener(
       'beforeprint',
       function () {
         isPrintPreview = true;
-        initMermaid(true, {
-          theme: getColorValue('PRINT-MERMAID-theme'),
-        });
+        // the print version already shows its graphs as they are printed
+        if (!isPrint) {
+          // the print variant only applies once the browser lays out the printout
+          initMermaid(true, {
+            theme: getColorValue('PRINT-MERMAID-theme'),
+          });
+        }
+        // the print dialog will not wait for us, but a graph that never came into
+        // view must at least be on its way instead of being left out entirely
+        drawMermaidRest();
       }.bind(this)
     );
     window.addEventListener(
       'afterprint',
       function () {
         isPrintPreview = false;
-        initMermaid(true);
+        if (isPrint) {
+          return;
+        }
+        // Firefox is still in print media during this event, so the colors of the
+        // screen are only there one task later
+        setTimeout(function () {
+          initMermaid(true);
+        }, 0);
       }.bind(this)
     );
   }
@@ -360,64 +754,37 @@ function initMermaid(update, attrs) {
   };
 
   if (update) {
+    // an enlarged graph is taken out of the page, where it can neither be
+    // printed nor tell whether it is visible
+    closeMermaidLightbox();
     unmark();
   }
   var is_initialized = update ? update_func(attrs) : init_func(attrs);
+  if (!update) {
+    // the page may have been loaded with the URL of an enlarged graph
+    syncMermaidLightbox();
+  }
   if (is_initialized) {
     mermaid.initialize(Object.assign({ securityLevel: 'antiscript', startOnLoad: false }, window.relearn.mermaidConfig, { theme: attrs.theme }));
-    mermaid.run({
-      postRenderCallback: function (id) {
-        // zoom for Mermaid
-        // https://github.com/mermaid-js/mermaid/issues/1860#issuecomment-1345440607
-        var svgs = d3.selectAll('body:not(.print) .mermaid-container.zoomable > .mermaid > #' + id);
-        svgs.each(function () {
-          var parent = this.parentElement;
-          // we need to copy the maxWidth, otherwise our reset button will not align in the upper right
-          parent.style.maxWidth = this.style.maxWidth || this.getAttribute('width');
-          // if no unit is given for the width
-          parent.style.maxWidth = parent.style.maxWidth || 'calc( ' + this.getAttribute('width') + 'px + 1rem )';
-          var svg = d3.select(this);
-          svg.html('<g>' + svg.html() + '</g>');
-          var inner = svg.select('*:scope > g');
-          parent.insertAdjacentHTML('beforeend', '<div class="actionbar"><span class="btn cstyle svg-reset-button action noborder notitle interactive"><button type="button" title="' + window.T_Reset_view + '"><i class="fa-fw fas fa-undo-alt"></i></button></span></div>');
-          var wrapper = parent.querySelector('.svg-reset-button');
-          var button = wrapper.querySelector('button');
-          var zoom = d3.zoom().on('zoom', function (e) {
-            inner.attr('transform', e.transform);
-            if (e.transform.k == 1 && e.transform.x == 0 && e.transform.y == 0) {
-              wrapper.classList.remove('zoomed');
-            } else {
-              wrapper.classList.add('zoomed');
-            }
-          });
-          button.addEventListener('click', function () {
-            this.blur();
-            svg.transition().duration(350).call(zoom.transform, d3.zoomIdentity);
-            showToast(window.T_View_reset);
-          });
-          svg.call(zoom);
-        });
-        // we need to mark again once the SVGs were drawn
-        // to mark terms inside an SVG;
-        // as we can not determine when all graphs are done,
-        // we debounce the call
-        debounce(mark, 200)();
-      },
-      querySelector: '.mermaid.mermaid-render',
-      suppressErrors: true,
-    });
+    drawMermaid();
   }
   if (update) {
     // if the page loads Mermaid but does not contain any
-    // graphs, we will not call the above debounced mark()
-    // and have to do it at least once here to redo our unmark()
+    // graphs, no drawing will mark() for us and we have to
+    // do it at least once here to redo our unmark()
     // call from the beginning of this function
-    debounce(mark, 200)();
+    mark();
   }
 }
 
+// the Swagger UI instance of each spec on the page, by the element it is rendered into
+var openapiStates = new WeakMap();
+
 function initOpenapi(update, attrs) {
-  if (!window.relearn.themeUseOpenapi) {
+  // the block is only written by the openapi dependency, so without it the page has
+  // nothing to render
+  var config = document.querySelector('#R-openapi-config');
+  if (!config) {
     return;
   }
   var state = this;
@@ -431,173 +798,256 @@ function initOpenapi(update, attrs) {
       'beforeprint',
       function () {
         isPrintPreview = true;
-        initOpenapi(true);
+        // the print version already shows its specs as they are printed; building
+        // them anew empties them, and Firefox and Safari print them empty
+        if (!isPrint) {
+          initOpenapi(true);
+        }
       }.bind(this)
     );
     window.addEventListener(
       'afterprint',
       function () {
         isPrintPreview = false;
-        initOpenapi(true);
+        if (isPrint) {
+          return;
+        }
+        // Firefox is still in print media during this event, so the colors of the
+        // screen are only there one task later
+        setTimeout(function () {
+          initOpenapi(true);
+        }, 0);
       }.bind(this)
     );
   }
 
   attrs = attrs || {};
 
-  function addFunctionToResizeEvent() {}
-  function getFirstAncestorByClass() {}
+  function loadStylesheet(root, url, integrity) {
+    return new Promise(function (resolve) {
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = url;
+      // a stylesheet from a custom URL is none of ours, so there is no hash to check against
+      if (integrity) {
+        link.integrity = integrity;
+      }
+      // a stylesheet that can not be loaded must not keep the spec from being shown
+      link.addEventListener('load', function () {
+        resolve(link);
+      });
+      link.addEventListener('error', function () {
+        resolve(link);
+      });
+      root.appendChild(link);
+    });
+  }
   function renderOpenAPI(oc) {
-    var relBasePath = window.relearn.relBasePath;
-    var assetBuster = window.relearn.themeUseOpenapi.assetsBuster;
-    var print = isPrint || isPrintPreview ? 'PRINT-' : '';
-    var format = print ? `print` : `html`;
-    var min = window.relearn.min;
-    var theme = `${relBasePath}/css/format-${format}${min}.css${assetBuster}`;
-    var variant = document.documentElement.dataset.rThemeVariant;
-    var swagger_theme = getColorValue(print + 'OPENAPI-theme');
-    var swagger_code_theme = getColorValue(print + 'OPENAPI-CODE-theme');
+    var print = isPrint || isPrintPreview;
+    var swagger_theme = getColorValue(print ? 'PRINT-OPENAPI-theme' : 'OPENAPI-theme');
+    var swagger_code_theme = getColorValue(print ? 'PRINT-OPENAPI-CODE-theme' : 'OPENAPI-CODE-theme');
 
     const openapiId = 'relearn-swagger-ui';
-    const openapiIframeId = openapiId + '-iframe';
-    const openapiIframe = document.getElementById(openapiIframeId);
-    if (openapiIframe) {
-      openapiIframe.remove();
-    }
-    const openapiErrorId = openapiId + '-error';
-    const openapiError = document.getElementById(openapiErrorId);
-    if (openapiError) {
+    const openapiErrorClass = 'sc-openapi-error';
+    const openapiError = oc.previousElementSibling;
+    if (openapiError && openapiError.classList.contains(openapiErrorClass)) {
       openapiError.remove();
     }
-    const oi = document.createElement('iframe');
-    oi.id = openapiIframeId;
-    oi.classList.toggle('sc-openapi-iframe', true);
-    oi.srcdoc = `<!doctype html>
-<html id="R-html" class="relearn ${swagger_theme}-mode" lang="${lang}" dir="${isRtl ? 'rtl' : 'ltr'}" data-r-output-format="${format}" data-r-theme-variant="${variant}">
-  <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="${window.relearn.themeUseOpenapi.css}${assetBuster}">
-    <link rel="stylesheet" href="${relBasePath}/css/swagger${min}.css${assetBuster}">
-    <link rel="stylesheet" href="${theme}">
-    <script>
-      function relearn_expand_all() {
-        document.querySelectorAll(".expand-operation[aria-expanded=false]").forEach(btn => btn.click());
-        document.querySelectorAll(".models-control[aria-expanded=false]").forEach(btn => btn.click());
-        document.querySelectorAll(".opblock-summary-control[aria-expanded=false]").forEach(btn => btn.click());
-        document.querySelectorAll(".model-container > .model-box > button[aria-expanded=false]").forEach(btn => btn.click());
-        return false;
-      }
-      function relearn_collapse_all() {
-        document.querySelectorAll(".expand-operation[aria-expanded=true]").forEach(btn => btn.click());
-        document.querySelectorAll(".models-control[aria-expanded=true]").forEach(btn => btn.click());
-        document.querySelectorAll(".opblock-summary-control[aria-expanded=true]").forEach(btn => btn.click());
-        document.querySelectorAll(".model-container > .model-box > .model-box > .model > span > button[aria-expanded=true]").forEach(btn => btn.click());
-        return false;
-      }
-    </script>
-  </head>
-  <body>
-    <a class="relearn-expander" href="" onclick="return relearn_collapse_all()">Collapse all</a>
-    <a class="relearn-expander" href="" onclick="return relearn_expand_all()">Expand all</a>
-    <div id="relearn-swagger-ui"></div>
-  </body>
-</html>`;
-    oi.height = '100%';
-    oi.width = '100%';
-    oi.onload = function () {
-      const openapiWrapper = getFirstAncestorByClass(oc, 'sc-openapi-wrapper');
-      const openapiPromise = new Promise(function (resolve) {
-        resolve();
+    // the spec is rendered into a shadow tree, so the styles of the page and the
+    // ones of the library don't get into each other's way; the variables of the
+    // theme are inherited by the tree and follow the variant of the page
+    var root = oc.shadowRoot;
+    if (!root) {
+      root = oc.attachShadow({ mode: 'open' });
+      root.addEventListener('click', function (event) {
+        var expander = event.target.closest('.relearn-expander');
+        if (!expander) {
+          return;
+        }
+        event.preventDefault();
+        expandOpenAPI(root, expander.dataset.expand == 'true');
       });
-      openapiPromise
-        .then(function () {
-          var options = {
-            defaultModelsExpandDepth: 2,
-            defaultModelExpandDepth: 2,
-            docExpansion: isPrint || isPrintPreview ? 'full' : 'list',
-            domNode: oi.contentWindow.document.getElementById(openapiId),
-            filter: !(isPrint || isPrintPreview),
-            layout: 'BaseLayout',
-            onComplete: function () {
-              if (isPrint || isPrintPreview) {
-                oi.contentWindow.document.querySelectorAll('.model-container > .model-box > button[aria-expanded=false]').forEach(function (btn) {
-                  btn.click();
-                });
-                setOpenAPIHeight(oi);
-              }
-            },
-            plugins: [SwaggerUIBundle.plugins.DownloadUrl],
-            presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-            syntaxHighlight: {
-              activated: true,
-              theme: swagger_code_theme,
-            },
-            validatorUrl: 'none',
-          };
-          if (oc.dataset.openapiSpec) {
-            try {
-              Object.assign(options, { spec: JSON.parse(oc.dataset.openapiSpec) });
-            } catch (err) {
-              try {
-                Object.assign(options, { spec: jsyaml.load(oc.dataset.openapiSpec) });
-              } catch (err) {
-                console.error('OpenAPI: file "' + oc.dataset.openapiUrl + '" could not be parsed as JSON or YAML');
-              }
-            }
-          } else {
-            Object.assign(options, { url: oc.dataset.openapiUrl });
-          }
-          SwaggerUIBundle(options);
-        })
-        .then(function () {
-          let observerCallback = function () {
-            setOpenAPIHeight(oi);
-          };
-          let observer = new MutationObserver(observerCallback);
-          observer.observe(oi.contentWindow.document.documentElement, {
-            childList: true,
-            subtree: true,
-          });
-        })
-        .then(function () {
-          if (openapiWrapper) {
-            openapiWrapper.classList.toggle('is-loading', false);
-          }
-          setOpenAPIHeight(oi);
-        })
-        .catch(function (error) {
-          const ed = document.createElement('div');
-          ed.classList.add('sc-alert', 'sc-alert-error');
-          ed.innerHTML = error;
-          ed.id = openapiErrorId;
-          while (oc.lastChild) {
-            oc.removeChild(oc.lastChild);
-          }
-          if (openapiWrapper) {
-            openapiWrapper.classList.toggle('is-loading', false);
-            openapiWrapper.insertAdjacentElement('afterbegin', ed);
+      new MutationObserver(scheduleMarkOpenapi).observe(root, { childList: true, subtree: true, characterData: true });
+    }
+    // the spec shown so far stays until the new one can be built, as Firefox and
+    // Safari print the page as it is when printing starts and would put nothing on
+    // paper instead
+    var view = document.createElement('div');
+    view.hidden = true;
+    root.appendChild(view);
+    // what the reader has opened is known by the instance we are about to replace
+    // and is handed on to the new one; printing opens everything by itself and
+    // keeps what was there before for the run after it
+    var previous = openapiStates.get(oc) || {};
+    var shown = previous.shown;
+    if (previous.ui && !previous.print) {
+      shown = previous.ui.getState().getIn(['layout', 'shown']);
+    }
+    var current = { ui: null, print: print, shown: shown };
+    openapiStates.set(oc, current);
+    // the shortcode may ask for another language than the one of the page
+    oc.dir = (oc.dataset.openapiDir ? oc.dataset.openapiDir == 'rtl' : isRtl) ? 'rtl' : 'ltr';
+    oc.classList.toggle('dark-mode', swagger_theme == 'dark');
+    Promise.all([loadStylesheet(view, config.dataset.openapiCssUrl, config.dataset.openapiCssIntegrity), loadStylesheet(view, config.dataset.swaggerCssUrl, config.dataset.swaggerCssIntegrity)])
+      .then(function () {
+        if (openapiStates.get(oc) !== current) {
+          // a later run has taken over the tree while the stylesheets were loading
+          view.remove();
+          return;
+        }
+        Array.from(root.children).forEach(function (child) {
+          if (child !== view) {
+            child.remove();
           }
         });
+        view.hidden = false;
+        // the texts of the expanders are translated by the shortcode and set as
+        // text, so they need no escaping
+        [false, true].forEach(function (expand) {
+          var expander = document.createElement('a');
+          expander.classList.add('relearn-expander');
+          expander.href = '';
+          expander.dataset.expand = expand;
+          expander.textContent = expand ? oc.dataset.openapiExpandAll || 'Expand all' : oc.dataset.openapiCollapseAll || 'Collapse all';
+          view.appendChild(expander);
+        });
+        var mount = document.createElement('div');
+        mount.id = openapiId;
+        view.appendChild(mount);
+        var options = {
+          defaultModelsExpandDepth: 2,
+          defaultModelExpandDepth: 2,
+          docExpansion: isPrint || isPrintPreview ? 'full' : 'list',
+          domNode: mount,
+          filter: !(isPrint || isPrintPreview),
+          layout: 'BaseLayout',
+          onComplete: function () {
+            if (isPrint || isPrintPreview) {
+              root.querySelectorAll('.model-container > .model-box > button[aria-expanded=false]').forEach(function (btn) {
+                btn.click();
+              });
+            }
+          },
+          plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          syntaxHighlight: {
+            activated: true,
+            theme: swagger_code_theme,
+          },
+          validatorUrl: 'none',
+        };
+        if (oc.dataset.openapiSpec) {
+          try {
+            Object.assign(options, { spec: JSON.parse(oc.dataset.openapiSpec) });
+          } catch (err) {
+            try {
+              Object.assign(options, { spec: jsyaml.load(oc.dataset.openapiSpec) });
+            } catch (err) {
+              console.error('OpenAPI: file "' + oc.dataset.openapiUrl + '" could not be parsed as JSON or YAML');
+            }
+          }
+        } else {
+          Object.assign(options, { url: oc.dataset.openapiUrl });
+        }
+        current.ui = SwaggerUIBundle(options);
+        if (!print && shown) {
+          shown.forEach(function (isShown, thing) {
+            current.ui.layoutActions.show(thing && thing.toJS ? thing.toJS() : thing, isShown);
+          });
+        }
+      })
+      .catch(function (error) {
+        const ed = document.createElement('div');
+        ed.classList.add('sc-alert', 'sc-alert-error', openapiErrorClass);
+        ed.innerHTML = error;
+        root.replaceChildren();
+        oc.insertAdjacentElement('beforebegin', ed);
+      });
+  }
+  function expandOpenAPI(doc, expand) {
+    // only what is not yet in the wanted state gets clicked
+    var current = expand ? 'false' : 'true';
+    var clickAll = function (selector) {
+      doc.querySelectorAll(selector).forEach(function (btn) {
+        btn.click();
+      });
     };
-    oc.appendChild(oi);
-  }
-  function setOpenAPIHeight(oi) {
-    // add empirical offset if in print preview (GC 103)
-    oi.style.height = oi.contentWindow.document.documentElement.getBoundingClientRect().height + (isPrintPreview ? 200 : 0) + 'px';
-  }
-  function resizeOpenAPI() {
-    let divi = document.getElementsByClassName('sc-openapi-iframe');
-    for (let i = 0; i < divi.length; i++) {
-      setOpenAPIHeight(divi[i]);
+    clickAll('.expand-operation[aria-expanded=' + current + ']');
+    clickAll('.models-control[aria-expanded=' + current + ']');
+    clickAll('.opblock-summary-control[aria-expanded=' + current + ']');
+    if (expand) {
+      clickAll('.model-container > .model-box > button[aria-expanded=false]');
+    } else {
+      clickAll('.model-container > .model-box > .model-box > .model > span > button[aria-expanded=true]');
     }
   }
-  let divo = document.getElementsByClassName('sc-openapi-container');
+  // the shortcode writes a spec as the text of a hidden `pre`, which gives way to
+  // the element the spec is rendered into
+  document.querySelectorAll('pre.sc-openapi-spec').forEach(function (pre) {
+    var oc = document.createElement('div');
+    oc.classList.add('sc-openapi-container');
+    oc.id = pre.id;
+    for (var key in pre.dataset) {
+      oc.dataset[key] = pre.dataset[key];
+    }
+    oc.dataset.openapiSpec = pre.textContent;
+    pre.replaceWith(oc);
+  });
+  let divo = document.querySelectorAll('.sc-openapi-container');
   for (let i = 0; i < divo.length; i++) {
     renderOpenAPI(divo[i]);
   }
-  if (divo.length) {
-    addFunctionToResizeEvent(resizeOpenAPI);
+}
+
+// set while we copy with our own textarea, so the global copy event handler
+// in initCodeClipboard() doesn't hijack the clipboard data with a possibly
+// still active page selection
+let isFakeClipboardCopy = false;
+
+// the async clipboard API is only available in secure contexts, so for http
+// connections we have to fall back to the deprecated execCommand; see #1222
+function writeTextToClipboardFallback(text) {
+  const fake = document.createElement('textarea');
+  fake.className = 'copy-to-clipboard-fake';
+  // keep the element in the current viewport vertically, so focussing it
+  // doesn't scroll the page
+  fake.style.top = (window.scrollY || document.documentElement.scrollTop) + 'px';
+  fake.setAttribute('readonly', '');
+  fake.value = text;
+  document.body.appendChild(fake);
+  fake.select();
+  fake.setSelectionRange(0, fake.value.length);
+  let copied = false;
+  isFakeClipboardCopy = true;
+  try {
+    copied = document.execCommand('copy');
+  } catch (e) {
+    copied = false;
   }
+  isFakeClipboardCopy = false;
+  fake.remove();
+  return copied ? Promise.resolve() : Promise.reject();
+}
+
+function writeTextToClipboard(text, message) {
+  let copy;
+  if (navigator.clipboard?.writeText) {
+    copy = navigator.clipboard.writeText(text).catch(function () {
+      // writing may still be rejected, eg. if the document isn't focused,
+      // so give the fallback a chance in that case, too
+      return writeTextToClipboardFallback(text);
+    });
+  } else {
+    copy = writeTextToClipboardFallback(text);
+  }
+  copy.then(
+    function () {
+      showToast(message);
+    },
+    function () {
+      showToast(window.T_Browser_unsupported_feature);
+    }
+  );
 }
 
 function initAnchorClipboard() {
@@ -611,18 +1061,13 @@ function initAnchorClipboard() {
     if (anchor.classList.contains('copyanchor')) {
       anchor.addEventListener('click', function () {
         this.blur();
-        if (!navigator.clipboard?.writeText) {
-          showToast(window.T_Browser_unsupported_feature);
-          return;
-        }
         const text = this.getAttribute('data-clipboard-text');
-        navigator.clipboard.writeText(text);
-        showToast(window.T_Link_copied_to_clipboard);
+        writeTextToClipboard(text, window.T_Link_copied_to_clipboard);
       });
     }
     if (anchor.classList.contains('scrollanchor')) {
       anchor.addEventListener('click', function () {
-        this.parentElement.scrollIntoView({ behavior: 'smooth' });
+        this.parentElement.scrollIntoView({ behavior: reducedmotion.matches ? 'auto' : 'smooth' });
         let state = window.history.state || {};
         state = Object.assign({}, typeof state === 'object' ? state : {});
         history.pushState({}, '', this.dataset.clipboardText);
@@ -646,6 +1091,10 @@ function initCodeClipboard() {
   }
 
   document.addEventListener('copy', function (ev) {
+    if (isFakeClipboardCopy) {
+      return;
+    }
+
     // shabby FF generates empty lines on cursor selection that we need to filter out; see #925
     var selection = document.getSelection();
     var node = selection.anchorNode;
@@ -737,10 +1186,11 @@ function initCodeClipboard() {
         button = document.createElement('button');
         button.type = 'button';
         button.setAttribute('title', window.T_Copy_to_clipboard);
+        button.setAttribute('aria-label', window.T_Copy_to_clipboard);
 
         if (isBlock) {
           // Wrap in actionbar structure for block buttons
-          button.innerHTML = '<i class="fa-fw far fa-copy"></i>';
+          button.innerHTML = '<i class="fa-fw far fa-copy" aria-hidden="true"></i>';
           wrapper = document.createElement('span');
           wrapper.classList.add('btn', 'cstyle', 'block-copy-to-clipboard-button', 'action', 'noborder', 'notitle', 'interactive');
           wrapper.appendChild(button);
@@ -750,7 +1200,7 @@ function initCodeClipboard() {
           insertElement = actionbar;
         } else {
           // Wrap in btn structure for inline buttons
-          button.innerHTML = '<i class="fa-fw far fa-copy"></i>';
+          button.innerHTML = '<i class="fa-fw far fa-copy" aria-hidden="true"></i>';
           wrapper = document.createElement('span');
           wrapper.classList.add('btn', 'cstyle', 'inline-copy-to-clipboard-button', 'inline', 'notitle', 'interactive');
           wrapper.appendChild(button);
@@ -795,19 +1245,13 @@ function initCodeClipboard() {
   var buttons = document.querySelectorAll('.block-copy-to-clipboard-button button, .inline-copy-to-clipboard-button button');
   buttons.forEach(function (button) {
     button.addEventListener('click', function () {
-      this.blur();
-      if (!navigator.clipboard?.writeText) {
-        showToast(window.T_Browser_unsupported_feature);
-        return;
-      }
       // For block buttons, get the actionbar's previous sibling; for inline, use wrapper's previous sibling
       var codeElement = this.closest('.actionbar') ? this.closest('.actionbar').previousElementSibling : this.parentElement.previousElementSibling;
       if (!codeElement) {
         return;
       }
       var text = codeElement.dataset.code || '';
-      navigator.clipboard.writeText(text);
-      showToast(window.T_Copied_to_clipboard);
+      writeTextToClipboard(text, window.T_Copied_to_clipboard);
     });
   });
 }
@@ -819,6 +1263,15 @@ function initArrowVerticalNav() {
   }
 
   document.addEventListener('keydown', function (event) {
+    if (event.shiftKey || event.ctrlKey || !event.altKey || event.metaKey || (event.key != 'ArrowUp' && event.key != 'ArrowDown')) {
+      return;
+    }
+    // a form field keeps the combination, where Alt+Down opens a select
+    if (event.target.matches(formelements)) {
+      return;
+    }
+    // the jump is all that should happen; some browsers scroll on top of it
+    event.preventDefault();
     var elems = Array.from(
       document.querySelectorAll(`main :not(.include.hide-first-heading) > :where(
                 .article-subheading,
@@ -829,38 +1282,34 @@ function initArrowVerticalNav() {
             main .include.hide-first-heading > :where( h1, h2, h3, h4, h5, h6 ) ~ :where( h1, h2, h3, h4, h5, h6 )
         `)
     );
-    if (!event.shiftKey && !event.ctrlKey && event.altKey && !event.metaKey) {
-      if (event.which == 38) {
-        // up
-        var target = isPrint ? document.querySelector('#R-body') : document.querySelector('.flex-block-wrapper');
-        elems.some(function (elem, i) {
-          var top = elem.getBoundingClientRect().top;
-          var topBoundary = top - topMain;
-          if (topBoundary > -1) {
+    if (event.key == 'ArrowUp') {
+      var target = isPrint ? document.querySelector('#R-body') : document.querySelector('.flex-block-wrapper');
+      elems.some(function (elem, i) {
+        var top = elem.getBoundingClientRect().top;
+        var topBoundary = top - topMain;
+        if (topBoundary > -1) {
+          target.scrollIntoView();
+          return true;
+        }
+        target = elem;
+      });
+    } else {
+      elems.some(function (elem, i) {
+        var top = elem.getBoundingClientRect().top;
+        var topBoundary = top - topMain;
+        if (topBoundary > -1 && topBoundary < 1) {
+          if (i + 1 < elems.length) {
+            var target = elems[i + 1];
             target.scrollIntoView();
-            return true;
           }
-          target = elem;
-        });
-      } else if (event.which == 40) {
-        // down
-        elems.some(function (elem, i) {
-          var top = elem.getBoundingClientRect().top;
-          var topBoundary = top - topMain;
-          if (topBoundary > -1 && topBoundary < 1) {
-            if (i + 1 < elems.length) {
-              var target = elems[i + 1];
-              target.scrollIntoView();
-            }
-            return true;
-          }
-          if (topBoundary >= 1) {
-            var target = elem;
-            target.scrollIntoView();
-            return true;
-          }
-        });
-      }
+          return true;
+        }
+        if (topBoundary >= 1) {
+          var target = elem;
+          target.scrollIntoView();
+          return true;
+        }
+      });
     }
   });
 }
@@ -877,7 +1326,7 @@ function initArrowHorizontalNav() {
   // keyboard navigation
   // avoid prev/next navigation if we are not at the start/end of the
   // horizontal area
-  var el = document.querySelector('#R-body-inner');
+  var el = document.querySelector('#R-main');
   var scrollStart = 0;
   var scrollEnd = 0;
   document.addEventListener('keydown', function (event) {
@@ -886,7 +1335,7 @@ function initArrowHorizontalNav() {
       if (f) {
         return;
       }
-      if (event.which == dir_key_start) {
+      if (event.key == dir_key_start) {
         if (!scrollStart && +el.scrollLeft.toFixed() * dir_scroll <= 0) {
           prev && prev.click();
         } else if (scrollStart != -1) {
@@ -894,7 +1343,7 @@ function initArrowHorizontalNav() {
         }
         scrollStart = -1;
       }
-      if (event.which == dir_key_end) {
+      if (event.key == dir_key_end) {
         if (!scrollEnd && +el.scrollLeft.toFixed() * dir_scroll + +el.clientWidth.toFixed() >= +el.scrollWidth.toFixed()) {
           next && next.click();
         } else if (scrollEnd != -1) {
@@ -910,7 +1359,7 @@ function initArrowHorizontalNav() {
       if (f) {
         return;
       }
-      if (event.which == dir_key_start) {
+      if (event.key == dir_key_start) {
         // check for false indication if keyup is delayed after navigation
         if (scrollStart == -1) {
           scrollStart = setTimeout(function () {
@@ -918,7 +1367,7 @@ function initArrowHorizontalNav() {
           }, 300);
         }
       }
-      if (event.which == dir_key_end) {
+      if (event.key == dir_key_end) {
         if (scrollEnd == -1) {
           scrollEnd = setTimeout(function () {
             scrollEnd = 0;
@@ -929,135 +1378,256 @@ function initArrowHorizontalNav() {
   });
 }
 
+// === classic scrollbar quirks ===============================================
+// the only JavaScript part of what the `classic scrollbar quirks` block in
+// theme.css describes; it goes away together with that block and the
+// `#R-scrollbar` markup in menu.html once no supported browser reports a space
+// taking scrollbar anymore
+function initMenuThumb(elm) {
+  // a space taking scrollbar would clip away the menu border and the active entry
+  // bleeding into the content area; if the browser gives us overlay scrollbars it
+  // draws them itself, otherwise we draw our own and leave the scrolling to it
+  if (!window.relearn.scrollbarSize) {
+    return;
+  }
+
+  var rail = document.querySelector('#R-scrollbar');
+  var thumb = document.querySelector('#R-scrollbar-thumb');
+  if (!elm || !rail || !thumb) {
+    return;
+  }
+
+  var scrolling;
+  var ticking = false;
+  // the menus geometry only changes when something is resized, so remember it
+  // instead of forcing a layout on every scroll event
+  var scrollport = 0;
+  var scrollable = 0;
+  var size = 0;
+
+  function measure() {
+    scrollport = elm.clientHeight;
+    scrollable = elm.scrollHeight - scrollport;
+    rail.classList.toggle('scrollable', scrollable > 0);
+    if (scrollable <= 0) {
+      return;
+    }
+    // the rail covers the menus scrollport
+    rail.style.setProperty('--INTERNAL-SCROLLBAR-height', '' + scrollport + 'px');
+    // enforce a minimum size, so the thumb stays grabbable in long menus, but
+    // never the whole rail, as that would leave it nothing to travel
+    size = Math.max(scrollport / elm.scrollHeight, Math.min(0.9, 20 / scrollport));
+    thumb.style.setProperty('--INTERNAL-SCROLLBAR-THUMB-size', size);
+  }
+
+  function position() {
+    if (scrollable <= 0) {
+      return;
+    }
+    thumb.style.setProperty('--INTERNAL-SCROLLBAR-THUMB-position', (elm.scrollTop / scrollable) * (1 - size));
+  }
+
+  elm.addEventListener(
+    'scroll',
+    function () {
+      // however many scroll events the browser fires, the thumb only has to be
+      // drawn once per frame
+      if (ticking) {
+        return;
+      }
+      ticking = true;
+      window.requestAnimationFrame(function () {
+        ticking = false;
+        position();
+        if (!hovernone.matches) {
+          // only where there is no mouse does scrolling reveal us; with one, hover
+          // and focus do it and the stylesheet has no rule for the class at all
+          return;
+        }
+        rail.classList.add('scrolling');
+        clearTimeout(scrolling);
+        scrolling = setTimeout(function () {
+          rail.classList.remove('scrolling');
+        }, 1000);
+      });
+    },
+    { passive: true }
+  );
+  // the menu changes its height if sections are expanded/collapsed or if the
+  // window is resized; a resize observer already runs after layout, so we can
+  // measure right away
+  var observer = new ResizeObserver(function () {
+    measure();
+    position();
+  });
+  observer.observe(elm);
+  Array.from(elm.children).forEach(function (e) {
+    if (e != rail) {
+      observer.observe(e);
+    }
+  });
+
+  // a browsers scrollbar only reacts to the primary button, so a right click
+  // reaches the context menu instead of scrolling us away; a second finger must
+  // not take over a gesture the first one is already doing
+  function isPrimaryButton(event) {
+    return event.button == 0 && event.isPrimary;
+  }
+
+  rail.addEventListener('pointerdown', function (event) {
+    if (event.target != rail) {
+      // the thumb drags itself
+      return;
+    }
+    if (!isPrimaryButton(event)) {
+      return;
+    }
+    // scroll by a page towards the click, like a browsers scrollbar does
+    var rect = thumb.getBoundingClientRect();
+    var reduced = reducedmotion.matches;
+    elm.scrollBy({ top: event.clientY < rect.top ? -elm.clientHeight : elm.clientHeight, behavior: reduced ? 'auto' : 'smooth' });
+    event.preventDefault();
+  });
+
+  thumb.addEventListener('pointerdown', function (event) {
+    if (!isPrimaryButton(event)) {
+      return;
+    }
+    var pointerId = event.pointerId;
+    var startY = event.clientY;
+    var startTop = elm.scrollTop;
+    // none of this changes while we are being dragged, so don't make the
+    // browser lay out the menu again for every pointer move
+    var track = elm.clientHeight - thumb.offsetHeight;
+    var range = elm.scrollHeight - elm.clientHeight;
+    function move(e) {
+      if (e.pointerId != pointerId) {
+        return;
+      }
+      if (track > 0) {
+        elm.scrollTop = startTop + ((e.clientY - startY) * range) / track;
+      }
+    }
+    function end(e) {
+      if (e.pointerId != pointerId) {
+        return;
+      }
+      thumb.classList.remove('dragging');
+      thumb.removeEventListener('pointermove', move);
+      thumb.removeEventListener('pointerup', end);
+      thumb.removeEventListener('pointercancel', end);
+      // our capture can also be lost without a pointerup reaching us; without
+      // this the drag would stay alive and hovering the thumb would scroll us
+      thumb.removeEventListener('lostpointercapture', end);
+    }
+    thumb.classList.add('dragging');
+    thumb.setPointerCapture(pointerId);
+    thumb.addEventListener('pointermove', move);
+    thumb.addEventListener('pointerup', end);
+    thumb.addEventListener('pointercancel', end);
+    thumb.addEventListener('lostpointercapture', end);
+    // don't start a text selection while dragging
+    event.preventDefault();
+  });
+
+  // not redundant to the observer above: it only reports while we are rendered
+  measure();
+  position();
+}
+// === end of classic scrollbar quirks ========================================
+
 function initMenuScrollbar() {
   if (isPrint) {
     return;
   }
 
   var elm = document.querySelector('#R-content-wrapper');
-  var elt = document.querySelector('.topbar-button.topbar-flyout .topbar-content-wrapper');
 
-  var autofocus = true;
   document.addEventListener('keydown', function (event) {
-    // for initial keyboard scrolling support, no element
-    // may be hovered, but we still want to react on
-    // cursor/page up/down. because we can't hack
-    // the scrollbars implementation, we try to trick
-    // it and give focus to the scrollbar - only
-    // to just remove the focus right after scrolling
-    // happend
-    autofocus = false;
-    if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey || event.which < 32 || event.which > 40) {
-      // if tab key was pressed, we are ended with our initial
-      // focus job
+    // a browser only scrolls the container that holds the focus; the page
+    // itself never scrolls, so without our help these keys do nothing as long
+    // as the focus is anywhere else, namely right after the page was loaded
+    if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey || !SCROLL_KEYS.includes(event.key)) {
+      return;
+    }
+    if (event.target.matches('select, option, textarea, input:not([type="checkbox"])')) {
+      // these need the keys for themselves; the list of a select drawn by us
+      // gives the focus to its options
+      return;
+    }
+    if (event.target.matches('[role="tab"]') && (event.key == 'Home' || event.key == 'End')) {
+      // in a list of tabs these lead to its first and last tab
       return;
     }
 
-    var c = elc && elc.matches(':hover');
-    var m = elm && elm.matches(':hover');
-    var t = elt && elt.matches(':hover');
-    var f = event.target.matches(formelements);
-    if (!c && !m && !t && !f) {
-      // only do this hack if none of our scrollbars
-      // is hovered
-      // if we are showing the sidebar as a flyout we
-      // want to scroll the content-wrapper, otherwise we want
-      // to scroll the body
-      var nt = document.querySelector('body').matches('.topbar-flyout');
-      var nm = document.querySelector('body').matches('.sidebar-flyout');
-      if (nt) {
-        var psb = pst.get(document.querySelector('.topbar-button.topbar-flyout'));
-        psb && psb.scrollbarY.focus();
-      } else if (nm) {
-        psm && psm.scrollbarY.focus();
-      } else {
-        document.querySelector('#R-body-inner').focus();
-        psc && psc.scrollbarY.focus();
+    var elt = document.querySelector('.topbar-button.topbar-flyout .topbar-content-wrapper');
+    var scroller = (elm && elm.contains(event.target) && elm) || (elt && elt.contains(event.target) && elt) || (elc && elc.contains(event.target) && elc);
+    var focused = !!scroller;
+    if (!scroller) {
+      if (event.target.matches(formelements)) {
+        return;
       }
+      // the focus is in none of our scroll containers, so we scroll the one
+      // the user expects: the hovered one, else the one of an open flyout,
+      // else the content
+      var b = document.querySelector('body');
+      scroller = (elt && elt.matches(':hover') && elt) || (elm && elm.matches(':hover') && elm) || (elc && elc.matches(':hover') && elc) || (b.matches('.topbar-flyout') && elt) || (b.matches('.sidebar-flyout') && elm) || elc;
+    }
+
+    // browsers disagree on whether they scroll the focused container
+    // themselves, so we always do it ourselves
+    var by = 0;
+    if (event.key == 'ArrowUp') {
+      by = -LINE_SCROLL;
+    } else if (event.key == 'ArrowDown') {
+      by = LINE_SCROLL;
+    } else if (event.key == 'PageUp') {
+      by = -scroller.clientHeight;
+    } else if (event.key == 'PageDown' || (event.key == ' ' && !focused)) {
+      // inside of a container the space key belongs to the focused element
+      by = scroller.clientHeight;
+    } else if (event.key == 'Home') {
+      by = -scroller.scrollHeight;
+    } else if (event.key == 'End') {
+      by = scroller.scrollHeight;
+    }
+    if (by) {
+      // left/right stay untouched, they page to the prev/next article
+      scroller.scrollBy({ top: by });
+      event.preventDefault();
     }
   });
-  // scrollbars will install their own keyboard handlers
-  // that need to be executed inbetween our own handlers
-  // PSC removed for #242 #243 #244
-  // psc = elc && new PerfectScrollbar('#R-body-inner');
-  psm = elm && new PerfectScrollbar('#R-content-wrapper', { scrollingThreshold: 2000, swipeEasing: false, wheelPropagation: false });
   document.querySelectorAll('.topbar-button .topbar-content-wrapper').forEach(function (e) {
-    var button = getTopbarButtonParent(e);
-    if (!button) {
-      return;
-    }
-    pst.set(button, new PerfectScrollbar(e, { scrollingThreshold: 2000, swipeEasing: false, wheelPropagation: false }));
     e.addEventListener('click', toggleTopbarFlyoutEvent);
   });
 
-  document.addEventListener('keydown', function () {
-    // if we facked initial scrolling, we want to
-    // remove the focus to not leave visual markers on
-    // the scrollbar
-    if (autofocus) {
-      psc && psc.scrollbarY.blur();
-      psm && psm.scrollbarY.blur();
-      pst.forEach(function (psb) {
-        psb.scrollbarY.blur();
-      });
-      autofocus = false;
-    }
-  });
-  // on resize, we have to redraw the scrollbars to let new height
-  // affect their size
-  window.addEventListener('resize', function () {
-    pst.forEach(function (psb) {
-      setTimeout(function () {
-        psb.update();
-      }, 10);
-    });
-    psm &&
-      setTimeout(function () {
-        psm.update();
-      }, 10);
-    psc &&
-      setTimeout(function () {
-        psc.update();
-      }, 10);
-  });
-  // now that we may have collapsible menus, we need to call a resize
-  // for the menu scrollbar if sections are expanded/collapsed
-  document.querySelectorAll('#R-sidebar .collapsible-menu input').forEach(function (e) {
-    e.addEventListener('change', function () {
-      psm &&
-        setTimeout(function () {
-          psm.update();
-        }, 10);
-    });
-  });
-  // bugfix for PS in RTL mode: the initial scrollbar position is off;
-  // calling update() once, fixes this
-  pst.forEach(function (psb) {
-    setTimeout(function () {
-      psb.update();
-    }, 10);
-  });
-  psm &&
-    setTimeout(function () {
-      psm.update();
-    }, 10);
-  psc &&
-    setTimeout(function () {
-      psc.update();
-    }, 10);
-
-  // finally, we want to adjust the contents end padding if there is a scrollbar visible
-  window.addEventListener('resize', adjustContentWidth);
-  adjustContentWidth();
+  initMenuThumb(elm);
 }
 
-function imageEscapeHandler(event) {
+function imageKeyHandler(event) {
+  // an enlarged image lies above everything else, so the keys are its own
+  // wherever the focus is, and none reaches the page below it
+  var shown = document.querySelector('.lightbox-back:target');
+  if (!shown) {
+    return;
+  }
+  event.stopPropagation();
   if (event.key == 'Escape') {
-    var image = event.target;
-    image.click();
+    shown.click();
+  } else if (event.key == 'Tab') {
+    // the link that closes it is all there is to move to, so the focus stays inside
+    event.preventDefault();
+    var close = shown.querySelector('.lightbox-close');
+    close && close.focus();
   }
 }
 
+// our shortcuts stay on the deprecated `event.which`: it names the letter on the
+// key in the reader's layout, which neither replacement does. `event.key` gives
+// the character typed, so a non-Latin layout never produces our letters and on
+// Windows, where Ctrl+Alt is AltGr, some layouts type another character instead;
+// `event.code` gives the key's position on a US keyboard, which moves our
+// letters on layouts like AZERTY
 function navShortcutHandler(event) {
   if (!event.shiftKey && event.altKey && event.ctrlKey && !event.metaKey && event.which == 78 /* n */) {
     toggleNav();
@@ -1089,7 +1659,7 @@ function printShortcutHandler(event) {
 }
 
 function showSearch() {
-  var s = document.querySelector('#R-search-by');
+  var s = document.querySelector('.searchbox input.search-by');
   if (!s) {
     return;
   }
@@ -1098,7 +1668,7 @@ function showSearch() {
     if (b.classList.contains('sidebar-flyout')) {
       closeNav();
     }
-    documentFocus();
+    s.blur();
   } else {
     if (!b.classList.contains('sidebar-flyout')) {
       openNav();
@@ -1107,15 +1677,42 @@ function showSearch() {
   }
 }
 
+// a toggling button tells assistive technology whether its target is shown
+function setExpanded(toggles, expanded) {
+  toggles.forEach(function (e) {
+    e.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  });
+}
+
+// back to the button that opened what was just closed; one that is not
+// displayed can not take the focus, which then stays where it is
+function focusToggle(toggle) {
+  if (toggle) {
+    toggle.focus();
+  }
+}
+
+function getNavToggles() {
+  return document.querySelectorAll('button[data-button-action="toggle-nav"]');
+}
+
+// in the small layout the open sidebar lies above the page, which then is out
+// of reach for the keyboard and screen readers, same as it is for the mouse;
+// the overlay stays in reach, as a click on it closes the sidebar
+function adjustNavInert() {
+  var b = document.querySelector('body');
+  var covered = b.classList.contains('menu-s-width') && b.classList.contains('sidebar-flyout');
+  document.querySelectorAll('#R-body > :not(#R-body-overlay)').forEach(function (e) {
+    e.inert = covered;
+  });
+}
+
 function openNav() {
   closeSomeTopbarButtonFlyout();
   var b = document.querySelector('body');
   b.classList.add('sidebar-flyout');
-  psm &&
-    setTimeout(function () {
-      psm.update();
-    }, 10);
-  psm && psm.scrollbarY.focus();
+  adjustNavInert();
+  setExpanded(getNavToggles(), true);
   var a = document.querySelector('#R-sidebar a');
   if (a) {
     a.focus();
@@ -1125,7 +1722,8 @@ function openNav() {
 function closeNav() {
   var b = document.querySelector('body');
   b.classList.remove('sidebar-flyout');
-  documentFocus();
+  adjustNavInert();
+  setExpanded(getNavToggles(), false);
 }
 
 function toggleNav() {
@@ -1139,7 +1737,12 @@ function toggleNav() {
 
 function navEscapeHandler(event) {
   if (event.key == 'Escape') {
-    closeNav();
+    // without an open sidebar there is nothing to close, and the focus stays
+    // where it is
+    if (document.querySelector('body').classList.contains('sidebar-flyout')) {
+      closeNav();
+      focusToggle(getNavToggles()[0]);
+    }
   }
 }
 
@@ -1151,28 +1754,26 @@ function getTopbarButtonParent(e) {
   return button;
 }
 
+function getTopbarButtonToggles(button) {
+  return button.querySelectorAll(':scope > .btn > button');
+}
+
 function openTopbarButtonFlyout(button) {
   closeNav();
   var body = document.querySelector('body');
   button.classList.add('topbar-flyout');
   body.classList.add('topbar-flyout');
-  var psb = pst.get(button);
-  psb &&
-    setTimeout(function () {
-      psb.update();
-    }, 10);
-  psb && psb.scrollbarY.focus();
-  var a = button.querySelector('.topbar-content-wrapper a');
-  if (a) {
-    a.focus();
-  }
+  setExpanded(getTopbarButtonToggles(button), true);
+  // the focus rests on the button, wherever the flyout was opened from; this
+  // announces its new state and has the flyout next in reach
+  focusToggle(getTopbarButtonToggles(button)[0]);
 }
 
 function closeTopbarButtonFlyout(button) {
   var body = document.querySelector('body');
   button.classList.remove('topbar-flyout');
   body.classList.remove('topbar-flyout');
-  documentFocus();
+  setExpanded(getTopbarButtonToggles(button), false);
 }
 
 function closeSomeTopbarButtonFlyout() {
@@ -1199,16 +1800,56 @@ function toggleTopbarFlyout(e) {
 }
 
 function toggleTopbarFlyoutEvent(event) {
-  if (event.target.classList.contains('topbar-content') || event.target.classList.contains('topbar-content-wrapper') || event.target.classList.contains('ps__rail-x') || event.target.classList.contains('ps__rail-y') || event.target.classList.contains('ps__thumb-x') || event.target.classList.contains('ps__thumb-y')) {
+  if (event.target.classList.contains('topbar-content') || event.target.classList.contains('topbar-content-wrapper')) {
     // the scrollbar was used, don't close flyout
     return;
   }
   toggleTopbarFlyout(event.target);
 }
 
+function handleTopbarButtons() {
+  // a toggle of the author: what it shows and hides is unknown to us, so each
+  // click changes its state; capturing, for the author's own listener to
+  // already find the new state. our own toggles are set where their target
+  // is shown and hidden, as that happens by other means than a click as well
+  document.addEventListener(
+    'click',
+    function (event) {
+      var button = event.target.closest('.btn > button[aria-expanded]');
+      if (!button || ['toggle-nav', 'toggle-flyout'].includes(button.dataset.buttonAction)) {
+        return;
+      }
+      setExpanded([button], button.getAttribute('aria-expanded') != 'true');
+    },
+    true
+  );
+
+  // one listener for all buttons declaring an action, wherever they were moved to;
+  // an action we don't know is left to the author's own listener
+  document.addEventListener('click', function (event) {
+    var button = event.target.closest('button[data-button-action]');
+    if (!button) {
+      return;
+    }
+    var action = button.dataset.buttonAction;
+    if (action == 'toggle-nav') {
+      toggleNav();
+    } else if (action == 'toggle-flyout') {
+      toggleTopbarFlyout(button);
+    }
+  });
+}
+
 function topbarFlyoutEscapeHandler(event) {
   if (event.key == 'Escape') {
-    closeSomeTopbarButtonFlyout();
+    // the target is where the key was pressed; closing moves the focus away
+    var target = event.target;
+    var button = closeSomeTopbarButtonFlyout();
+    if (button) {
+      // who is in the flyout loses their place with it and goes back to the
+      // button; who has moved on elsewhere stays where they are
+      focusToggle(button.contains(target) ? getTopbarButtonToggles(button)[0] : target);
+    }
   }
 }
 
@@ -1252,8 +1893,12 @@ function initToc() {
     m.addEventListener('click', closeSomeTopbarButtonFlyout);
   }
 
-  // finally give initial focus to allow keyboard scrolling in FF
-  documentFocus();
+  // the content is out of reach as long as the sidebar lies above it, so the
+  // sidebar is closed before the browser follows the link
+  var s = document.querySelector('#R-skiplink');
+  if (s) {
+    s.addEventListener('click', closeNav);
+  }
 }
 
 function initSwipeHandler() {
@@ -1306,14 +1951,246 @@ function initSwipeHandler() {
 }
 
 function initImage() {
+  // whether the enlarged image was opened from this page, which leaves a history
+  // entry to return to; a page loaded with the image already enlarged has none
+  var openedHere = false;
+
+  // capturing, to be asked before anyone else
+  document.addEventListener('keydown', imageKeyHandler, true);
+
   document.querySelectorAll('.lightbox-back').forEach(function (e) {
-    e.addEventListener('keydown', imageEscapeHandler);
+    e.addEventListener('click', function (event) {
+      event.preventDefault();
+      var close = e.querySelector('.lightbox-close');
+      var opener = close && document.querySelector(close.getAttribute('href'));
+      if (openedHere) {
+        // leave the lightbox the way we came instead of adding another history entry
+        history.back();
+      } else if (close) {
+        // going back would leave the page, so its entry is replaced instead. the
+        // browser only lets go of the enlarged image if the URL targets something
+        // else, which is the image's place; after that the fragment can go
+        window.location.replace(close.getAttribute('href'));
+        window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+      }
+      // return to the image it was opened from
+      opener && opener.focus();
+    });
+  });
+
+  // the browser hands the focus to an enlarged image it navigates to, but not
+  // to one it returns to through its history or still shows after a reload
+  var focusShown = function () {
+    var shown = document.querySelector('.lightbox-back:target');
+    shown && !shown.contains(document.activeElement) && shown.focus();
+  };
+  window.addEventListener('hashchange', function () {
+    openedHere = !!document.querySelector('.lightbox-back:target');
+    focusShown();
+  });
+  // on a reload it only knows the target of the URL once the page is loaded
+  if (document.readyState == 'complete') {
+    focusShown();
+  } else {
+    window.addEventListener('load', focusShown);
+  }
+
+  // paper has no lightbox to open, so a printout must not carry a link to it
+  window.addEventListener('beforeprint', function () {
+    document.querySelectorAll('.lightbox-link[href]').forEach(function (e) {
+      e.dataset.href = e.getAttribute('href');
+      e.removeAttribute('href');
+    });
+  });
+  window.addEventListener('afterprint', function () {
+    document.querySelectorAll('.lightbox-link[data-href]').forEach(function (e) {
+      e.setAttribute('href', e.dataset.href);
+      delete e.dataset.href;
+    });
   });
 }
 
 function initExpand() {
   document.querySelectorAll('.expand > input').forEach(function (e) {
     e.addEventListener('change', initMermaid.bind(null, true, null));
+  });
+}
+
+function sortableTableCells(row) {
+  // the first row of a group is not reached by any cell from above, so its
+  // cells and their colspans make up all columns of the table
+  var cells = [];
+  Array.from(row.cells).forEach(function (cell) {
+    for (var i = 0; i < cell.colSpan; ++i) {
+      cells.push(cell);
+    }
+  });
+  return cells;
+}
+
+function sortableTableNumber(text) {
+  return /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(text) ? Number(text) : NaN;
+}
+
+function initSortableTables() {
+  if (isPrint) {
+    return;
+  }
+  var collator = new Intl.Collator(document.documentElement.lang || undefined, { numeric: true, sensitivity: 'base' });
+  var compare = function (a, b) {
+    var na = sortableTableNumber(a);
+    var nb = sortableTableNumber(b);
+    if (!isNaN(na) && !isNaN(nb)) {
+      return na - nb;
+    }
+    return collator.compare(a, b);
+  };
+
+  document.querySelectorAll('.sortable-table > table').forEach(function (table) {
+    var wrapper = table.parentElement;
+    // the groups in their original order, each with the values of its first row
+    var groups = Array.from(table.tBodies).map(function (group, index) {
+      return {
+        group: group,
+        index: index,
+        values: sortableTableCells(group.rows[0]).map(function (cell) {
+          return cell.textContent.trim();
+        }),
+      };
+    });
+    // the sort keys, the latest click first; sorting by them from the original order
+    // gives the same as sorting the current order by each click in turn, as long as the
+    // sort keeps the order of equal values
+    var keys = [];
+
+    var caption = table.createCaption();
+    caption.classList.add('a11y-only');
+    caption.textContent = window.T_Sortable_columns;
+
+    var headers = Array.from(table.querySelectorAll('th[data-sort-col]')).map(function (th) {
+      var label = th.textContent.trim();
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.title = window.T_Change_sorting;
+      var text = document.createElement('span');
+      text.classList.add('sort-caption');
+      while (th.firstChild) {
+        text.appendChild(th.firstChild);
+      }
+      button.appendChild(text);
+      button.insertAdjacentHTML('beforeend', '<span class="sort-indicator" aria-hidden="true"><span class="btn cstyle action noborder notitle"><span><i class="fa-fw fas fa-sort"></i><span class="sort-rank"></span></span></span></span><span class="sort-state a11y-only"></span>');
+      th.appendChild(button);
+      return { th: th, button: button, col: parseInt(th.dataset.sortCol, 10), label: label };
+    });
+
+    // the actionbar is shown above the table but follows it for the keyboard, after the column headers
+    wrapper.insertAdjacentHTML('beforeend', '<div class="actionbar"><span class="btn cstyle sort-reset-button action noborder notitle interactive"><button type="button" title="' + window.T_Reset_sorting + '" aria-label="' + window.T_Reset_sorting + '"><i class="fa-fw fas fa-undo-alt" aria-hidden="true"></i></button></span></div>');
+    var reset = wrapper.querySelector('.sort-reset-button');
+
+    var update = function () {
+      groups
+        .slice()
+        .sort(function (a, b) {
+          for (var i = 0; i < keys.length; ++i) {
+            var va = a.values[keys[i].col] || '';
+            var vb = b.values[keys[i].col] || '';
+            // empty cells stay at the end, whatever the direction
+            if (!va != !vb) {
+              return va ? -1 : 1;
+            }
+            var result = compare(va, vb) * keys[i].dir;
+            if (result) {
+              return result;
+            }
+          }
+          return a.index - b.index;
+        })
+        .forEach(function (g) {
+          table.appendChild(g.group);
+        });
+
+      headers.forEach(function (header) {
+        var k = keys.findIndex(function (key) {
+          return key.col == header.col;
+        });
+        var key = keys[k];
+        var icon = header.button.querySelector('.sort-indicator i');
+        icon.classList.remove('fa-sort', 'fa-sort-up', 'fa-sort-down');
+        icon.classList.add(!key ? 'fa-sort' : key.dir > 0 ? 'fa-sort-up' : 'fa-sort-down');
+        // the rank only tells something once there is more than one key
+        header.button.querySelector('.sort-rank').textContent = key && keys.length > 1 ? k + 1 : '';
+        // only the primary key may carry aria-sort, the others are told in words
+        if (k == 0) {
+          header.th.setAttribute('aria-sort', key.dir > 0 ? 'ascending' : 'descending');
+        } else {
+          header.th.removeAttribute('aria-sort');
+        }
+        header.button.querySelector('.sort-state').textContent = k > 0 ? (key.dir > 0 ? window.T_Sort_key_ascending : window.T_Sort_key_descending).replace('{0}', k + 1) : '';
+      });
+      reset.classList.toggle('sorted', keys.length > 0);
+    };
+
+    headers.forEach(function (header) {
+      header.button.addEventListener('click', function () {
+        var k = keys.findIndex(function (key) {
+          return key.col == header.col;
+        });
+        // the primary key goes from ascending to descending to no longer sorting by it,
+        // any other column becomes the primary key
+        var message = '';
+        if (k == 0 && keys[0].dir > 0) {
+          keys[0].dir = -1;
+          message = window.T_Sorted_by_descending;
+        } else if (k == 0) {
+          keys.shift();
+          message = window.T_Unsorted_by;
+        } else {
+          if (k > 0) {
+            keys.splice(k, 1);
+          }
+          keys.unshift({ col: header.col, dir: 1 });
+          message = window.T_Sorted_by_ascending;
+        }
+        update();
+        // a function, as a replacement string would take `$&` and the like of a caption as patterns
+        showToast(
+          message.replace('{0}', function () {
+            return header.label;
+          })
+        );
+      });
+    });
+
+    reset.querySelector('button').addEventListener('click', function () {
+      var col = keys.length ? keys[0].col : -1;
+      var primary = headers.find(function (header) {
+        return header.col == col;
+      });
+      // asked before the button vanishes, which may take its focus right away
+      var focused = document.activeElement == this;
+      keys = [];
+      update();
+      // the focus the vanished button held goes to the column that was sorted by
+      if (primary && focused) {
+        primary.button.focus();
+      }
+      showToast(window.T_Sorting_reset);
+    });
+  });
+}
+
+function initOverflowTitle() {
+  // truncation depends on the current width, so decide on each hover whether the tooltip is needed
+  document.addEventListener('pointerover', function (event) {
+    var e = event.target.closest('[data-overflow-title]');
+    if (!e) {
+      return;
+    }
+    if (e.scrollWidth > e.clientWidth) {
+      e.setAttribute('title', e.dataset.overflowTitle);
+    } else {
+      e.removeAttribute('title');
+    }
   });
 }
 
@@ -1396,11 +2273,14 @@ function transferScrollToHistory(event) {
 function scrollToPositions() {
   // show active menu entry
   window.setTimeout(function () {
-    var e = document.querySelector('#R-sidebar li.active a');
-    if (e && e.scrollIntoView) {
-      e.scrollIntoView({
-        block: 'center',
-      });
+    // we move the menu ourselves: `scrollIntoView` also makes the entry the
+    // point the tab key starts from, which would lead past the skip link
+    var e = document.querySelector('#R-content-wrapper li.active a');
+    if (e) {
+      var wrapper = document.querySelector('#R-content-wrapper');
+      var port = wrapper.getBoundingClientRect();
+      var box = e.getBoundingClientRect();
+      wrapper.scrollTop += box.top - port.top - (port.height - box.height) / 2;
     }
   }, 10);
 
@@ -1414,7 +2294,7 @@ function scrollToPositions() {
 
   var state = window.history.state || {};
   state = typeof state === 'object' ? state : {};
-  if (state.hasOwnProperty('contentScrollTop')) {
+  if (Object.hasOwn(state, 'contentScrollTop')) {
     window.setTimeout(function () {
       elc.scrollTop = +state.contentScrollTop;
     }, 10);
@@ -1453,6 +2333,7 @@ function handleHistoryClearer() {
   document.querySelectorAll('.R-historyclearer button').forEach(function (select) {
     select.addEventListener('click', function (event) {
       clearHistory();
+      showToast(window.T_History_cleared);
     });
   });
 }
@@ -1460,7 +2341,7 @@ function handleHistoryClearer() {
 function handleLanguageSwitcher() {
   document.querySelectorAll('.R-languageswitcher select').forEach(function (select) {
     select.addEventListener('change', function (event) {
-      const url = this.options[`R-select-language-${this.value}`].dataset.url;
+      const url = this.selectedOptions[0].dataset.url;
       this.value = this.querySelector('[data-selected]')?.value ?? select.value;
       window.location = url;
     });
@@ -1470,7 +2351,10 @@ function handleLanguageSwitcher() {
 function handleVariantSwitcher() {
   document.querySelectorAll('.R-variantswitcher select').forEach(function (select) {
     select.addEventListener('change', function (event) {
-      window.relearn.changeVariant(this.value);
+      var variant = this.value;
+      window.relearn.fadeVariant(function () {
+        window.relearn.changeVariant(variant);
+      });
     });
   });
 }
@@ -1478,9 +2362,38 @@ function handleVariantSwitcher() {
 function handleVersionSwitcher() {
   document.querySelectorAll('.R-versionswitcher select').forEach(function (select) {
     select.addEventListener('change', function (event) {
-      const url = (this.options[`R-select-version-${this.value}`].dataset.abs == 'true' ? '' : window.relearn.relBaseUri) + this.options[`R-select-version-${this.value}`].dataset.uri + window.relearn.path;
+      const option = this.selectedOptions[0];
+      const url = option.dataset.url ?? (option.dataset.abs == 'true' ? '' : window.relearn.relBaseUri) + option.dataset.uri + window.relearn.path;
       this.value = this.querySelector('[data-selected]')?.value ?? select.value;
       window.location = url;
+    });
+  });
+}
+
+function handleMenuSelectKeys() {
+  // a select drawn by us opens its list on the up/down keys, while the one the
+  // browser draws selects the neighbouring option right away; we do the latter
+  // for both, so all browsers behave alike
+  document.querySelectorAll('.menu-control select').forEach(function (select) {
+    select.addEventListener('keydown', function (event) {
+      if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey || (event.key != 'ArrowUp' && event.key != 'ArrowDown')) {
+        return;
+      }
+      if (select.matches(':open')) {
+        // inside of the open list the keys move between its options
+        return;
+      }
+      event.preventDefault();
+      var options = Array.from(select.options).filter(function (option) {
+        return !option.disabled;
+      });
+      var index = options.indexOf(select.selectedOptions[0]) + (event.key == 'ArrowUp' ? -1 : 1);
+      if (index < 0 || index >= options.length) {
+        return;
+      }
+      select.value = options[index].value;
+      select.dispatchEvent(new Event('input', { bubbles: true }));
+      select.dispatchEvent(new Event('change', { bubbles: true }));
     });
   });
 }
@@ -1494,7 +2407,59 @@ const observer = new PerformanceObserver(function () {
 });
 observer.observe({ type: 'navigation' });
 
+// the nodes inside the shadow tree of a spec belong to the library rendering
+// them, which stumbles over an element of ours wrapped around its text; so the
+// terms in there are painted by ranges, which leave the tree as it is
+function markOpenapi() {
+  if (!window.Highlight || !CSS.highlights) {
+    return;
+  }
+  var search = window.sessionStorage.getItem(window.relearn.absBaseUri + '/search-value');
+  var words = (search ?? '').split(' ').filter((word) => word.trim() != '');
+  var ranges = [];
+  if (words.length) {
+    var re = new RegExp(words.map((word) => regexEscape(word)).join('|'), 'gi');
+    document.querySelectorAll('.sc-openapi-container').forEach(function (oc) {
+      if (!oc.shadowRoot) {
+        return;
+      }
+      var walker = document.createTreeWalker(oc.shadowRoot, NodeFilter.SHOW_TEXT);
+      for (var node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (!node.parentElement || /^(script|style)$/i.test(node.parentElement.tagName)) {
+          continue;
+        }
+        re.lastIndex = 0;
+        for (var match = re.exec(node.data); match; match = re.exec(node.data)) {
+          var range = new Range();
+          range.setStart(node, match.index);
+          range.setEnd(node, match.index + match[0].length);
+          ranges.push(range);
+        }
+      }
+    });
+  }
+  if (ranges.length) {
+    CSS.highlights.set('relearn-search', new Highlight(...ranges));
+  } else {
+    CSS.highlights.delete('relearn-search');
+  }
+}
+
+// the library renders a part of a spec once it is opened, so the terms have to
+// be marked again whenever its tree changes
+function scheduleMarkOpenapi() {
+  if (scheduleMarkOpenapi.pending) {
+    return;
+  }
+  scheduleMarkOpenapi.pending = true;
+  requestAnimationFrame(function () {
+    scheduleMarkOpenapi.pending = false;
+    markOpenapi();
+  });
+}
+
 function mark() {
+  markOpenapi();
   var search = window.sessionStorage.getItem(window.relearn.absBaseUri + '/search-value');
   var words = (search ?? '').split(' ').filter((word) => word.trim() != '');
   if (!words || !words.length) {
@@ -1502,7 +2467,7 @@ function mark() {
   }
 
   // mark some additional stuff as searchable
-  var bodyInnerLinks = document.querySelectorAll('#R-body-inner a:not(.lightbox-link):not(.btn):not(.lightbox-back)');
+  var bodyInnerLinks = document.querySelectorAll('#R-main a:not(.lightbox-link):not(.btn):not(.lightbox-close)');
   for (var i = 0; i < bodyInnerLinks.length; i++) {
     bodyInnerLinks[i].classList.add('highlight');
   }
@@ -1532,10 +2497,6 @@ function mark() {
       parent = parent.parentNode;
     }
   }
-  psm &&
-    setTimeout(function () {
-      psm.update();
-    }, 10);
 }
 window.relearn.markSearch = mark;
 
@@ -1621,10 +2582,7 @@ function unmark() {
 
   var highlighted = document.querySelectorAll('.highlightable');
   unhighlight(highlighted, { element: 'mark', className: 'search' });
-  psm &&
-    setTimeout(function () {
-      psm.update();
-    }, 10);
+  markOpenapi();
 }
 
 function unhighlight(es, options) {
@@ -1691,11 +2649,55 @@ function searchInputHandler(value) {
   if (value.length) {
     window.sessionStorage.setItem(window.relearn.absBaseUri + '/search-value', value);
     mark();
+    scrollMarkedIntoView();
   }
+  announceMarked(value);
+}
+
+function scrollMarkedIntoView() {
+  // marking expands the sections on the way to a match, so the match itself can
+  // end up below the menus fold without anything telling the reader about it
+  var wrapper = document.querySelector('#R-content-wrapper');
+  var marked = wrapper && wrapper.querySelector('mark.search');
+  if (!marked) {
+    return;
+  }
+  var port = wrapper.getBoundingClientRect();
+  var box = marked.getBoundingClientRect();
+  if (box.top >= port.top && box.bottom <= port.bottom) {
+    // it can be seen already, so don't move the menu under the readers eyes
+    return;
+  }
+  // center it like we do for the active entry; a section can be taller than the
+  // menu, so we go for the match itself and not for the section containing it
+  wrapper.scrollTop += box.top - port.top - (port.height - box.height) / 2;
+}
+
+var announceMarkedTimer;
+function announceMarked(search, delay = 1000) {
+  clearTimeout(announceMarkedTimer);
+  if (!search.length || document.querySelector('#R-searchresults')) {
+    // the search page tells how many pages were found, which is all that
+    // matters there
+    return;
+  }
+  // told a moment after the last change of the term, so not with every key
+  // typed; a loaded page needs less of a wait, just enough for a screen reader
+  // to be done announcing it, as it drops what changes meanwhile
+  announceMarkedTimer = setTimeout(function () {
+    var count = document.querySelectorAll('#R-main mark.search').length;
+    if (count) {
+      showToast(
+        window.T_N_matches_on_page.replace('{1}', count).replace('{0}', function () {
+          return search;
+        })
+      );
+    }
+  }, delay);
 }
 
 function initSearch() {
-  // sync input/escape between searchbox and searchdetail
+  // sync input/escape between searchbox and searchinput
   var inputs = document.querySelectorAll('input.search-by');
   inputs.forEach(function (e) {
     e.addEventListener('keydown', function (event) {
@@ -1710,9 +2712,6 @@ function initSearch() {
         inputs.forEach(function (e) {
           e.value = '';
         });
-        if (!words || !words.length) {
-          documentFocus();
-        }
       }
     });
     e.addEventListener('input', function (event) {
@@ -1731,9 +2730,7 @@ function initSearch() {
     e.addEventListener('click', function () {
       inputs.forEach(function (e) {
         e.value = '';
-        var event = document.createEvent('Event');
-        event.initEvent('input', false, false);
-        e.dispatchEvent(event);
+        e.dispatchEvent(new Event('input'));
       });
       window.sessionStorage.removeItem(window.relearn.absBaseUri + '/search-value');
       unmark();
@@ -1752,10 +2749,10 @@ function initSearch() {
   if (search) {
     inputs.forEach(function (e) {
       e.value = search;
-      var event = document.createEvent('Event');
-      event.initEvent('input', false, false);
-      e.dispatchEvent(event);
+      e.dispatchEvent(new Event('input'));
     });
+    // nobody is typing, so this takes the place of the wait set by the inputs
+    announceMarked(search, 500);
   }
 
   window.relearn.isSearchInterfaceReady = true;
@@ -1790,17 +2787,91 @@ function useMermaid(config) {
     mermaid.initialize(Object.assign({ securityLevel: 'antiscript', startOnLoad: false }, config));
   }
 }
-if (window.relearn.themeUseMermaid) {
-  useMermaid(window.relearn.themeUseMermaid);
+(function () {
+  // the block is only written by the mermaid dependency; we are deferred, so it
+  // stands in the document by now wherever the dependency put it
+  var config = document.querySelector('#R-mermaid-config');
+  if (config) {
+    window.relearn.themeUseMermaid = JSON.parse(config.textContent);
+    useMermaid(window.relearn.themeUseMermaid);
+  }
+})();
+
+// an icon written by the author, like the one of a menu entry, comes as it is;
+// it is decoration unless it says otherwise, so assistive technology skips it
+function initIcons() {
+  document.querySelectorAll('i[class*="fa-"]:not([aria-hidden]):not([aria-label]):not([role]):not([title])').forEach(function (e) {
+    e.setAttribute('aria-hidden', 'true');
+  });
 }
 
-function useOpenapi(config) {
-  if (config.css && config.cssInProject) {
-    config.css = window.relearn.relBasePath + config.css;
-  }
+function initEdits() {
+  // a screen reader doesn't tell where inserted or deleted text starts and
+  // ends, so the stylesheet writes it around the text; being the same for
+  // all languages, it gets the texts from here
+  var texts = {
+    '--ins-start-text': window.T_Inserted_text_start,
+    '--ins-end-text': window.T_Inserted_text_end,
+    '--del-start-text': window.T_Deleted_text_start,
+    '--del-end-text': window.T_Deleted_text_end,
+  };
+  Object.keys(texts).forEach(function (name) {
+    document.documentElement.style.setProperty(name, JSON.stringify(' ' + texts[name] + ' '));
+  });
 }
-if (window.relearn.themeUseOpenapi) {
-  useOpenapi(window.relearn.themeUseOpenapi);
+
+// the menu is not printed, so on paper its logo leads the topbar instead, like
+// in the print version; for the time of printing, the topbar gets a copy of it.
+// the copy keeps the identifier, as all the styles of the logo go by it, and the
+// screen never shows it, so nothing moves behind the print dialog
+function initPrintLogo() {
+  var logo = document.querySelector('#R-sidebar #R-logo');
+  var topbar = document.querySelector('#R-topbar');
+  if (!logo || !topbar) {
+    return;
+  }
+  var copyLogo = function () {
+    var copy = logo.cloneNode(true);
+    // the logo of the print variant may never have been shown, so its image
+    // was never loaded; it must not wait to be scrolled into view
+    copy.querySelectorAll('img[loading="lazy"]').forEach(function (img) {
+      img.loading = 'eager';
+    });
+    // an inlined SVG refers to its parts by their identifiers, and a reference
+    // goes to the first element of one, the original in the menu, which is not
+    // printed and paints nothing; so the parts of the copy get their own
+    var suffix = '-R-print';
+    var parts = copy.querySelectorAll('svg[id], svg [id]');
+    if (!parts.length) {
+      return copy;
+    }
+    var ids = Array.from(parts).map(function (e) {
+      var id = e.id;
+      e.id = id + suffix;
+      return id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    });
+    var reference = new RegExp('#(' + ids.join('|') + ')(?![\\w-])', 'g');
+    copy.querySelectorAll('svg, svg *').forEach(function (e) {
+      Array.from(e.attributes).forEach(function (a) {
+        var value = a.value.replace(reference, '#$1' + suffix);
+        if (value != a.value) {
+          a.value = value;
+        }
+      });
+      if (e.localName == 'style') {
+        e.textContent = e.textContent.replace(reference, '#$1' + suffix);
+      }
+    });
+    return copy;
+  };
+  var copy = null;
+  window.addEventListener('beforeprint', function () {
+    copy = copy || topbar.insertBefore(copyLogo(), topbar.firstChild);
+  });
+  window.addEventListener('afterprint', function () {
+    copy && copy.remove();
+    copy = null;
+  });
 }
 
 function ready(fn) {
@@ -1812,9 +2883,11 @@ function ready(fn) {
 }
 
 ready(function () {
+  initIcons();
   initArrowVerticalNav();
   initArrowHorizontalNav();
   handleHistoryClearer();
+  handleMenuSelectKeys();
   handleLanguageSwitcher();
   handleVariantSwitcher();
   handleVersionSwitcher();
@@ -1824,17 +2897,23 @@ ready(function () {
   initToc();
   initAnchorClipboard();
   initCodeClipboard();
-  fixCodeTabs();
-  restoreTabSelections();
+  initSortableTables();
+  handleTabs();
+  handleExpanders();
+  handleTopbarButtons();
   initSwipeHandler();
   initHistory();
   initSearch();
   initImage();
   initExpand();
+  initOverflowTitle();
   initScrollPositionSaver();
+  initEdits();
+  initPrintLogo();
 });
 
 (function () {
+  var html = document.documentElement;
   var body = document.querySelector('body');
   var topbar = document.querySelector('#R-topbar');
   function addTopbarButtonInfos() {
@@ -1907,9 +2986,9 @@ ready(function () {
       });
   }
   function moveTopbarButtons() {
-    var isS = body.classList.contains('menu-s-width');
-    var isM = body.classList.contains('menu-m-width');
-    var isL = body.classList.contains('menu-l-width');
+    var isS = html.classList.contains('menu-s-width');
+    var isM = html.classList.contains('menu-m-width');
+    var isL = html.classList.contains('menu-l-width');
     // move buttons once, width has a distinct value
     if (isS && !isM && !isL) {
       moveAreaTopbarButtons('s');
@@ -1938,12 +3017,7 @@ ready(function () {
             }
           });
         } else {
-          var clone = wrapper.cloneNode(true);
-          var irrelevant = clone.querySelectorAll('div.ps__rail-x, div.ps__rail-y');
-          irrelevant.forEach(function (e) {
-            e.parentNode.removeChild(e);
-          });
-          isEmpty = !clone.innerHTML.trim();
+          isEmpty = !wrapper.innerHTML.trim();
         }
         button.querySelector('button').disabled = isEmpty;
         button.querySelector('.btn').classList.toggle('interactive', !isEmpty);
@@ -1951,49 +3025,34 @@ ready(function () {
       }
     });
   }
-  function setWidthS(e) {
-    body.classList[e.matches ? 'add' : 'remove']('menu-s-width');
+  function adjustBreadcrumbTabstops() {
+    // the small layout puts the linked entries out of sight, where they must
+    // not be a stop for the tab key but stay for screen readers; an entry
+    // that is always out of sight is written that way and left alone
+    var isS = html.classList.contains('menu-s-width');
+    topbar.querySelectorAll('.topbar-breadcrumbs li:not(.a11y-only) > a').forEach(function (a) {
+      if (isS) {
+        a.setAttribute('tabindex', '-1');
+      } else {
+        a.removeAttribute('tabindex');
+      }
+    });
   }
-  function setWidthM(e) {
-    body.classList[e.matches ? 'add' : 'remove']('menu-m-width');
-  }
-  function setWidthL(e) {
-    body.classList[e.matches ? 'add' : 'remove']('menu-l-width');
-  }
-  function onWidthChange(setWidth, e) {
-    setWidth(e);
+  function onWidthChange() {
     moveTopbarButtons();
     adjustEmptyTopbarContents();
+    adjustBreadcrumbTabstops();
+    adjustNavInert();
   }
   if (topbar) {
-    var mqs = window.matchMedia('only screen and (max-width: 47.999rem)');
-    mqs.addEventListener('change', onWidthChange.bind(null, setWidthS));
-    var mqm = window.matchMedia('only screen and (min-width: 48rem) and (max-width: 59.999rem)');
-    mqm.addEventListener('change', onWidthChange.bind(null, setWidthM));
-    var mql = window.matchMedia('only screen and (min-width: 60rem)');
-    mql.addEventListener('change', onWidthChange.bind(null, setWidthL));
+    // theme-head.js keeps the width classes up to date
+    document.addEventListener('themeWidthChanged', onWidthChange);
 
     addTopbarButtonInfos();
-    setWidthS(mqs);
-    setWidthM(mqm);
-    setWidthL(mql);
     moveTopbarButtons();
     adjustEmptyTopbarContents();
+    adjustBreadcrumbTabstops();
   }
-})();
-
-(function () {
-  var body = document.querySelector('body');
-  function setWidth(e) {
-    body.classList[e.matches ? 'add' : 'remove']('main-max-width');
-  }
-  function onWidthChange(setWidth, e) {
-    setWidth(e);
-  }
-  var width = getColorValue('MAIN-MAX-width');
-  var mqm = window.matchMedia('screen and ( min-width: ' + width + ')');
-  mqm.addEventListener('change', onWidthChange.bind(null, setWidth));
-  setWidth(mqm);
 })();
 
 function getColorValue(c) {
@@ -2035,7 +3094,6 @@ function initVersionIndex(index) {
     index.forEach(function (version) {
       // Create new option element
       var option = document.createElement('option');
-      option.id = 'R-select-version-' + version.value;
       option.value = version.value;
       option.dataset.abs = version.isAbs;
       option.dataset.uri = version.baseURL;
@@ -2079,12 +3137,12 @@ function initVersionJs() {
     url.searchParams.set('v', randomNum.toString());
     js.src = url.toString();
     js.setAttribute('async', '');
-    js.onload = function () {
+    js.addEventListener('load', function () {
       initVersionIndex(relearn_versionindex);
-    };
-    js.onerror = function (e) {
+    });
+    js.addEventListener('error', function (e) {
       console.error('Error getting version index file');
-    };
+    });
     document.head.appendChild(js);
   }
 }

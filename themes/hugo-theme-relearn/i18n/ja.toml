@@ -22,6 +22,15 @@ other = "\"{0}\" で {1} 件の結果が見つかりました"
 [Clear-History]
 other = "履歴削除"
 
+[History-cleared]
+other = "履歴を削除しました"
+
+[Enlarge-graph]
+other = "グラフを拡大"
+
+[Close-graph]
+other = "拡大したグラフを閉じる"
+
 [Reset-view]
 other = "ビューのリセット"
 
@@ -44,7 +53,7 @@ other = "ホームページへ行く"
 other = "Home"
 
 [Edit-this-page]
-other = "編集"
+other = "ページを編集"
 
 [Show-Markdown]
 other = "マークダウンを表示"
@@ -57,6 +66,12 @@ other = "章全体を印刷する"
 
 [More-action]
 other = "更に"
+
+[Previous-page]
+other = "前のページ"
+
+[Next-page]
+other = "次のページ"
 
 [shortcuts-menuTitle]
 other = "更に"
@@ -141,3 +156,66 @@ other = "バージョン"
 
 [Browser-unsupported-feature]
 other = "このブラウザはこの機能をサポートしていません"
+
+[Pages-group-fallback]
+other = "その他"
+
+[Skip-to-content]
+other = "メインコンテンツへスキップ"
+
+[Breadcrumbs]
+other = "パンくずリスト"
+
+[Search-page]
+other = "検索ページを開く"
+
+[Close-image]
+other = "拡大画像を閉じる"
+
+[Expand-all]
+other = "すべて展開"
+
+[Collapse-all]
+other = "すべて折りたたむ"
+
+[Inserted-text-start]
+other = "挿入されたテキストの開始"
+
+[Inserted-text-end]
+other = "挿入されたテキストの終了"
+
+[Deleted-text-start]
+other = "削除されたテキストの開始"
+
+[Deleted-text-end]
+other = "削除されたテキストの終了"
+
+[N-matches-on-page]
+other = "このページで \"{0}\" が {1} 件見つかりました"
+
+[Sortable-columns]
+other = "ボタンのある列見出しで並べ替えできます。"
+
+[Sort-key-ascending]
+other = "{0} 番目に並べ替え、昇順"
+
+[Sort-key-descending]
+other = "{0} 番目に並べ替え、降順"
+
+[Sorted-by-ascending]
+other = "\"{0}\" で並べ替え、昇順"
+
+[Sorted-by-descending]
+other = "\"{0}\" で並べ替え、降順"
+
+[Unsorted-by]
+other = "\"{0}\" での並べ替えを解除しました"
+
+[Change-sorting]
+other = "並べ替えを変更"
+
+[Reset-sorting]
+other = "並べ替えをリセット"
+
+[Sorting-reset]
+other = "並べ替えをリセットしました"

@@ -22,6 +22,15 @@ other = "{1} resultat(er) fundet for \"{0}\""
 [Clear-History]
 other = "Ryd historik"
 
+[History-cleared]
+other = "Historik ryddet"
+
+[Enlarge-graph]
+other = "Forstør graf"
+
+[Close-graph]
+other = "Luk forstørret graf"
+
 [Reset-view]
 other = "Nulstil visning"
 
@@ -44,7 +53,7 @@ other = "Gå til forsiden"
 other = "Forside"
 
 [Edit-this-page]
-other = "Rediger"
+other = "Rediger side"
 
 [Show-Markdown]
 other = "Vis Markdown"
@@ -57,6 +66,12 @@ other = "Udskriv hele kapitlet"
 
 [More-action]
 other = "Mere"
+
+[Previous-page]
+other = "Forrige side"
+
+[Next-page]
+other = "Næste side"
 
 [shortcuts-menuTitle]
 other = "Mere"
@@ -141,3 +156,66 @@ other = "Version"
 
 [Browser-unsupported-feature]
 other = "Denne browser understøtter ikke denne funktion"
+
+[Pages-group-fallback]
+other = "Andet"
+
+[Skip-to-content]
+other = "Spring til hovedindhold"
+
+[Breadcrumbs]
+other = "Brødkrummesti"
+
+[Search-page]
+other = "Åbn søgeside"
+
+[Close-image]
+other = "Luk forstørret billede"
+
+[Expand-all]
+other = "Udvid alle"
+
+[Collapse-all]
+other = "Skjul alle"
+
+[Inserted-text-start]
+other = "Start på indsat tekst"
+
+[Inserted-text-end]
+other = "Slut på indsat tekst"
+
+[Deleted-text-start]
+other = "Start på slettet tekst"
+
+[Deleted-text-end]
+other = "Slut på slettet tekst"
+
+[N-matches-on-page]
+other = "{1} forekomst(er) af \"{0}\" på denne side"
+
+[Sortable-columns]
+other = "Kolonneoverskrifter med knapper kan sorteres."
+
+[Sort-key-ascending]
+other = "sorteret på {0}. plads, stigende"
+
+[Sort-key-descending]
+other = "sorteret på {0}. plads, faldende"
+
+[Sorted-by-ascending]
+other = "Sorteret efter \"{0}\", stigende"
+
+[Sorted-by-descending]
+other = "Sorteret efter \"{0}\", faldende"
+
+[Unsorted-by]
+other = "Ikke længere sorteret efter \"{0}\""
+
+[Change-sorting]
+other = "Skift sortering"
+
+[Reset-sorting]
+other = "Nulstil sortering"
+
+[Sorting-reset]
+other = "Sortering nulstillet!"

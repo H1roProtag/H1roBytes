@@ -22,6 +22,15 @@ other = "{1} نتیجه برای \"{0}\" یافت شد"
 [Clear-History]
 other = "پاک کردن تاریخچه"
 
+[History-cleared]
+other = "تاریخچه پاک شد"
+
+[Enlarge-graph]
+other = "بزرگ‌نمایی نمودار"
+
+[Close-graph]
+other = "بستن نمودار بزرگ‌شده"
+
 [Reset-view]
 other = "بازنشانی نمایش"
 
@@ -44,7 +53,7 @@ other = "رفتن به صفحه اصلی"
 other = "Home"
 
 [Edit-this-page]
-other = "ویرایش"
+other = "ویرایش صفحه"
 
 [Show-Markdown]
 other = "نمایش Markdown"
@@ -57,6 +66,12 @@ other = "چاپ کل فصل"
 
 [More-action]
 other = "بیشتر"
+
+[Previous-page]
+other = "صفحه قبلی"
+
+[Next-page]
+other = "صفحه بعدی"
 
 [shortcuts-menuTitle]
 other = "بیشتر"
@@ -141,3 +156,66 @@ other = "نسخه"
 
 [Browser-unsupported-feature]
 other = "این مرورگر از این ویژگی پشتیبانی نمی‌کند"
+
+[Pages-group-fallback]
+other = "سایر"
+
+[Skip-to-content]
+other = "پرش به محتوای اصلی"
+
+[Breadcrumbs]
+other = "مسیر راهنما"
+
+[Search-page]
+other = "باز کردن صفحه جستجو"
+
+[Close-image]
+other = "بستن تصویر بزرگ‌شده"
+
+[Expand-all]
+other = "باز کردن همه"
+
+[Collapse-all]
+other = "بستن همه"
+
+[Inserted-text-start]
+other = "شروع متن درج‌شده"
+
+[Inserted-text-end]
+other = "پایان متن درج‌شده"
+
+[Deleted-text-start]
+other = "شروع متن حذف‌شده"
+
+[Deleted-text-end]
+other = "پایان متن حذف‌شده"
+
+[N-matches-on-page]
+other = "{1} مورد برای \"{0}\" در این صفحه یافت شد"
+
+[Sortable-columns]
+other = "سرستون‌های دارای دکمه قابل مرتب‌سازی هستند."
+
+[Sort-key-ascending]
+other = "مرتب‌شده در جایگاه {0}، صعودی"
+
+[Sort-key-descending]
+other = "مرتب‌شده در جایگاه {0}، نزولی"
+
+[Sorted-by-ascending]
+other = "مرتب‌شده بر اساس \"{0}\"، صعودی"
+
+[Sorted-by-descending]
+other = "مرتب‌شده بر اساس \"{0}\"، نزولی"
+
+[Unsorted-by]
+other = "دیگر بر اساس \"{0}\" مرتب نشده است"
+
+[Change-sorting]
+other = "تغییر مرتب‌سازی"
+
+[Reset-sorting]
+other = "بازنشانی مرتب‌سازی"
+
+[Sorting-reset]
+other = "مرتب‌سازی بازنشانی شد!"

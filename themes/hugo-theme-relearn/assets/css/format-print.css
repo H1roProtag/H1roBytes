@@ -1,3 +1,4 @@
+#R-skiplink,
 #R-sidebar {
   display: none;
 }
@@ -14,32 +15,84 @@
 html {
   font-size: 8.763pt;
 }
-body {
-  background-color: rgba(255, 255, 255, 1);
-}
-pre:not(.mermaid) {
-  border: 1px solid rgba(204, 204, 204, 1);
-}
 #R-body #R-topbar {
-  background-color: rgba(255, 255, 255, 1); /* avoid background bleeding*/
-  border-bottom: 1px solid rgba(221, 221, 221, 1);
+  /* the logo leads the topbar outside of its wrapper, so it is the topbar
+     itself that carries the background */
+  background-color: var(--INTERNAL-TOPBAR-BG-color);
   border-radius: 0;
-  color: rgba(119, 119, 119, 1);
+  display: flex;
   padding-left: 0; /* for print, we want to align with the footer to ease the layout */
   padding-right: 0;
+}
+#R-body #R-topbar > .topbar-wrapper {
+  /* a background of its own would be painted over the border of the topbar,
+     unlike the logo next to it, and cover the line where rounded to the pixels
+     of the paper */
+  background: none;
+  flex: 1 1 0;
+  min-width: 0;
+}
+/* the menu is not printed, so its logo leads the topbar instead; it must never
+   grow the topbar, so it has a fixed image height and a single line title,
+   whatever layout and line breaks are set for the menu. it is shown in full,
+   the breadcrumbs take what is left */
+#R-topbar > #R-logo {
+  align-self: center;
+  flex: none;
+  margin-block: 0;
+}
+#R-topbar > #R-logo.R-default {
+  flex-direction: row;
+  /* the text size of the topbar, so the title is as big as the breadcrumbs */
+  font-size: inherit;
+  width: auto;
+}
+#R-topbar > #R-logo.R-default .logo-image {
+  width: auto;
+}
+/* every image of the logo, also of a logo.html of the site's own */
+#R-topbar > #R-logo :is(img, svg):not(svg *) {
+  /* the image effects of the content never reach the logo in the menu, so
+     they must not here either */
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  height: 1.5rem;
+  max-width: none;
+  width: auto;
+}
+#R-topbar > #R-logo.R-default .logo-title {
+  font-size: 1em;
+  white-space: nowrap;
+}
+/* the breadcrumbs are centered by their capitals like the title, so both
+   stand on the same line where they share their font */
+#R-body .topbar-breadcrumbs {
+  padding-block: calc((1lh - 1cap) / 2);
+  text-box: trim-both cap alphabetic;
+}
+/* only where the breadcrumbs follow the logo; at the end of the topbar they
+   are apart from it */
+#R-topbar:has(> #R-logo) :is(.topbar-area-start, .topbar-area-middle) .breadcrumbs li.topbar-breadcrumbs-divider {
+  display: inline-block;
+}
+#R-topbar:has(> #R-logo) :is(.topbar-area-start, .topbar-area-middle) .topbar-breadcrumbs:has(> ol > .topbar-breadcrumbs-divider) {
+  /* the divider towards the logo brings the spacing of the breadcrumbs */
+  padding-inline-start: 0;
 }
 #R-body .topbar-button {
   /* we don't need the buttons while printing */
   /* we need !important to turn off JS topbar button handling setting element styles */
   display: none !important;
 }
-@media screen and (max-width: 47.999rem) {
-  #R-body .topbar-breadcrumbs {
+@media screen {
+  :where(.menu-s-width) #R-body .topbar-breadcrumbs {
     visibility: visible;
   }
 }
 
-code.copy-to-clipboard-code:after {
+code.copy-to-clipboard-code:has(+ .inline-copy-to-clipboard-button):after,
+.inline-copy-to-clipboard-button.btn {
   display: none;
 }
 
@@ -51,68 +104,52 @@ code.copy-to-clipboard-code:after {
   display: none;
 }
 
-#R-body h1,
-#R-body h2,
-#R-body .card-title,
-#R-body h3,
-#R-body .article-subheading,
-#R-body h4,
-#R-body h5,
-#R-body h6 {
-  /* better contrast for colored elements */
-  color: rgba(0, 0, 0, 1);
+blockquote::before,
+figure.quote::before {
+  background-color: var(--INTERNAL-MAIN-TEXT-color);
 }
-#R-body th,
-#R-body td,
-#R-body code,
-#R-body strong,
-#R-body b,
-#R-body li,
-#R-body dd,
-#R-body dt,
-#R-body p,
-#R-body a,
-#R-body button,
-#R-body .badge .badge-content {
-  /* better contrast for colored elements */
-  color: rgba(0, 0, 0, 1);
+blockquote p,
+blockquote cite,
+#R-body figure.quote > figcaption {
+  /* nothing is toned down, as that costs contrast */
+  color: var(--INTERNAL-MAIN-TEXT-color);
+  opacity: 1;
 }
 #R-body .anchor {
   display: none;
 }
-#R-body pre:not(.mermaid),
-#R-body code {
-  background-color: rgba(255, 255, 255, 1);
-  border-color: rgba(221, 221, 221, 1);
-}
 
 hr {
-  border-bottom: 1px solid rgba(221, 221, 221, 1);
+  border-bottom: 1px solid var(--INTERNAL-MAIN-TEXT-color);
 }
-#R-body #R-body-inner {
-  overflow: visible; /* turn off limitations for perfect scrollbar */
+#R-body pre:not(.mermaid) {
+  /* the variant's colors of block code win over the ones of its syntax highlighting style */
+  background-color: var(--INTERNAL-CODE-BLOCK-BG-color);
+  color: var(--INTERNAL-CODE-BLOCK-color);
+}
+
+#R-body #R-main {
+  overflow: visible; /* turn off scrolling, so the whole content is printed */
   /* reset paddings for chapters in screen */
   padding: 0 3.25rem 4rem 3.25rem;
 }
 
-#R-body #R-body-inner h1 {
-  border-bottom: 1px solid rgba(221, 221, 221, 1);
+#R-body #R-main h1 {
+  border-bottom: 1px solid var(--INTERNAL-BOX-NEUTRAL-color);
   font-size: 3.25rem;
   margin-bottom: 2rem;
   padding-bottom: 0.75rem;
 }
 
-/* Children shortcode */
-.children-type-group li > p + p,
-.children-type-tree li > p + p,
-.children-type-flat li > p {
+/* Pages and children shortcode */
+:is(.pages-tree, .pages-sections, .children-type-group, .children-type-tree) li > p + p,
+:is(.pages-list, .children-type-flat) li > p {
   font-size: 1rem;
 }
 
 .footline {
   /* in print mode show footer line to signal reader the end of document */
-  border-top: 1px solid rgba(221, 221, 221, 1);
-  color: rgba(119, 119, 119, 1);
+  border-top: 1px solid var(--INTERNAL-BOX-NEUTRAL-color);
   margin-top: 1.5rem;
   padding-top: 0.75rem;
 }
@@ -122,12 +159,12 @@ h1 + .footline {
   display: none;
 }
 
-#R-body #R-body-inner .headline a,
-#R-body #R-body-inner .footline a,
-#R-body #R-body-inner .btn a {
+#R-body #R-main .headline a,
+#R-body #R-main .footline a,
+#R-body #R-main .btn a {
   text-decoration: none;
 }
-#R-body #R-body-inner a {
+#R-body #R-main a {
   /* in print we want to distinguish links in our content from
     normal text even if printed black/white;
     don't use a.highlight in selector to also get links that are
@@ -138,11 +175,10 @@ h1 + .footline {
   /* the header is sticky which is not suitable for print; */
   position: initial;
 }
-#R-topbar > .topbar-wrapper {
-  background-color: initial;
-}
 #R-body .topbar-sidebar-divider {
-  border-width: 0;
+  /* there is no menu to divide from; what is left of its pixel compensation
+     would widen the spacing between the logo and the breadcrumbs */
+  display: none;
 }
 article .R-taxonomy {
   display: none;
@@ -154,43 +190,30 @@ mark.search {
 .mermaid.zoom:hover {
   border-color: transparent;
 }
-.box > .box-content {
-  background-color: rgba(255, 255, 255, 1);
-}
-
-.btn,
-#R-body .tab-nav-button {
-  color: rgba(0, 0, 0, 1);
-}
-#R-body .tab-nav-button.active {
-  border-bottom-color: rgba(255, 255, 255, 1);
-  color: rgba(0, 0, 0, 1);
-}
 #R-body .tab-nav-button.active > .tab-nav-text {
-  background-color: rgba(255, 255, 255, 1);
-}
-#R-body .tab-content-text {
-  background-color: rgba(255, 255, 255, 1);
-  color: rgba(0, 0, 0, 1);
+  /* a line covered exactly still shines through at its edge on paper, so the cover reaches beyond it */
+  margin-bottom: -2px;
+  padding-bottom: 2px;
 }
 
 article:not(.card) {
   break-before: page;
 }
-#R-body-inner article:not(.card):first-of-type {
+#R-main > .flex-block-wrapper > article:not(.card):first-of-type {
+  /* keep the printed page on the same paper as the topbar */
   break-before: avoid;
 }
 
-#R-body #R-body-inner .flex-block-wrapper {
+#R-body #R-main .flex-block-wrapper {
   max-width: calc(var(--INTERNAL-MAIN-MAX-width) - var(--INTERNAL-MENU-L-width) - 2 * 3.25rem);
   width: 100%;
 }
 
-#R-body #R-body-inner > .flex-block-wrapper article.narrow > p {
+#R-body #R-main > .flex-block-wrapper article.narrow > p {
   font-size: 1.015625rem;
   text-align: start;
 }
 
-#R-body #R-body-inner > .flex-block-wrapper article.narrow > .article-subheading {
+#R-body #R-main > .flex-block-wrapper article.narrow > .article-subheading {
   margin-top: 0;
 }

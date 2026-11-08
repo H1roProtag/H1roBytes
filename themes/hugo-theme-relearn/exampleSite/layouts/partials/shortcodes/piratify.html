@@ -8,7 +8,7 @@
 {{- $pagefield := cond (ne $content nil) nil (.pagefield | default "Content") }}
 {{- $writenotice := cond (ne .writenotice nil) .writenotice false }}
 {{- $langtrg := "pir" }}
-{{- $langsrc := cond (eq $page.Language.Lang $langtrg) (.langsrc | default "en") $page.Language.Lang }}
+{{- $langsrc := cond (eq $page.Language.Name $langtrg) (.langsrc | default "en") $page.Language.Name }}
 {{- $baseURL := urls.Parse site.BaseURL }}
 {{- $baseURLpath := $baseURL.Path | default "/" }}
 {{- $l := $page.RelPermalink }}
@@ -22,7 +22,7 @@
 	{{- $c = $page.TableOfContents }}
 {{- end }}
 {{- range $page.AllTranslations }}
-	{{- if eq .Language.Lang $langsrc }}
+	{{- if eq .Language.Name $langsrc }}
 		{{- $l = .RelPermalink }}
 		{{- if ne $content nil }}
 			{{- $c = $content }}
@@ -35,9 +35,9 @@
 		{{- break }}
 	{{- end }}
 {{- end }}
-{{- if eq $page.Language.Lang $langtrg }}
+{{- if eq $page.Language.Name $langtrg }}
 	{{- if $writenotice }}
-		{{- partial "shortcodes/notice.html" (dict
+		{{- partial "shortcodes/callout.html" (dict
 			"page" $page
 			"content" "<p>Fello' pirrrates, grog made us dizzy! Be awarrre some stuff may look weird in this trrranslat'n. Like seeing Merrrmaids and stuff.</p>\n"
 			"icon" "skull-crossbones"
@@ -117,6 +117,11 @@
 		"href"
 	-}}
 	{{- $fix := dict
+		"act'n" "action"
+		"break'n" "breaking"
+		"caut'n" "caution"
+		"load'n" "loading"
+		"opt'n" "option"
 		"warn'n" "warning"
 		"sect'n" "section"
 		"t'ble" "table"

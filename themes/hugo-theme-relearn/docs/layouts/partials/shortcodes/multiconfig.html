@@ -1,17 +1,19 @@
-
 {{- /*
   Heavily modified from https://github.com/gohugoio/hugoDocs/blob/master/_vendor/github.com/gohugoio/gohugoioTheme/layouts/shortcodes/code-toggle.html
 
-  Renders syntax-highlighted configuration data in TOML, YAML and JSON formats.
+  Renders syntax-highlighted configuration data in YAML, TOML and JSON formats.
 
   @param {Page} [page] The page to render on.
-  @param {string} [content] Plain content to render.
-  @param {string} [config] The section of site.Data.docs.config to render.
-  @param {string} [dataKey] Only render specific section
+  @param {string} [content] The YAML, TOML or JSON content to render.
   @param {string} [file] The file name to display above the rendered code.
   @param {bool} [fm=false] If true, render the code as front matter.
-  @param {bool} [skipHeader=false] If false, omit top level key(s) when rendering a section of site.Data.docs.config.
-  @param {string} [section] The file name to display above the rendered code.
+  @param {string} [section] The dotted key to nest the content under.
+
+  The format of the content is detected by Hugo. In YAML and TOML, lines of
+  content enclosed by the comments `# <mark>` and `# </mark>` are
+  highlighted in every format. The enclosed lines must be removable
+  without leaving invalid content behind, as they are found by comparing the
+  rendering of the content with and without them.
 
   @returns {template.HTML}
 */}}
@@ -19,8 +21,6 @@
 {{- /* Get parameters. */}}
 {{- $page := .page }}
 {{- $content := .content }}
-{{- $config := .config }}
-{{- $dataKey := .dataKey }}
 {{- $file := .file }}
 {{- $fm := false }}
 {{- if in (slice "false" false 0) .fm }}
@@ -28,40 +28,47 @@
 {{- else if in (slice "true" true 1) .fm }}
   {{- $fm = true }}
 {{- end }}
-{{- $skipHeader := false }}
-{{- if in (slice "false" false 0) .skipHeader }}
-  {{- $skipHeader = false }}
-{{- else if in (slice "true" true 1) .skipHeader }}
-  {{- $skipHeader = true }}
-{{- end }}
 {{- $section := .section }}
 
 {{- /* Define constants. */}}
-{{- $delimiters := dict "toml" "+++" "yaml" "---" }}
-{{- $langs := slice "toml" "yaml" "json" }}
+{{- $delimiters := dict "yaml" "---" "toml" "+++" }}
+{{- $langs := slice "yaml" "toml" "json" }}
 
 {{- /* Render. */}}
-{{- $code := "" }}
-{{- if $config }}
-  {{- $file = $file | default "hugo" }}
-  {{- $sections := (split $config ".") }}
-  {{- $configSection := index $page.Site.Data.docs.config $sections }}
-  {{- $code = dict $sections $configSection }}
-  {{- if $skipHeader }}
-    {{- $code = $configSection }}
-  {{- end }}
-{{- else if $dataKey }}
-  {{- $file = $file | default $dataKey }}
-  {{- $sections := (split $dataKey ".") }}
-  {{- $code = index $page.Site.Data.docs $sections }}
-{{- else }}
-  {{- $code = $content }}
+{{- $code := $content }}
+{{- /* JSON has no comments, so a `#` in it belongs to a string. */}}
+{{- $json := hasPrefix (trim $code "\n\r\t ") "{" }}
+{{- /* The content without its marked lines; equal to the content if nothing is marked. */}}
+{{- $base := $code }}
+{{- if not $json }}
+  {{- $base = $code | replaceRE `(?s)[ \t]*#[ \t]*<mark>.*?#[ \t]*</mark>[^\r\n]*(\r\n|\r|\n)?` "" }}
+  {{- /* Remove comments together with their indentation. */}}
+  {{- $code = $code | replaceRE `[ \t]*#.*(\r\n|\r|\n)?` "" }}
 {{- end }}
-{{- /* Remove toml comments. */}}
-{{- $code = $code | replaceRE `#.*(\r\n|\r|\n)?` "" }}
-{{- $code = trim $code "\n\r\t " }}
-{{- if and $section $code }}
-  {{- $code = printf "[%s]\n%s" $section $code }}
+{{- $marked := ne $base $content }}
+{{- /* Remove blank lines before the content and whitespace after it; the
+  indentation of the first line is kept, as YAML content may be indented as
+  a whole. */}}
+{{- $code = $code | replaceRE `^\s*(\r\n|\r|\n)|\s+$` "" }}
+{{- /* Parse the content here, as `transform.Remarshal` trims a string and
+  with it the indentation of the first line. Nest the parsed content, as
+  prepending a header to its text would let its own table headers escape the
+  section. */}}
+{{- if $code }}
+  {{- $code = transform.Unmarshal $code }}
+  {{- with $section }}
+    {{- $code = dict (split . ".") $code }}
+  {{- end }}
+{{- end }}
+{{- if $marked }}
+  {{- $base = $base | replaceRE `[ \t]*#.*(\r\n|\r|\n)?` "" }}
+  {{- $base = $base | replaceRE `^\s*(\r\n|\r|\n)|\s+$` "" }}
+  {{- if $base }}
+    {{- $base = transform.Unmarshal $base }}
+    {{- with $section }}
+      {{- $base = dict (split . ".") $base }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- $params := dict "page" $page "groupid" "config-code" }}
 {{- with $file }}
@@ -73,11 +80,35 @@
   {{- if $hCode }}
     {{- $hCode = $hCode | transform.Remarshal . }}
   {{- end }}
-  {{- if and $fm (in (slice "toml" "yaml") .) }}
+  {{- $hBase := "" }}
+  {{- if and $marked $base }}
+    {{- $hBase = $base | transform.Remarshal . }}
+  {{- end }}
+  {{- if and $fm (in (slice "yaml" "toml") .) }}
     {{- $placeHolder := (index $delimiters .) }}
     {{- $hCode = printf "%s\n%s%s\n" $placeHolder $hCode $placeHolder }}
+    {{- $hBase = printf "%s\n%s%s\n" $placeHolder $hBase $placeHolder }}
   {{- end }}
-  {{- $contentparam = $contentparam | append (dict "title" . "content" (printf "````%s\n%s````" . $hCode | $page.RenderString)) }}
+  {{- /* The marked lines are those the rendering of the base lacks. Both are
+    walked in step, so this only holds while marking adds lines; a trailing
+    comma is no difference, as JSON sets one once an element follows. */}}
+  {{- $attributes := "" }}
+  {{- if $marked }}
+    {{- $baseLines := split (chomp $hBase) "\n" }}
+    {{- $hlLines := slice }}
+    {{- $j := 0 }}
+    {{- range $i, $line := split (chomp $hCode) "\n" }}
+      {{- if and (lt $j (len $baseLines)) (eq (strings.TrimSuffix "," $line) (strings.TrimSuffix "," (index $baseLines $j))) }}
+        {{- $j = add $j 1 }}
+      {{- else }}
+        {{- $hlLines = $hlLines | append (add $i 1) }}
+      {{- end }}
+    {{- end }}
+    {{- with $hlLines }}
+      {{- $attributes = printf " {hl_Lines=%q}" (delimit . " ") }}
+    {{- end }}
+  {{- end }}
+  {{- $contentparam = $contentparam | append (dict "title" . "content" (printf "````%s%s\n%s````" . $attributes $hCode | $page.RenderString)) }}
 {{- end }}
 {{- $params = $params | merge (dict "content" $contentparam) }}
 {{- partial "shortcodes/tabs.html" $params }}

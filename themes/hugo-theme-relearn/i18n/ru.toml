@@ -22,6 +22,15 @@ other = "{1} результатов найдено для \"{0}\""
 [Clear-History]
 other = "Очистить историю"
 
+[History-cleared]
+other = "История очищена"
+
+[Enlarge-graph]
+other = "Увеличить график"
+
+[Close-graph]
+other = "Закрыть увеличенный график"
+
 [Reset-view]
 other = "Вид на сброс"
 
@@ -44,7 +53,7 @@ other = "Перейти на главную"
 other = "Home"
 
 [Edit-this-page]
-other = "редактировать"
+other = "Редактировать страницу"
 
 [Show-Markdown]
 other = "Показать Markdown"
@@ -57,6 +66,12 @@ other = "Печать всей главы"
 
 [More-action]
 other = "Еще"
+
+[Previous-page]
+other = "Предыдущая страница"
+
+[Next-page]
+other = "Следующая страница"
 
 [shortcuts-menuTitle]
 other = "Еще"
@@ -141,3 +156,66 @@ other = "Версия"
 
 [Browser-unsupported-feature]
 other = "Этот браузер не поддерживает эту функцию"
+
+[Pages-group-fallback]
+other = "Прочее"
+
+[Skip-to-content]
+other = "Перейти к основному содержимому"
+
+[Breadcrumbs]
+other = "Навигационная цепочка"
+
+[Search-page]
+other = "Открыть страницу поиска"
+
+[Close-image]
+other = "Закрыть увеличенное изображение"
+
+[Expand-all]
+other = "Развернуть все"
+
+[Collapse-all]
+other = "Свернуть все"
+
+[Inserted-text-start]
+other = "Начало вставленного текста"
+
+[Inserted-text-end]
+other = "Конец вставленного текста"
+
+[Deleted-text-start]
+other = "Начало удалённого текста"
+
+[Deleted-text-end]
+other = "Конец удалённого текста"
+
+[N-matches-on-page]
+other = "{1} совпадений для \"{0}\" на этой странице"
+
+[Sortable-columns]
+other = "Заголовки столбцов с кнопками позволяют сортировку."
+
+[Sort-key-ascending]
+other = "сортировка на позиции {0}, по возрастанию"
+
+[Sort-key-descending]
+other = "сортировка на позиции {0}, по убыванию"
+
+[Sorted-by-ascending]
+other = "Отсортировано по \"{0}\", по возрастанию"
+
+[Sorted-by-descending]
+other = "Отсортировано по \"{0}\", по убыванию"
+
+[Unsorted-by]
+other = "Больше не отсортировано по \"{0}\""
+
+[Change-sorting]
+other = "Изменить сортировку"
+
+[Reset-sorting]
+other = "Сбросить сортировку"
+
+[Sorting-reset]
+other = "Сортировка сброшена!"

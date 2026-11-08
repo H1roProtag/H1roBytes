@@ -1,11 +1,10 @@
-+++
-title = 'Version 3.0'
-type = 'changelog'
-weight = 0
+---
+params:
+  disableToc: false
+  hidden: true
+title: Version 3.0
+type: changelog
+weight: 0
+---
 
-[params]
-  disableToc = false
-  hidden = true
-+++
-
-{{% pages showhidden="true" showdivider="true" reverse="true" %}}
+{{% pages display="content" hidden="true" orderby="auto desc" %}}

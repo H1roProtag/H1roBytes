@@ -22,6 +22,15 @@ other = "تم العثور على {1} نتيجة لـ \"{0}\""
 [Clear-History]
 other = "مسح السجل"
 
+[History-cleared]
+other = "تم مسح السجل"
+
+[Enlarge-graph]
+other = "تكبير الرسم البياني"
+
+[Close-graph]
+other = "إغلاق الرسم البياني المكبّر"
+
 [Reset-view]
 other = "إعادة تعيين طريقة العرض"
 
@@ -44,7 +53,7 @@ other = "الذهاب إلى الصفحة الرئيسية"
 other = "Home"
 
 [Edit-this-page]
-other = "حرر"
+other = "تحرير الصفحة"
 
 [Show-Markdown]
 other = "إظهار Markdown"
@@ -57,6 +66,12 @@ other = "طباعة الفصل بأكمله"
 
 [More-action]
 other = "المزيد"
+
+[Previous-page]
+other = "الصفحة السابقة"
+
+[Next-page]
+other = "الصفحة التالية"
 
 [shortcuts-menuTitle]
 other = "المزيد"
@@ -141,3 +156,66 @@ other = "إصدار"
 
 [Browser-unsupported-feature]
 other = "هذا المتصفح لا يدعم هذه الميزة"
+
+[Pages-group-fallback]
+other = "أخرى"
+
+[Skip-to-content]
+other = "تخطي إلى المحتوى الرئيسي"
+
+[Breadcrumbs]
+other = "مسار التنقل"
+
+[Search-page]
+other = "فتح صفحة البحث"
+
+[Close-image]
+other = "إغلاق الصورة المكبّرة"
+
+[Expand-all]
+other = "توسيع الكل"
+
+[Collapse-all]
+other = "طي الكل"
+
+[Inserted-text-start]
+other = "بداية النص المُدرج"
+
+[Inserted-text-end]
+other = "نهاية النص المُدرج"
+
+[Deleted-text-start]
+other = "بداية النص المحذوف"
+
+[Deleted-text-end]
+other = "نهاية النص المحذوف"
+
+[N-matches-on-page]
+other = "تم العثور على {1} تطابق لـ \"{0}\" في هذه الصفحة"
+
+[Sortable-columns]
+other = "رؤوس الأعمدة التي تحتوي على أزرار قابلة للفرز."
+
+[Sort-key-ascending]
+other = "مرتب في الموضع {0}، تصاعدي"
+
+[Sort-key-descending]
+other = "مرتب في الموضع {0}، تنازلي"
+
+[Sorted-by-ascending]
+other = "تم الفرز حسب \"{0}\"، تصاعديًا"
+
+[Sorted-by-descending]
+other = "تم الفرز حسب \"{0}\"، تنازليًا"
+
+[Unsorted-by]
+other = "لم يعد مفروزًا حسب \"{0}\""
+
+[Change-sorting]
+other = "تغيير الفرز"
+
+[Reset-sorting]
+other = "إعادة تعيين الفرز"
+
+[Sorting-reset]
+other = "تمت إعادة تعيين الفرز!"

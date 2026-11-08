@@ -1,9 +1,11 @@
 {{- $_hugo_config := `{ "version": 1 }` }}
+{{- $action   := (.Get "action") }}
 {{- $color    := (.Get "color") }}
 {{- $content  := .Inner }}
 {{- $href     := (.Get "href") }}
 {{- $icon     := (.Get "icon") }}
 {{- $image    := (.Get "image") }}
+{{- $imagealt := (.Get "imagealt") }}
 {{- $params   := (.Get "params") }}
 {{- $style    := (.Get "style") }}
 {{- $template := (.Get "template") }}
@@ -13,11 +15,13 @@
     {{- $cards = .Parent.Store.Get "cards" }}
 {{- end }}
 {{- $cards = $cards | append (dict
+    "action"   $action
     "color"    $color
     "content"  $content
     "href"     $href
     "icon"     $icon
     "image"    $image
+    "imagealt" $imagealt
     "params"   $params
     "style"    $style
     "template" $template

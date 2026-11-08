@@ -30,36 +30,40 @@
     {{- end }}
 
     {{- $hrefattributes := .attributes | default dict }}
-    {{- $buttontype := "" }}
-    {{- $isButton := false }}
-    {{- $isLink := false }}
+    {{- $action := (trim .action " ") | default "" }}
+    {{- $onclick := "" }}
+    {{- $hreftitle := "" }}
     {{- $href := (trim .href " ") | default "" }}
-    {{- if or $buttontype (strings.HasPrefix $href "javascript:") }}
-      {{- $isButton = true }}
-      {{- $href = substr $href (len "javascript:") }}
-      {{- if not $buttontype }}
-        {{- $buttontype = "button" }}
-      {{- end }}
+    {{- $code := partial "_relearn/urlScriptCode.gotmpl" $href }}
+    {{- $isScript := ne $code false }}
+    {{- if or $action $isScript }}
+      {{- /* the card becomes a button; its code is no destination to link to */}}
+      {{- $onclick = cond $isScript $code "" }}
+      {{- $href = "" }}
     {{- else if not $href }}
     {{- else }}
-      {{- $isLink = true }}
-      {{- $u := urls.Parse .href }}
-      {{- if $u.IsAbs }}
-        {{- partialCached "_relearn/urlExists.gotmpl" (dict "url" .href "page" $page "type" "link") $u.String }}
-      {{- else }}
-        {{- $linkObject := partial "_relearn/linkObject.gotmpl" (dict "url" .href "page" $page) }}
-        {{- if $linkObject }}
-          {{- $href = partial "_relearn/decoratedLink.gotmpl" (dict "url" .href "page" $page "linkObject" $linkObject "param" "link") }}
-        {{- else }}
-          {{- $filepath := "[virtual file]" }}{{ with and $page $page.File $page.File.Filename }}{{ $filepath = . }}{{ end }}
-          {{- $msg := printf "%q: link '%s' is not a page or a resource" $filepath .href }}
-          {{- partial "_relearn/urlErrorReport.gotmpl" (dict "url" .href "page" $page "param" "link" "msg" $msg) }}
+      {{- $resolved := partial "_relearn/urlResolve.gotmpl" (dict "url" $href "page" $page "param" "link") }}
+      {{- $href = $resolved.href }}
+      {{- with $resolved.linkObject }}
+        {{- /* only a page carries a title; asking a resource for one fails the
+	build instead of answering nothing, hence the `try` */}}
+        {{- $linktitle := try .LinkTitle }}
+        {{- with $linktitle.Value }}
+          {{- $hreftitle = . }}
         {{- end }}
       {{- end }}
+      {{- $hreftitle = $hreftitle | default $href }}
       {{- $hrefattributes = merge $hrefattributes (partial "_relearn/linkAttributes.gotmpl" (dict "url" $href "page" $page)) }}
     {{- end }}
 
-    {{- $imageattributes := dict }}
+    {{- /* an image the card shows without a title is the only content its link
+	has, so it is named after the link's target - its title, or else its URL. An
+	image next to a title repeats what the title already says and is left
+	decorative */}}
+    {{- $imagealt := .imagealt | default "" }}
+    {{- if and (not $imagealt) (not $title) }}
+      {{- $imagealt = $hreftitle }}
+    {{- end }}
     {{- $image := .image }}
     {{- if $image }}
       {{- $page := $page }}
@@ -67,33 +71,20 @@
         {{- /* in case of the children shortcode, we are called in the context of a children page, and need to use that to resolve relative image paths */ -}}
         {{- $page = . }}
       {{- end }}
-      {{- $imageattributes := default dict }}
-      {{- $u := urls.Parse .image }}
-      {{- $image = $u.String }}
-      {{- if $u.IsAbs }}
-        {{- partialCached "_relearn/urlExists.gotmpl" (dict "url" .image "page" $page "type" "image") $u.String }}
-      {{- else }}
-        {{- $linkObject := partial "_relearn/linkObject.gotmpl" (dict "url" .image "page" $page "searchPage" false) }}
-        {{- if $linkObject }}
-          {{- $image = partial "_relearn/decoratedLink.gotmpl" (dict "url" .image "page" $page "linkObject" $linkObject "param" "image") }}
-        {{- else }}
-          {{- $filepath := "[virtual file]" }}{{ with and $page $page.File $page.File.Filename }}{{ $filepath = . }}{{ end }}
-          {{- $msg := printf "%q: image '%s' is not a resource" $filepath .image }}
-          {{- partial "_relearn/urlErrorReport.gotmpl" (dict "url" .image "page" $page "param" "image" "msg" $msg) }}
-        {{- end }}
-      {{- end }}
-      {{- $imageattributes = merge $imageattributes (partial "_relearn/linkAttributes.gotmpl" (dict "url" $image "page" $page)) }}
+      {{- $image = (partial "_relearn/urlResolve.gotmpl" (dict "url" .image "page" $page "param" "image")).href }}
     {{- end }}
 
     {{- if or $image $title $hasContent $params }}
       {{- $cards = $cards | append (dict
+        "action"   $action
         "color"    $color
         "content"  (cond $hasContent $content "")
         "href"     $href
         "hrefattributes" $hrefattributes
         "icon"     $icon
         "image"    $image
-        "imageattributes" $imageattributes
+        "imagealt" $imagealt
+        "onclick"  $onclick
         "params"   $params
         "style"    $style
         "template" $template
@@ -102,8 +93,9 @@
     {{- end }}
   {{- end }}
 {{- end }}
+{{- $columns := (math.Max 1 (math.Min 5 (.columns | default 3 | float))) | int }}
 {{- if len $cards -}}
-<ul class="card-container">
+<ul class="card-container card-columnize card-columnize-{{ $columns }}">
   {{- range $cards }}
     {{- $template = printf "cards/%s.html" .template }}
     {{- $params := merge . (dict "page" $page) }}

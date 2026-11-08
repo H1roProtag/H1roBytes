@@ -19,6 +19,15 @@ other = "{1} találat a(z) \"{0}\" kifejezésre"
 [Clear-History]
 other = "Előzmények törlése"
 
+[History-cleared]
+other = "Előzmények törölve"
+
+[Enlarge-graph]
+other = "Diagram nagyítása"
+
+[Close-graph]
+other = "Nagyított diagram bezárása"
+
 [Reset-view]
 other = "Nézet visszaállítása"
 
@@ -44,7 +53,7 @@ other = "Menj a kezdőlapra"
 other = "Home"
 
 [Edit-this-page]
-other = "Szerkesztés"
+other = "Oldal szerkesztése"
 
 [Show-Markdown]
 other = "Markdown megjelenítése"
@@ -57,6 +66,12 @@ other = "Teljes fejezet nyomtatása"
 
 [More-action]
 other = "Egyebek"
+
+[Previous-page]
+other = "Előző oldal"
+
+[Next-page]
+other = "Következő oldal"
 
 [shortcuts-menuTitle]
 other = "Egyebek"
@@ -141,3 +156,66 @@ other = "Verzió"
 
 [Browser-unsupported-feature]
 other = "Ez a böngésző nem támogatja ezt a funkciót"
+
+[Pages-group-fallback]
+other = "Egyéb"
+
+[Skip-to-content]
+other = "Ugrás a fő tartalomhoz"
+
+[Breadcrumbs]
+other = "Morzsamenü"
+
+[Search-page]
+other = "Keresőoldal megnyitása"
+
+[Close-image]
+other = "Nagyított kép bezárása"
+
+[Expand-all]
+other = "Összes kibontása"
+
+[Collapse-all]
+other = "Összes összecsukása"
+
+[Inserted-text-start]
+other = "Beszúrt szöveg kezdete"
+
+[Inserted-text-end]
+other = "Beszúrt szöveg vége"
+
+[Deleted-text-start]
+other = "Törölt szöveg kezdete"
+
+[Deleted-text-end]
+other = "Törölt szöveg vége"
+
+[N-matches-on-page]
+other = "{1} előfordulás a(z) \"{0}\" kifejezésre ezen az oldalon"
+
+[Sortable-columns]
+other = "A gombbal ellátott oszlopfejlécek szerint rendezhető."
+
+[Sort-key-ascending]
+other = "{0}. helyen rendezve, növekvő"
+
+[Sort-key-descending]
+other = "{0}. helyen rendezve, csökkenő"
+
+[Sorted-by-ascending]
+other = "Rendezve: \"{0}\", növekvő"
+
+[Sorted-by-descending]
+other = "Rendezve: \"{0}\", csökkenő"
+
+[Unsorted-by]
+other = "Már nincs rendezve: \"{0}\""
+
+[Change-sorting]
+other = "Rendezés módosítása"
+
+[Reset-sorting]
+other = "Rendezés visszaállítása"
+
+[Sorting-reset]
+other = "Rendezés visszaállítva!"

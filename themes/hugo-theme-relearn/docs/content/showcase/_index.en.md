@@ -1,14 +1,12 @@
-+++
-title = 'Showcase'
-
-[build]
-  render = 'always'
-  list = 'never'
-  publishResources = true
-
-[params]
-  menuPre = "<i class='fa-fw fas fa-camera'></i> "
-+++
+---
+title: Showcase
+build:
+  render: always
+  list: never
+  publishResources: true
+params:
+  menuPre: '<i class="fa-fw fas fa-camera"></i> '
+---
 
 ## Poésieland by Barbara Post
 
@@ -18,7 +16,7 @@ A collection of poems with requirements for improved taxonomy support, adjusted 
 
 ## GoboLinux Wiki by NEONsys.org
 
-A Linux distribution wiki with customized CSS and the inspiration for the theme's Neon variant.
+A Linux distribution wiki with customized CSS and the inspiration for the theme's [Neon variant](configuration/branding/colors?variant=neon#shipped-variants).
 
 [![GoboLinux image](gobolinux.png?width=60pc&lightbox=false)](https://wiki.gobolinux.org/)
 

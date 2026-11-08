@@ -1,13 +1,13 @@
-+++
-categories = ['reference']
-title = 'Configuration'
-type = 'chapter'
-weight = 2
-
-[params]
-  menuPre = "<i class='fa-fw fas fa-gears'></i> "
-+++
+---
+categories:
+- reference
+params:
+  menuPre: '<i class="fa-fw fas fa-gears"></i> '
+title: Configuration
+type: chapter
+weight: 2
+---
 
 Find out how to configure and customize your site.
 
-{{% children type="list" description=true %}}
+{{% pages display="headings" description=true %}}

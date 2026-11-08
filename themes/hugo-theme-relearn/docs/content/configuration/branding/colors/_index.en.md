@@ -1,35 +1,44 @@
-+++
-categories = ['explanation', 'howto']
-description = "Learn how to customize your site's colors"
-options = ['themeVariant']
-title = 'Colors'
-weight = 2
-+++
+---
+categories:
+- explanation
+- howto
+description: Learn how to customize your site's colors
+options:
+- themeVariant
+- themeVariantPrint
+title: Colors
+weight: 2
+---
 
-The Relearn theme offers color variants to change your site's appearance. Each color variant contains of a CSS file and optional settings in your `hugo.toml`.
+The Relearn theme offers color variants to change your site's appearance. Each color variant contains of a CSS file and optional settings in your project configuration.
 
 You can use the [shipped variants](#shipped-variants), [customize them](#modifying-variants), or create your own. The [interactive variant generator](configuration/branding/generator) can help you with this.
 
-Once set up in `hugo.toml`, you can switch variants using the selector at the bottom of the menu.
+Once set up in your project configuration, you can switch variants using the selector at the bottom of the menu.
 
 ## Shipped Variants
 
 The theme ships with the following set of variants
 
 - Relearn
-  - Light: the classic Relearn default, coming with signature green, dark sidebar and light content area
-  - Dark: dark variant of Light, coming with signature green, dark sidebar and dark content area
-  - Bright: alternative of Light, coming with signature green, green sidebar and light content area
+  - [Light](configuration/branding/colors?variant=relearn-light#shipped-variants): the classic Relearn default, coming with signature green, dark sidebar and light content area
+  - [Dark](configuration/branding/colors?variant=relearn-dark#shipped-variants): dark variant of Light, coming with signature green, dark sidebar and dark content area
 - Zen
-  - Light: a more relaxed white/grey variant, coming with blue accents, light sidebar and light content area
-  - Dark: dark variant of Light, coming with blue accents, dark sidebar and dark content area
+  - [Light](configuration/branding/colors?variant=zen-light#shipped-variants): a more relaxed white/grey variant, coming with blue accents, light sidebar and light content area
+  - [Dark](configuration/branding/colors?variant=zen-dark#shipped-variants): dark variant of Light, coming with blue accents, dark sidebar and dark content area
+- Contrast
+  - [Light](configuration/branding/colors?variant=contrast-light#shipped-variants): [colors chosen for high contrast](configuration/publishing/accessibility), coming with black text on white, darker boxes and a matching syntax highlighting
+  - [Dark](configuration/branding/colors?variant=contrast-dark#shipped-variants): dark variant of Light, coming with white text on black, brighter boxes and a matching syntax highlighting
+- Tome
+  - [Light](configuration/branding/colors?variant=tome-light#shipped-variants): a book-like variant, coming with burgundy accents, calligraphic titles, warm paper tones and a glow around the page
+  - [Dark](configuration/branding/colors?variant=tome-dark#shipped-variants): dark variant of Light, coming with garnet accents, calligraphic titles, dark leather tones and a glow around the page
 - Experimental
-  - Neon: a variant that glows in the dark, gradient sidebar and dark content area
+  - [Neon](configuration/branding/colors?variant=neon#shipped-variants): a variant that glows in the dark, gradient sidebar and dark content area
 - Retro
-  - Learn: the default of the old Learn theme, coming with signature light purple, dark sidebar and light content area
-  - Blue: a blue variant of the old Learn theme, coming tinted in blue, dark sidebar and light content area
-  - Green: a green variant of the old Learn theme, coming tinted in green, dark sidebar and light content area
-  - Red: a red variant of the old Learn theme, coming tinted in red, dark sidebar and light content area
+  - [Learn](configuration/branding/colors?variant=learn#shipped-variants): the default of the old Learn theme, coming with signature light purple, dark sidebar and light content area
+  - [Blue](configuration/branding/colors?variant=blue#shipped-variants): a blue variant of the old Learn theme, coming tinted in blue, dark sidebar and light content area
+  - [Green](configuration/branding/colors?variant=green#shipped-variants): a green variant of the old Learn theme, coming tinted in green, dark sidebar and light content area
+  - [Red](configuration/branding/colors?variant=red#shipped-variants): a red variant of the old Learn theme, coming tinted in red, dark sidebar and light content area
 
 ## Changing the Variant
 
@@ -64,7 +73,7 @@ The first variant is the default, and a selector will appear if there's more tha
 If you want to have more control, where the variant switcher is positioned or you want to configure a different icon, see the [chapter on sidebar configuration](configuration/sidebar/menus#defining-sidebar-menus).
 
 > [!note]
-> The selected theme variant will be [stored in the reader's browser](configuration/sitemanagement/storedinformation).
+> The selected theme variant will be [stored in the reader's browser](configuration/publishing/storedinformation).
 
 #### Adjust to OS Settings
 
@@ -90,7 +99,7 @@ The theme offers an advanced way to configure theme variants and all of the aspe
 
 Like with the [multiple variants](#multiple-variants) option, you are defining your theme variants in an array but now in a table with suboptions.
 
-Again, in this case, the first variant is the default chosen on first view and a variant selector will be shown in the menu footer if the array contains more than one entry.
+Again, in this case, the first variant is the default chosen on first view and a variant selector will be shown in the menu footer if the array contains more than one variant.
 
 {{< multiconfig file=hugo section=params >}}
 themeVariant = [ 'relearn-light', 'relearn-dark' ]
@@ -114,24 +123,97 @@ The `identifier` option is mandatory and equivalent to the string in the first e
 | identifier            | _&lt;empty&gt;_ | Must correspond to the name of a color variant either in your site's or the theme's directory in the form `assets/css/theme-<IDENTIFIER>.css`. |
 | name                  | see notes       | The name to be displayed in the variant selector. If not set, the identifier is used in a human readable form. |
 | auto                  | _&lt;empty&gt;_ | If set, the variant is treated as an [auto mode variant](#adjust-to-os-settings). It has the same behavior as the `themeVariantAuto` option. The first entry in the array is the color variant for light mode, the second for dark mode. Defining auto mode variants with the advanced options has the benefit that you can now have multiple auto mode variants instead of just one with the simple options. |
-| logo                  | _&lt;empty&gt;_ | [Override for the default logo](configuration/branding/logo#variant-specific-logos) |
+| params                | _&lt;empty&gt;_ | Values of the site's `params` that are overridden while this variant is active, see [below](#variant-parameters). |
+| hidden                | `false`         | If `true`, the variant will not be shown in the variant switcher but is still available for internal use (e.g. to override parameter when used as a sub-variant of an auto mode variant). |
+| print                 | see notes       | The [print variant](#theme-variant-print) used instead of this variant when printing. If not set, the one of the `themeVariantPrint` option is used. An auto mode variant ignores it and prints with the print variants of its light and dark variant. |
+
+#### Variant Parameters
+
+Some of the site's `params` can be given a different value for a variant by setting it in the variant's `params`. While the variant is active, it takes the place of the site's value.
+
+| Name                  | Notes       |
+|-----------------------|-------------|
+| logo                  | [Logo of the variant](configuration/branding/logo#variant-specific-logos), only its `src` |
+
+{{< multiconfig file=hugo section=params >}}
+themeVariant = [
+	{ identifier = 'relearn-light' },
+	{ identifier = 'neon',         params = { logo = { src = '/images/logo-neon.svg' } } }
+]
+{{< /multiconfig >}}
+
+#### Dividers
+
+To group the entries of the variant switcher, put an entry `{ type = 'divider' }` between them. It draws a line in the variant switcher and is no variant itself.
+
+Give the divider a `name` to label the group following it, like `{ type = 'divider', name = 'Classic' }`. A named divider may also stand first to label the first group.
+
+Of consecutive dividers only the last one is kept. Trailing dividers are dropped, as are leading ones without a name.
 
 #### Example Configuration
 
 {{< multiconfig file=hugo section=params >}}
 themeVariant = [
+	{ type = 'divider',             name = 'Modern' },
 	{ identifier = 'relearn-auto',  name = 'Relearn Light/Dark', auto = [] },
 	{ identifier = 'relearn-light'  },
 	{ identifier = 'relearn-dark'   },
-	{ identifier = 'relearn-bright' },
+	{ type = 'divider'              },
 	{ identifier = 'zen-auto',      name = 'Zen Light/Dark', auto = [ 'zen-light', 'zen-dark' ] },
 	{ identifier = 'zen-light'      },
 	{ identifier = 'zen-dark'       },
+	{ type = 'divider',             name = 'Classic' },
 	{ identifier = 'retro-auto',    name = 'Retro Learn/Neon', auto = [ 'learn', 'neon' ] },
 	{ identifier = 'neon'           },
 	{ identifier = 'learn'          }
 ]
 {{< /multiconfig >}}
+
+### Print Variant {#theme-variant-print}
+
+When a page is printed or shown as its [print version](configuration/sitemanagement/outputformats#print-support), it doesn't use the variant selected by the reader but its print variant, with the theme's print variables on top.
+
+The print variables set every color that depends on a light or dark background to values made for paper, with links, titles, code, boxes and the topbar in black on white. So the print shows the fonts of the print variant but the colors of paper. The print variables are in the theme's `assets/css/format-print-variables.css`. To change them for your site, copy the file into your site's `assets/css` directory and edit it. To keep a single value of a print variant on paper, mark it `!important` in the variant.
+
+````css {title="assets/css/theme-my-light.css"}
+:root {
+  --MAIN-LINK-color: rgba( 0, 0, 255, 1 ) !important; /* blue links also on paper */
+}
+````
+
+{{% badge style="option" %}}Option{{% /badge %}} Set `themeVariantPrint` to the print variant of your site. Default is `relearn-light`.
+
+{{< multiconfig file=hugo section=params >}}
+themeVariantPrint = 'zen-light'
+{{< /multiconfig >}}
+
+With the [advanced configuration](#theme-variant-advanced), each variant can name its own print variant with the `print` parameter, which wins over `themeVariantPrint`. A variant naming itself prints with its own fonts.
+
+If a print variant has a different print variant itself, by its `print` parameter or by `themeVariantPrint`, that one is used instead, and so on, until a variant names itself. If this comes back to a variant already visited, the build stops with an error. An auto mode variant prints with the print variants of its light and dark variant, following the reader's OS setting.
+
+In the following example, both variants print with the fonts of the light variant.
+
+{{< multiconfig file=hugo section=params >}}
+themeVariant = [
+	{ identifier = 'my-auto',  auto = [ 'my-light', 'my-dark' ] },
+	{ identifier = 'my-light', print = 'my-light' },
+	{ identifier = 'my-dark',  print = 'my-light' }
+]
+{{< /multiconfig >}}
+
+A print variant doesn't need to be part of `themeVariant`. If you list it, set it `hidden` to keep it out of the variant switcher.
+
+The style rules of a print variant apply to the print as well. If your variant contains style rules that are meant for the screen only, wrap them as follows. The print version of a page is shown on screen too, so `@media screen` alone is not enough.
+
+````css {title="assets/css/theme-my-dark.css"}
+:root:not([data-r-output-format='print']) {
+  @media screen {
+    h1 {
+      text-shadow: 0 0 4px rgba( 255, 255, 255, 1 ); /* a glow, only for the screen */
+    }
+  }
+}
+````
 
 ## Advanced Topics
 
@@ -139,17 +221,25 @@ themeVariant = [
 
 You can [override the default logo](configuration/branding/logo#variant-specific-logos) of a site for each variant.
 
+### Linking to a Variant
+
+You can select a variant by adding the query parameter `variant`, containing the identifier of the variant, to the URL of any page of your site, e.g. `https://example.com/my-page?variant=relearn-dark`. This also works for [links in your content](authoring/linking/pages#links-to-a-color-variant).
+
+This has the same effect as if the reader had selected the variant with the variant switcher: The selection is [stored in the reader's browser](configuration/publishing/storedinformation), replacing a previous one, and carried over to the following presented pages. The query parameter is removed from the URL in the browser's address bar afterwards.
+
+The variant must be one of your configured variants and must not be `hidden`. Otherwise the query parameter is ignored.
+
 ### Modifying Variants
 
 In case you like a shipped variant but only want to tweak some aspects, you have some choices. **Don't edit the file in the theme's directory!** You will lose the ability to later easily upgrade your theme to a newer version.
 
 1. Copy and change
 
-    You can copy the shipped variant file from the theme's `themes/hugo-theme-relearn/assets/css` directory to the site's `assets/css` directory and either store it with the same name or give it a new name. Edit the settings and save the new file. Afterwards, you can use it in your `hugo.toml` by the chosen name.
+    You can copy the shipped variant file from the theme's `themes/hugo-theme-relearn/assets/css` directory to the site's `assets/css` directory and either store it with the same name or give it a new name. Edit the settings and save the new file. Afterwards, you can use it in your project configuration by the chosen name.
 
 2. Create and import
 
-    You can create a new variant file in the site's `assets/css` directory and give it a new name. Import the shipped variant, add the settings you want to change and save the new file. Afterwards, you can use it in your `hugo.toml` by the chosen name.
+    You can create a new variant file in the site's `assets/css` directory and give it a new name. Import the shipped variant, add the settings you want to change and save the new file. Afterwards, you can use it in your project configuration by the chosen name.
 
     For example, you want to use the `relearn-light` variant but want to change the syntax highlighting schema to the one used in the `neon` variant. For that, create a new `assets/css/theme-my-branding.css` in your site's directory and add the following lines:
 
@@ -163,7 +253,7 @@ In case you like a shipped variant but only want to tweak some aspects, you have
     }
     ````
 
-    Afterwards, put this in your `hugo.toml` to use your new variant:
+    Afterwards, put this in your project configuration to use your new variant:
 
     {{< multiconfig file=hugo section=params >}}
     themeVariant = 'my-branding'

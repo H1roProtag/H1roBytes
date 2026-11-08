@@ -1,5 +1,5 @@
 baseURL = 'https://hirobytes.xyz'
-languageCode = 'en-us'
+locale = 'en-us'
 title = 'H1roBytes'
 theme = 'hugo-theme-relearn'
 
@@ -69,29 +69,9 @@ theme = 'hugo-theme-relearn'
   # If set to true, hide table of contents menu in the header of all pages
   disableToc = false
 
-  # Load MathJax on every page regardless if a MathJax shortcode is present
-  math = true
-
-  # Specifies the remote location of the MathJax js
-  customMathJaxURL = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
-
-  # Initialization parameter for MathJax, see MathJax documentation
-  mathJaxInitialize = "{}"
-
-  # Load Mermaid on every page regardless if a Mermaid shortcode or codefence is present
-  mermaid = true
-
-  # Specifies the remote location of the Mermaid js
-  customMermaidURL = "https://unpkg.com/mermaid/dist/mermaid.min.js"
-
-  # Initialization parameter for Mermaid, see Mermaid documentation
-  mermaidInitialize = "{ \"theme\": \"default\" }"
-
-  # Load OpenAPI on every page regardless if an OpenAPI shortcode is present
-  openapi = true
-
-  # Specifies the remote location of the swagger-ui js
-  customOpenapiURL = "https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"
+  # Math (KaTeX), Mermaid, and OpenAPI/Swagger-UI are disabled by default and
+  # load automatically on the pages that use them; the theme ships these
+  # libraries itself, so no CDN URLs are configured
 
   # Hide Next and Previous page buttons displayed in topbar
   disableNextPrev = true
@@ -101,7 +81,7 @@ theme = 'hugo-theme-relearn'
   ordersectionsby = "weight"
 
   # Change default color scheme with a variant one. Eg. can be "auto", "red", "blue", "green" or an array like ["blue", "green"]. Options "auto", "relearn-bright", "relearn-light", "relearn-dark", "zen-light", "zen-dark", "neon", "learn", "blue", "green", "red".
-  themeVariant = ["relearn-dark", "zen-dark", "relearn-bright", "relearn-light", "zen-light", "neon", "learn", "blue", "green", "red"]
+  themeVariant = ["relearn-dark", "zen-dark", "relearn-light", "zen-light", "neon", "learn", "blue", "green", "red"]
   themeVariantAuto = [ "relearn-dark" ]
 
   # Change the breadcrumb separator. Default to ">".

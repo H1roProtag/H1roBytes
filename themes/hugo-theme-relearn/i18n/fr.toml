@@ -22,6 +22,15 @@ other = "{1} résultats trouvés pour \"{0}\""
 [Clear-History]
 other = "Supprimer l'historique"
 
+[History-cleared]
+other = "Historique supprimé"
+
+[Enlarge-graph]
+other = "Agrandir le graphique"
+
+[Close-graph]
+other = "Fermer le graphique agrandi"
+
 [Reset-view]
 other = "Réinitialiser la vue"
 
@@ -44,7 +53,7 @@ other = "Vers la page d'accueil"
 other = "Home"
 
 [Edit-this-page]
-other = "Éditer"
+other = "Modifier la page"
 
 [Show-Markdown]
 other = "Afficher Markdown"
@@ -57,6 +66,12 @@ other = "Imprimer le chapitre entier"
 
 [More-action]
 other = "Aller plus loin"
+
+[Previous-page]
+other = "Page précédente"
+
+[Next-page]
+other = "Page suivante"
 
 [shortcuts-menuTitle]
 other = "Aller plus loin"
@@ -141,3 +156,66 @@ other = "Version"
 
 [Browser-unsupported-feature]
 other = "Ce navigateur ne prend pas en charge cette fonctionnalité"
+
+[Pages-group-fallback]
+other = "Autres"
+
+[Skip-to-content]
+other = "Aller au contenu principal"
+
+[Breadcrumbs]
+other = "Fil d'Ariane"
+
+[Search-page]
+other = "Ouvrir la page de recherche"
+
+[Close-image]
+other = "Fermer l'image agrandie"
+
+[Expand-all]
+other = "Tout développer"
+
+[Collapse-all]
+other = "Tout réduire"
+
+[Inserted-text-start]
+other = "Début du texte inséré"
+
+[Inserted-text-end]
+other = "Fin du texte inséré"
+
+[Deleted-text-start]
+other = "Début du texte supprimé"
+
+[Deleted-text-end]
+other = "Fin du texte supprimé"
+
+[N-matches-on-page]
+other = "{1} occurrences de \"{0}\" sur cette page"
+
+[Sortable-columns]
+other = "Les en-têtes de colonne avec des boutons permettent le tri."
+
+[Sort-key-ascending]
+other = "trié en position {0}, croissant"
+
+[Sort-key-descending]
+other = "trié en position {0}, décroissant"
+
+[Sorted-by-ascending]
+other = "Trié par \"{0}\", croissant"
+
+[Sorted-by-descending]
+other = "Trié par \"{0}\", décroissant"
+
+[Unsorted-by]
+other = "N'est plus trié par \"{0}\""
+
+[Change-sorting]
+other = "Modifier le tri"
+
+[Reset-sorting]
+other = "Réinitialiser le tri"
+
+[Sorting-reset]
+other = "Tri réinitialisé!"

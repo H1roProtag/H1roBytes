@@ -1,8 +1,8 @@
-+++
-[build]
-  render = 'never'
-  list = 'never'
-  publishResources = false
-+++
+---
+build:
+  render: never
+  list: never
+  publishResources: false
+---
 
-{{%children type="list" description="true" %}}
+{{% pages display="headings" description="true" %}}

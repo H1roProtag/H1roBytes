@@ -22,6 +22,15 @@ other = "{1} results found for \"{0}\""
 [Clear-History]
 other = "Clear History"
 
+[History-cleared]
+other = "History cleared"
+
+[Enlarge-graph]
+other = "Enlarge graph"
+
+[Close-graph]
+other = "Close enlarged graph"
+
 [Reset-view]
 other = "Reset view"
 
@@ -44,7 +53,7 @@ other = "Go to homepage"
 other = "Home"
 
 [Edit-this-page]
-other = "Edit"
+other = "Edit page"
 
 [Show-Markdown]
 other = "Show Markdown"
@@ -57,6 +66,12 @@ other = "Print whole chapter"
 
 [More-action]
 other = "More"
+
+[Previous-page]
+other = "Previous page"
+
+[Next-page]
+other = "Next page"
 
 [shortcuts-menuTitle]
 other = "More"
@@ -141,3 +156,66 @@ other = "Version"
 
 [Browser-unsupported-feature]
 other = "This browser doesn't support this feature"
+
+[Pages-group-fallback]
+other = "Other"
+
+[Skip-to-content]
+other = "Skip to main content"
+
+[Breadcrumbs]
+other = "Breadcrumbs"
+
+[Search-page]
+other = "Open search page"
+
+[Close-image]
+other = "Close enlarged image"
+
+[Expand-all]
+other = "Expand all"
+
+[Collapse-all]
+other = "Collapse all"
+
+[Inserted-text-start]
+other = "Start of inserted text"
+
+[Inserted-text-end]
+other = "End of inserted text"
+
+[Deleted-text-start]
+other = "Start of deleted text"
+
+[Deleted-text-end]
+other = "End of deleted text"
+
+[N-matches-on-page]
+other = "{1} matches for \"{0}\" on this page"
+
+[Sortable-columns]
+other = "Column headers with buttons are sortable."
+
+[Sort-key-ascending]
+other = "sorted at position {0}, ascending"
+
+[Sort-key-descending]
+other = "sorted at position {0}, descending"
+
+[Sorted-by-ascending]
+other = "Sorted by \"{0}\", ascending"
+
+[Sorted-by-descending]
+other = "Sorted by \"{0}\", descending"
+
+[Unsorted-by]
+other = "No longer sorted by \"{0}\""
+
+[Change-sorting]
+other = "Change sorting"
+
+[Reset-sorting]
+other = "Reset sorting"
+
+[Sorting-reset]
+other = "Sorting reset!"

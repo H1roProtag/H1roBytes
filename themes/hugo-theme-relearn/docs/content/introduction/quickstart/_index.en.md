@@ -1,9 +1,10 @@
-+++
-categories = ['tutorial']
-description = 'Initialize your website in a few simple steps'
-title = 'Getting Started'
-weight = 1
-+++
+---
+categories:
+- tutorial
+description: Initialize your website in a few simple steps
+title: Getting Started
+weight: 1
+---
 
 Here's how to start your new website. If you're new to Hugo, we recommend learning more about it in its excellent [starter's guide](https://gohugo.io/getting-started/).
 
@@ -12,16 +13,16 @@ Here's how to start your new website. If you're new to Hugo, we recommend learni
 
 ## Install Hugo
 
-Download and install Hugo {{% badge style="hugo" %}}0.141.0{{% /badge %}} or newer for your operating system [following the instructions](https://gohugo.io/installation/).
+Download and install Hugo {{% badge style="hugo" %}}0.166.0{{% /badge %}} or newer for your operating system [following the instructions](https://gohugo.io/installation/).
 
 The _standard_ edition of Hugo is sufficient but you can also use the _extended_ edition.
 
 ## Create your Project
 
-Use Hugo's `new site` command to make a new website
+Use Hugo's `new site` command to make a new website with its project configuration in a `hugo.yaml` file
 
 ````shell
-hugo new site my-new-site
+hugo new site my-new-site --format yaml
 ````
 
 Then move into the new directory
@@ -34,11 +35,33 @@ Run all following commands from this directory.
 
 ## Install the Theme
 
-### Download as a Zip File
+### Use a Downloaded Archive
 
-You can [download the theme as a .zip file](https://github.com/McShelby/hugo-theme-relearn/archive/main.zip) and unzip it into the `themes/hugo-theme-relearn` directory.
+Download the theme from GitHub and extract it into the `themes/hugo-theme-relearn` directory
 
-Then add this at the top of your `hugo.toml`
+````shell
+mkdir "themes/hugo-theme-relearn"
+curl -L https://github.com/McShelby/hugo-theme-relearn/archive/main.tar.gz | tar -xz --strip-components=1 -C "themes/hugo-theme-relearn"
+````
+
+This doesn't work in Windows PowerShell 5.1. Use `cmd` or PowerShell 7 instead.
+
+Then add this **at the top** of your project configuration
+
+{{< multiconfig file=hugo >}}
+theme = 'hugo-theme-relearn'
+{{< /multiconfig >}}
+
+### Use as a Git Submodule
+
+If you want to use [Git](https://git-scm.com/) for your project, create a repository and add the theme as a Git submodule
+
+````shell
+git init -b main
+git submodule add --depth 1 https://github.com/McShelby/hugo-theme-relearn.git themes/hugo-theme-relearn
+````
+
+Then add this **at the top** of your project configuration
 
 {{< multiconfig file=hugo >}}
 theme = 'hugo-theme-relearn'
@@ -46,38 +69,18 @@ theme = 'hugo-theme-relearn'
 
 ### Use Hugo's Module System
 
-Install the Relearn theme using [Hugo's module system](https://gohugo.io/hugo-modules/use-modules/#use-a-module-for-a-theme)
+Install the Relearn theme using [Hugo's module system](https://gohugo.io/hugo-modules/use-modules/#import), which requires [Go](https://go.dev/dl/) to be installed
 
 ````shell
 hugo mod init example.com
 ````
 
-Then add this at the end of your `hugo.toml`
+Then add this **at the bottom** of your project configuration
 
 {{< multiconfig file=hugo >}}
 [module]
   [[module.imports]]
     path = 'github.com/McShelby/hugo-theme-relearn'
-{{< /multiconfig >}}
-
-### Use as a Git Submodule
-
-If you're using [Git](https://git-scm.com/) for your project, you can create a repository now
-
-````shell
-git init
-````
-
-Add the theme as a Git submodule
-
-````shell
-git submodule add --depth 1 https://github.com/McShelby/hugo-theme-relearn.git themes/hugo-theme-relearn
-````
-
-Then add this at the top of your `hugo.toml`
-
-{{< multiconfig file=hugo >}}
-theme = 'hugo-theme-relearn'
 {{< /multiconfig >}}
 
 ## Create Content

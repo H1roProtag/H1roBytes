@@ -1,11 +1,11 @@
-+++
-categories = ['reference']
-description = 'Configure the content area of your site'
-title = 'Content'
-weight = 4
+---
+categories:
+- reference
+description: Configure the content area of your site
+params:
+  alwaysopen: false
+title: Content
+weight: 4
+---
 
-[params]
-  alwaysopen = false
-+++
-
-{{% children type="list" description=true %}}
+{{% pages display="headings" description=true %}}

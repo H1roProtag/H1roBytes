@@ -1,74 +1,38 @@
-+++
-categories = ['howto', 'reference']
-description = 'Render code with a syntax highlighter'
-frontmatter = ['highlightWrap']
-options = ['disableHoverBlockCopyToClipBoard', 'disableInlineCopyToClipBoard', 'highlightWrap']
-title = 'Highlight'
-+++
+---
+categories:
+- howto
+- reference
+description: Render code with a syntax highlighter
+frontmatter:
+- highlightWrap
+options:
+- disableHoverBlockCopyToClipBoard
+- disableInlineCopyToClipBoard
+- highlightWrap
+title: Highlight
+---
 
 The `highlight` shortcode renders your code with a syntax highlighter.
 
-{{< highlight lineNos="true" type="py" wrap="true" title="python" >}}
-print("Hello World!")
-{{< /highlight >}}
+{{% multishortcode name="highlight" print="false" %}}
+lineNos: "true"
+type: "py"
+wrap: "true"
+title: "python"
+content: |
+  print("Hello World!")
+{{% /multishortcode %}}
 
 ## Usage
 
-{{< tabs groupid="shortcode-parameter">}}
-{{% tab title="markdown" %}}
-
-````md
-```py {lineNos="true" wrap="true" title="python"}
-print("Hello World!")
-```
-````
-
-{{% /tab %}}
-{{% tab title="shortcode" %}}
-
-````go
-{{</* highlight lineNos="true" type="py" wrap="true" title="python" */>}}
-print("Hello World!")
-{{</* /highlight */>}}
-````
-
-{{% /tab %}}
-{{% tab title="shortcode (positional)" %}}
-
-````go
-{{</* highlight py "lineNos=true,wrap=true,title=python" */>}}
-print("Hello World!")
-{{</* /highlight */>}}
-````
-
-{{% /tab %}}
-{{% tab title="partial" %}}
-
-````go
-{{ partial "shortcodes/highlight.html" (dict
-  "page"    .
-  "content" "print(\"Hello World!\")"
-  "lineNos" "true"
-  "type"    "py"
-  "wrap"    "true"
-  "title"   "python"
-)}}
-````
-
-{{% /tab %}}
-{{% tab title="partial (compat)" %}}
-
-````go
-{{ partial "shortcodes/highlight.html" (dict
-  "page"    .
-  "content" "print(\"Hello World!\")"
-  "options" "lineNos=true,wrap=true,title=python"
-  "type"    "py"
-)}}
-````
-
-{{% /tab %}}
-{{< /tabs >}}
+{{% multishortcode name="highlight" execute="false" %}}
+lineNos: "true"
+type: "py"
+wrap: "true"
+title: "python"
+content: |
+  print("Hello World!")
+{{% /multishortcode %}}
 
 This shortcode is fully compatible with Hugo's [`highlight` shortcode](https://gohugo.io/content-management/syntax-highlighting/#highlight-shortcode) but **offers some extensions**.
 
@@ -78,15 +42,15 @@ You are free to also call this shortcode from your own partials. In this case it
 
 Markdown codefence syntax is widely available in other Markdown parsers like GitHub and therefore is the recommended syntax for generating portable Markdown.
 
-The [`tab` shortcode](shortcodes/tab) is also capable of displaying code but with limited options.
+The [`tab` shortcode](shortcodes/tabs#single-tab) is also capable of displaying code but with limited options.
 
 ### Parameters
 
 | Name                  | Position | Default          | Notes       |
 |-----------------------|--------- | -----------------|-------------|
 | **type**              | 1        | _&lt;empty&gt;_  | The language of the code to highlight. Choose from one of the [supported languages](https://gohugo.io/content-management/syntax-highlighting/#list-of-chroma-highlighting-languages). Case-insensitive. |
-| **title**             |          | _&lt;empty&gt;_  | **Extension**. Arbitrary title for code. This displays the code like a [single tab](shortcodes/tab) if `hl_inline=false` (which is Hugo's default). |
-| **wrap**              |          | see notes        | **Extension**. When `true` the content may wrap on long lines otherwise it will be scrollable.<br><br>The default value can be set in your `hugo.toml` and overwritten via front matter. [See below](#setting-wrap-of-long-lines). |
+| **title**             |          | _&lt;empty&gt;_  | **Extension**. Arbitrary title for code. This displays the code like a [single tab](shortcodes/tabs#single-tab) if `hl_inline=false` (which is Hugo's default). |
+| **wrap**              |          | see notes        | **Extension**. When `true` the content may wrap on long lines otherwise it will be scrollable.<br><br>The default value can be set in your project configuration and overwritten via front matter. [See below](#setting-wrap-of-long-lines). |
 | **options**           | 2        | _&lt;empty&gt;_  | An optional, comma-separated list of zero or more [Hugo supported options](https://gohugo.io/functions/highlight/#options) as well as extension parameter from this table. |
 | _**&lt;option&gt;**_  |          | _&lt;empty&gt;_  | Any of [Hugo's supported options](https://gohugo.io/functions/highlight/#options). |
 | _**&lt;content&gt;**_ |          | _&lt;empty&gt;_  | Your code to highlight. |
@@ -109,7 +73,7 @@ If used together with wrapping of long lines, use this recommended settings. Oth
 
 {{% badge style="option" %}}Option{{% /badge %}} {{% badge style="frontmatter" %}}Front Matter{{% /badge %}} By default, code will be wrapped if the line is not long enough.
 
-You can disable wrapping by setting `highlightWrap=false` or by setting the [`wrap` parameter](#parameters) individually for each code block.
+You can disable wrapping by setting `highlightWrap` to `false` or by setting the [`wrap` parameter](#parameters) individually for each code block.
 
 {{< multiconfig section=params >}}
 highlightWrap=false
@@ -119,7 +83,7 @@ highlightWrap=false
 
 {{% badge style="option" %}}Option{{% /badge %}} By default inline code has a button to copy the code to the clipboard.
 
-If you want to disable this feature, set `disableInlineCopyToClipBoard=true`.
+If you want to disable this feature, set `disableInlineCopyToClipBoard` to `true`.
 
 {{< multiconfig file=hugo section=params >}}
 disableInlineCopyToClipBoard = true
@@ -129,7 +93,7 @@ disableInlineCopyToClipBoard = true
 
 {{% badge style="option" %}}Option{{% /badge %}} By default block code has a button to copy the code to the clipboard that is only visible on hover.
 
-Set `disableHoverBlockCopyToClipBoard=true` to disable the hover effect and always show the button.
+Set `disableHoverBlockCopyToClipBoard` to `true` to disable the hover effect and always show the button.
 
 {{< multiconfig file=hugo section=params >}}
 disableHoverBlockCopyToClipBoard = true
@@ -143,71 +107,50 @@ You can configure the color style used for code blocks in your [color variants s
 
 ### Line Numbers with Starting Offset
 
-As mentioned above, line numbers in a `table` layout will shift if code is wrapping, so better use `inline`. To make things easier for you, set `lineNumbersInTable = false` in your `hugo.toml` and add `lineNos = true` when calling the shortcode instead of the specific values `table` or `inline`.
+As mentioned above, line numbers in a `table` layout will shift if code is wrapping, so better use `inline`. To make things easier for you, set `markup.highlight.lineNumbersInTable` to `false` in your project configuration and add `lineNos=true` when calling the shortcode instead of the specific values `table` or `inline`.
 
-````go
-{{</* highlight lineNos="true" lineNoStart="666" type="py" */>}}
-# the hardest part is to start writing code; here's a kickstart; just copy and paste this; it's free; the next lines will cost you serious credits
-print("Hello")
-print(" ")
-print("World")
-print("!")
-{{</* /highlight */>}}
-````
+{{% multishortcode name="highlight" %}}
+lineNos: "true"
+lineNoStart: "666"
+type: "py"
+content: |
+  # the hardest part is to start writing code; here's a kickstart; just copy and paste this; it's free; the next lines will cost you serious credits
+  print("Hello")
+  print(" ")
+  print("World")
+  print("!")
+{{% /multishortcode %}}
 
-{{< highlight lineNos="true" lineNoStart="666" type="py" >}}
-# the hardest part is to start writing code; here's a kickstart; just copy and paste this; it's free; the next lines will cost you serious credits
-print("Hello")
-print(" ")
-print("World")
-print("!")
-{{< /highlight >}}
+### With Title
 
-### Markdown Codefence with Title
-
-
-````md
-```py { title="python" }
-# a bit shorter
-print("Hello World!")
-```
-````
-
-```py { title="python" }
-# a bit shorter
-print("Hello World!")
-```
-
-
+{{% multishortcode name="highlight" %}}
+type: "py"
+title: "python"
+content: |
+  # a bit shorter
+  print("Hello World!")
+{{% /multishortcode %}}
 
 ### With Wrap
 
-````go
-{{</* highlight type="py" wrap="true" hl_lines="2" */>}}
-# Quicksort Python One-liner
-lambda L: [] if L==[] else qsort([x for x in L[1:] if x< L[0]]) + L[0:1] + qsort([x for x in L[1:] if x>=L[0]])
-# Some more stuff
-{{</* /highlight */>}}
-````
-
-{{< highlight type="py" wrap="true" hl_lines="2" >}}
-# Quicksort Python One-liner
-lambda L: [] if L==[] else qsort([x for x in L[1:] if x< L[0]]) + L[0:1] + qsort([x for x in L[1:] if x>=L[0]])
-# Some more stuff
-{{< /highlight >}}
+{{% multishortcode name="highlight" %}}
+type: "py"
+wrap: "true"
+hl_lines: "2"
+content: |
+  # Quicksort Python One-liner
+  lambda L: [] if L==[] else qsort([x for x in L[1:] if x< L[0]]) + L[0:1] + qsort([x for x in L[1:] if x>=L[0]])
+  # Some more stuff
+{{% /multishortcode %}}
 
 ### Without Wrap
 
-````go
-{{</* highlight type="py" wrap="false" hl_lines="2" */>}}
-# Quicksort Python One-liner
-lambda L: [] if L==[] else qsort([x for x in L[1:] if x< L[0]]) + L[0:1] + qsort([x for x in L[1:] if x>=L[0]])
-# Some more stuff
-{{</* /highlight */>}}
-````
-
-{{< highlight type="py" wrap="false" hl_lines="2">}}
-# Quicksort Python One-liner
-lambda L: [] if L==[] else qsort([x for x in L[1:] if x< L[0]]) + L[0:1] + qsort([x for x in L[1:] if x>=L[0]])
-# Some more stuff
-{{< /highlight >}}
+{{% multishortcode name="highlight" %}}
+type: "py"
+wrap: "false"
+hl_lines: "2"
+content: |
+  # Quicksort Python One-liner
+  lambda L: [] if L==[] else qsort([x for x in L[1:] if x< L[0]]) + L[0:1] + qsort([x for x in L[1:] if x>=L[0]])
+  # Some more stuff
+{{% /multishortcode %}}

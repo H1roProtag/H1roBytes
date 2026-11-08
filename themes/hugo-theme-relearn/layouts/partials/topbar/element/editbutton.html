@@ -1,0 +1,48 @@
+{{- $element := partial "_relearn/topbarElementParams.gotmpl" (dict "context" . "type" "editbutton") }}
+{{- $onwidths := cond (isset $element "onwidths") $element.onwidths "area-more" }}
+{{- $onwidthm := cond (isset $element "onwidthm") $element.onwidthm "show" }}
+{{- $onwidthl := cond (isset $element "onwidthl") $element.onwidthl "show" }}
+{{- $titleonwidths := cond (isset $element "titleonwidths") $element.titleonwidths "hide" }}
+{{- $titleonwidthm := cond (isset $element "titleonwidthm") $element.titleonwidthm "hide" }}
+{{- $titleonwidthl := cond (isset $element "titleonwidthl") $element.titleonwidthl "hide" }}
+{{- with .page }}
+	{{- $show := .File }}
+	{{- if $show }}
+		{{- $show = not (partial "_relearn/pageIsSpecial.gotmpl" .) }}
+	{{- end }}
+	{{- if $show }}
+		{{- $filePath := printf "%s%s" (strings.TrimLeft "/" (replace .File.Dir "\\" "/")) .File.LogicalName }}
+		{{- /* the directory $filePath is resolved against, written as a URL spells
+		a path: forward slashes and no leading slash, so it can be appended to a
+		URL prefix on Windows and Unix alike */}}
+		{{- $baseDir := strings.TrimLeft "/" (strings.TrimSuffix "/" (strings.TrimSuffix $filePath (replace .File.Filename "\\" "/"))) }}
+		{{- $href := "" }}
+		{{- if site.Params.editURL }}
+			{{- $href = site.Params.editURL }}
+			{{- if not (strings.Contains $href "${FilePath}") }}
+				{{- $href = printf "%s%s" $href "${FilePath}" }}
+			{{- end }}
+		{{- end }}
+		{{- if isset .Params "editurl" }}
+			{{- $href = .Params.editURL }}
+		{{- end }}
+		{{- $href = strings.Replace $href "${BaseDir}" $baseDir }}
+		{{- $href = strings.Replace $href "${FilePath}" $filePath }}
+		{{- if $href }}
+			{{- partial "topbar/func/button.html" (dict
+				"page" .
+				"class" "topbar-button-edit"
+				"href" $href
+				"icon" "pen"
+				"onwidths" $onwidths
+				"onwidthm" $onwidthm
+				"onwidthl" $onwidthl
+				"titleonwidths" $titleonwidths
+				"titleonwidthm" $titleonwidthm
+				"titleonwidthl" $titleonwidthl
+				"title" (T "Edit-this-page")
+				"hint" (printf "%s (CTRL+ALT+w)" (T "Edit-this-page"))
+			)}}
+		{{- end }}
+	{{- end }}
+{{- end }}

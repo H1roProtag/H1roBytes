@@ -110,9 +110,9 @@ Next I ran ```show options``` to see which options I needed to set. The only thi
 
 Type ```run``` or ```exploit``` to start the attack.
 
-{{% notice style="note" %}}
+{{% callout style="note" %}}
 I did switch from a Kali VM to TryHackMe's attackbox here due to some network throttling.
-{{% /notice %}} 
+{{% /callout %}} 
 
 ![MetasploitShell](task2_metasploitShell.png)
 
@@ -134,9 +134,9 @@ On your machine you will want do download a Powershell script called PowerUp. Fi
 
 Select "Raw". Then use [this link](https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1) with our ```wget``` command. 
 
-{{% notice style="note" %}}
+{{% callout style="note" %}}
 Learn more about wget [here](https://www.geeksforgeeks.org/wget-command-in-linux-unix/).
-{{% /notice %}} 
+{{% /callout %}} 
 
 ![Github Raw](task3_PowerUp_GitHubRAW.png)
 
@@ -169,13 +169,13 @@ Now that we know the service the next thing to do is to create an msfvenom shell
 
 ![MSFvenom](task3_msfvenom.png)
 
-{{% notice style="note" %}}
+{{% callout style="note" %}}
 Learn more about **msfvenom**:
 
 - [Metasploit Unleashed by Offsec](https://www.offsec.com/metasploit-unleashed/msfvenom/)
 - [Msfvenom Tutorials for Beginners](https://www.hackingarticles.in/msfvenom-tutorials-beginners/)
 - [Working with Payload Metasploit in Kali Linux by Geeks for Geeks](https://www.geeksforgeeks.org/working-with-payload-metasploit-in-kali-linux/)
-{{% /notice %}} 
+{{% /callout %}} 
 
 In a new terminal or clear your existing one we want to start a [Netcat listener](https://blog.natem135.com/posts/using-a-netcat-listener/) on the same port as your specified msfvenom shell - port 1234.
 
@@ -218,9 +218,9 @@ Finally cd to your Desktop and ```type``` the contents of your root flag.
 
 First, I love that THM goes through rooms with and then with out Metasploit, because some clients and exams don't allow for the use of Metasploit. If you get stuck and need a small hint [Hacksploit](https://www.youtube.com/watch?v=BzmljZkgeSs) has a great walkthrough.
 
-{{% notice style="warning" %}}
+{{% callout style="warning" %}}
 You will not be able to use THM built in AttackBox for this section. A Python server is needed on port 80 and it conflicts with AttackBox.
-{{% /notice %}} 
+{{% /callout %}} 
 
 First you will want to use searchsploit or the exploit database to find your exploit code. I used ```searchsploit Rejetto HTTP File Server 2.3.x``` and then used the -p flag to view the full exploit path. Once you know where it is you can copy the file to a new location. I used exploit.py on my Desktop.
 

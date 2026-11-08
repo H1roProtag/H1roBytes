@@ -2,22 +2,29 @@
 {{- $icon := .icon }}
 {{- $hint := .hint }}
 {{- $title := .title }}
+{{- $titleonwidths := .titleonwidths }}
+{{- $titleonwidthm := .titleonwidthm }}
+{{- $titleonwidthl := .titleonwidthl }}
 {{- $onempty := cond (isset . "onempty") .onempty "disable" }}
 {{- $onwidths := cond (isset . "onwidths") .onwidths "show" }}
 {{- $onwidthm := cond (isset . "onwidthm") .onwidthm "show" }}
 {{- $onwidthl := cond (isset . "onwidthl") .onwidthl "show" }}
 {{- with .page }}
-	{{- $content := printf "\n                  <div class=\"topbar-area topbar-area-%s\" data-area=\"%s\">%s\n                  </div>" $area $area (partial (printf "topbar/area/%s.html" $area) .) | safeHTML }}
+	{{- $content := printf "\n                  <div class=\"topbar-area topbar-area-%s\" data-area=\"%s\">%s\n                  </div>" $area $area (partial "topbar/area.html" (dict "page" . "area" $area)) | safeHTML }}
 	{{- partial "topbar/func/button.html" (dict
 		"page" .
 		"class" (printf "topbar-button-%s" $area)
-		"href" "javascript:toggleTopbarFlyout(this)"
+		"action" "toggle-flyout"
+		"istoggle" true
 		"icon" $icon
 		"onempty" $onempty
 		"onwidths" $onwidths
 		"onwidthm" $onwidthm
 		"onwidthl" $onwidthl
 		"title" $title
+		"titleonwidths" $titleonwidths
+		"titleonwidthm" $titleonwidthm
+		"titleonwidthl" $titleonwidthl
 		"hint" $hint
 		"content" $content
 	)}}

@@ -22,6 +22,15 @@ other = "為\"{0}\"找到 {1} 個結果"
 [Clear-History]
 other = "清除歷史紀錄"
 
+[History-cleared]
+other = "歷史紀錄已清除"
+
+[Enlarge-graph]
+other = "放大圖表"
+
+[Close-graph]
+other = "關閉放大的圖表"
+
 [Reset-view]
 other = "重置檢視"
 
@@ -44,7 +53,7 @@ other = "回到首頁"
 other = "Home"
 
 [Edit-this-page]
-other = "編輯網頁"
+other = "編輯頁面"
 
 [Show-Markdown]
 other = "顯示 Markdown"
@@ -57,6 +66,12 @@ other = "列印整章"
 
 [More-action]
 other = "更多"
+
+[Previous-page]
+other = "上一頁"
+
+[Next-page]
+other = "下一頁"
 
 [shortcuts-menuTitle]
 other = "更多"
@@ -141,3 +156,66 @@ other = "版本"
 
 [Browser-unsupported-feature]
 other = "此瀏覽器不支援此功能"
+
+[Pages-group-fallback]
+other = "其他"
+
+[Skip-to-content]
+other = "跳至主要內容"
+
+[Breadcrumbs]
+other = "導覽路徑"
+
+[Search-page]
+other = "開啟搜尋頁面"
+
+[Close-image]
+other = "關閉放大的圖片"
+
+[Expand-all]
+other = "全部展開"
+
+[Collapse-all]
+other = "全部摺疊"
+
+[Inserted-text-start]
+other = "插入文字開始"
+
+[Inserted-text-end]
+other = "插入文字結束"
+
+[Deleted-text-start]
+other = "刪除文字開始"
+
+[Deleted-text-end]
+other = "刪除文字結束"
+
+[N-matches-on-page]
+other = "在此頁面中為\"{0}\"找到 {1} 處相符"
+
+[Sortable-columns]
+other = "帶按鈕的欄標題可用於排序。"
+
+[Sort-key-ascending]
+other = "第 {0} 級排序，遞增"
+
+[Sort-key-descending]
+other = "第 {0} 級排序，遞減"
+
+[Sorted-by-ascending]
+other = "已按\"{0}\"排序，遞增"
+
+[Sorted-by-descending]
+other = "已按\"{0}\"排序，遞減"
+
+[Unsorted-by]
+other = "已取消按\"{0}\"排序"
+
+[Change-sorting]
+other = "變更排序"
+
+[Reset-sorting]
+other = "重設排序"
+
+[Sorting-reset]
+other = "排序已重設！"

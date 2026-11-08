@@ -1,11 +1,15 @@
-+++
-categories = ['howto']
-description = 'What site-wide meta information can be set'
-frontmatter = ['description']
-options = ['author.email', 'author.name']
-title = 'Meta Information'
-weight = 4
-+++
+---
+categories:
+- howto
+description: What site-wide meta information can be set
+frontmatter:
+- description
+options:
+- author.email
+- author.name
+title: Meta Information
+weight: 4
+---
 
 ## Site Author Information
 
@@ -33,7 +37,7 @@ title = 'Hugo Relearn Theme'
 
 When your page is shared on social media, you can set a site-wide image to display with the link
 
-{{< multiconfig file=hugo >}}
+{{< multiconfig file=hugo section=params >}}
 images = [ 'images/hero.png' ]
 {{< /multiconfig >}}
 

@@ -1,41 +1,24 @@
-+++
-categories = ['howto', 'reference']
-description = 'Get value of site params'
-title = 'SiteParam'
-+++
+---
+categories:
+- howto
+- reference
+description: Get value of site params
+title: SiteParam
+---
 
-The `siteparam` shortcode prints values of site-wide params contained in your `hugo.toml`.
+The `siteparam` shortcode prints values of site-wide params contained in your project configuration.
+
+{{% multishortcode name="siteparam" print="false" %}}
+name = "siteparam.test.greetings"
+{{% /multishortcode %}}
 
 ## Usage
 
+{{% multishortcode name="siteparam" execute="false" %}}
+name = "siteparam.test.greetings"
+{{% /multishortcode %}}
+
 To print params from a page's front matter and falling back to the site options, use Hugo's built-in [`param` shortcode](https://gohugo.io/shortcodes/param/).
-
-{{< tabs groupid="shortcode-parameter">}}
-{{% tab title="shortcode" %}}
-
-````go
-{{%/* siteparam name="editURL" */%}}
-````
-
-{{% /tab %}}
-{{% tab title="shortcode (positional)" %}}
-
-````go
-{{%/* siteparam "editURL" */%}}
-````
-
-{{% /tab %}}
-{{% tab title="partial" %}}
-
-````go
-{{ partial "shortcodes/siteparam.html" (dict
-  "page" .
-  "name" "editURL"
-)}}
-````
-
-{{% /tab %}}
-{{< /tabs >}}
 
 ### Parameters
 
@@ -47,15 +30,13 @@ To print params from a page's front matter and falling back to the site options,
 
 ### `editURL`
 
-```go
-`editURL` value: {{%/* siteparam name="editURL" */%}}
-```
-
-`editURL` value: {{% siteparam name="editURL" %}}
+{{% multishortcode name="siteparam" format="`editURL` value: `%s`" %}}
+name = "editURL"
+{{% /multishortcode %}}
 
 ### Nested Parameter with Markdown and HTML Formatting
 
-To use formatted parameter, add this in your `hugo.toml`:
+To use formatted parameter, add this in your project configuration:
 
 {{< multiconfig file=hugo >}}
 [markup.goldmark.renderer]
@@ -69,8 +50,6 @@ Now values containing Markdown will be formatted correctly.
   text = 'A **nested** parameter <b>with</b> formatting'
 {{< /multiconfig >}}
 
-```go
-Formatted parameter: {{%/* siteparam name="siteparam.test.text" */%}}
-```
-
-Formatted parameter: {{% siteparam name="siteparam.test.text" %}}
+{{% multishortcode name="siteparam" format="Formatted parameter: %s" %}}
+name = "siteparam.test.text"
+{{% /multishortcode %}}

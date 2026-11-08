@@ -1,0 +1,31 @@
+{
+  "title": "Details",
+  "name": "details",
+  "elementType": "explicit-end",
+  "outputType": "html",
+  "rawContent": true,
+  "formats": ["markdown-blockquote", "shortcode", "partial"],
+  "markdown-blockquote": {
+    "expanded": "false",
+    "style": "details",
+    "title": "Details"
+  },
+  "parameters": [
+    {
+      "name": "summary",
+      "markdown-blockquote-name": "title"
+    },
+    {
+      "name": "open",
+      "markdown-blockquote-name": "expanded"
+    },
+    {
+      "name": "name",
+      "markdown-blockquote-name": "groupid"
+    },
+    {
+      "name": "title",
+      "markdown-blockquote-name": "hint"
+    }
+  ]
+}

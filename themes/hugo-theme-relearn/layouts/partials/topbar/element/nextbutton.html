@@ -1,0 +1,32 @@
+{{- $element := partial "_relearn/topbarElementParams.gotmpl" (dict "context" . "type" "nextbutton") }}
+{{- $onwidths := cond (isset $element "onwidths") $element.onwidths "show" }}
+{{- $onwidthm := cond (isset $element "onwidthm") $element.onwidthm "show" }}
+{{- $onwidthl := cond (isset $element "onwidthl") $element.onwidthl "show" }}
+{{- $titleonwidths := cond (isset $element "titleonwidths") $element.titleonwidths "hide" }}
+{{- $titleonwidthm := cond (isset $element "titleonwidthm") $element.titleonwidthm "hide" }}
+{{- $titleonwidthl := cond (isset $element "titleonwidthl") $element.titleonwidthl "hide" }}
+{{- with .page }}
+	{{- $show := not (.Param "disableNextPrev") }}
+	{{- if $show }}
+		{{- $endarrow := "🡒" }}
+		{{- if eq (.Language.Direction | default (T "Reading-direction") | default "ltr") "rtl" }}
+			{{- $endarrow = "🡐" }}
+		{{- end }}
+        {{- $next := partial "_relearn/pageNext.gotmpl" . }}
+		{{- $nextTitle := partial "title.gotmpl" (dict "page" $next "outputFormat" "html") }}
+		{{- partial "topbar/func/button.html" (dict
+			"page" .
+			"class" "topbar-button-next"
+			"linkObject" $next
+			"icon" "chevron-right"
+			"onwidths" $onwidths
+			"onwidthm" $onwidthm
+			"onwidthl" $onwidthl
+			"titleonwidths" $titleonwidths
+			"titleonwidthm" $titleonwidthm
+			"titleonwidthl" $titleonwidthl
+			"title" (T "Next-page")
+			"hint" (printf "%s (%s)" $nextTitle ($endarrow | safeHTML))
+		)}}
+	{{- end }}
+{{- end }}

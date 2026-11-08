@@ -1,22 +1,15 @@
 {{- if or (eq .Kind "taxonomy") (eq .Kind "term") }}
-  {{- $lastCapital := "" }}
-  {{- $pages := slice }}
-  {{- $type := .Params.children.type | default "groupInternal" }}
-  {{- if or (eq $type "group") (eq $type "groupInternal") }}
-    {{- if eq .Kind "taxonomy" }}
-      {{- $pages = partialCached "_relearn/pagesTaxonomy.gotmpl" . .Path }}
-    {{- else if eq .Kind "term" }}
-      {{- $pages = partialCached "_relearn/pagesTerm.gotmpl" . .Path }}
-    {{- end }}
+  {{- $params := partial "_relearn/pagesParams.gotmpl" (dict "page" .) }}
+  {{- $groups := slice }}
+  {{- if $params.groupby }}
+    {{- $groups = partial "_relearn/pagesGroups.gotmpl" $params }}
   {{- end }}
 
   {{- $toc_pages := "" }}
-  {{- range $pages }}
-    {{- $capital := substr .LinkTitle 0 1 | upper }}
-    {{- if ne $lastCapital $capital }}
-      {{- $toc_pages = printf "%s    <li><a href=\"#%s\">%s</a></li>\n" $toc_pages ($capital | plainify | anchorize) $capital }}
+  {{- range $groups }}
+    {{- with .Label }}
+      {{- $toc_pages = printf "%s    <li><a href=\"#%s\">%s</a></li>\n" $toc_pages (. | plainify | anchorize) (. | htmlEscape) }}
     {{- end }}
-    {{- $lastCapital = $capital }}
   {{- end }}
   {{- $toc := trim (partial "toc.html" .) "\n\r\t " }}
   {{- if and (not $toc) $toc_pages }}
@@ -27,7 +20,8 @@
     {{- $toc = replaceRE "^(<nav id=\"TableOfContents\">[\\s]*<ul>)[\\s]*<ul>[\\n\\r]*" "${1}\n" $toc }}
     {{- $toc = replaceRE "[\\s]*(</nav>)$" "\n  </ul>\n${1}" $toc }}
     {{- $toc = replaceRE "[ \\t]*</ul>[\\s]*(</ul>[\\s]*</nav>)$" "  ${1}" $toc }}
-    {{- $toc = replaceRE "([ \\t]*</ul>[\\s]*</nav>)$" (printf "%s${1}" $toc_pages) $toc }}
+    {{- /* a `$` in a label would otherwise be read as a reference to a group of the expression */}}
+    {{- $toc = replaceRE "([ \\t]*</ul>[\\s]*</nav>)$" (printf "%s${1}" (replace $toc_pages "$" "$$")) $toc }}
   {{- end }}
 {{ $toc | safeHTML }}
 {{- else }}

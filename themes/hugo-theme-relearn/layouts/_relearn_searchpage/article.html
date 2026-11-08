@@ -5,11 +5,11 @@
   </header>
 {{ partial "heading-pre.html" . }}{{ partial "heading.html" . }}{{ partial "heading-post.html" . }}
 
-<search>
-  <form action="javascript:window.relearn.executeTriggeredSearch()">
+{{- /* the print version shows what was searched for, but nothing is to be operated there */}}
+<search{{ if eq (.Store.Get "relearnOutputFormat") "print" }} inert{{ end }}>
+  <form>
     <div class="searchform">
-      <label class="a11y-only" for="R-search-by-detail">{{ T "Search" }}</label>
-      <input data-search-input id="R-search-by-detail" class="search-by" name="search-by" type="search" placeholder="{{ T "Search-placeholder" }}">
+      <input data-search-input class="search-by" name="search-by" type="search" aria-label="{{ T "Search" }}" placeholder="{{ T "Search-placeholder" }}">
       {{- partial "shortcodes/button.html" (dict
         "page" .
         "type" "submit"
@@ -20,7 +20,7 @@
     </div>
   </form>
 </search>
-<div class="searchhint">
+<div class="searchhint" role="status">
 </div>
 <hr>
 <div id="R-searchresults">

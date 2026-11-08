@@ -1,16 +1,39 @@
-+++
-categories = ['howto']
-description = 'Provide your own logo, favicon and menu title'
-options = ['linkTitle', 'logo']
-title = 'Logo & Title'
-weight = 1
-+++
+---
+categories:
+- howto
+description: Provide your own logo, favicon and menu title
+options:
+- linkTitle
+- logo
+- themeVariant
+title: Logo & Title
+weight: 1
+---
 
-## Change the Favicon
+## Changing the Favicon
 
 If your favicon is an SVG, PNG, or ICO, just drop your image in your site's `assets/images/` or `static/images/` directory and name it `favicon.svg`, `favicon.png`, or `favicon.ico` respectively.
 
 If you want to adjust your favicon according to your OS settings for light/dark mode, add the image files `assets/images/favicon-light.svg` and `assets/images/favicon-dark.svg` to your site's directory, respectively, corresponding to your file format. In case some of the files are missing, the theme falls back to `favicon.svg` for each missing file. All supplied favicons must be of the same file format.
+
+An SVG favicon can also adapt itself, so a single `favicon.svg` is enough. Draw everything that should adapt with `currentColor` and switch `color` with a `prefers-color-scheme` media query. This covers fills and strokes of all shapes alike, while parts with a color of their own keep it:
+
+````xml {title="assets/images/favicon.svg"}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="currentColor">
+  <style>
+    svg:root { color: black; }
+    @media (prefers-color-scheme: dark) {
+      svg:root { color: white; }
+    }
+  </style>
+  <path d="..."/>
+  <circle cx="32" cy="32" r="8" fill="none" stroke="currentColor"/>
+</svg>
+````
+
+The `svg:root` selector restricts the rules to the SVG being displayed as an image of its own. If the same file is inlined into the page, for example as a [logo with the `inlinecontent` image effect](#coloring-svg-logos), the rules do not leak into the page's other SVGs and the theme colors the `currentColor` parts instead.
+
+Some browsers only pick up a changed OS setting for the favicon after a reload.
 
 If no favicon file is found, the theme will look up the alternative filename `logo` in the same location and will repeat the search for the list of supported file types.
 
@@ -20,17 +43,21 @@ If you need to change this default behavior, create a new file `layouts/partials
 <link rel="icon" href="/images/favicon.bmp" type="image/bmp">
 ````
 
-## Change the Menu Title
+## Changing the Title
 
-{{% badge style="option" %}}Option{{% /badge %}} The site `title` of your `hugo.toml` will be used for the text at the top of the sidebar. If you want to show a different text in the sidebar, you can overwrite it by setting `params.linkTitle`.
+{{% badge style="option" %}}Option{{% /badge %}} The site `title` of your project configuration will be used for the text at the top of the sidebar. If you want to show a different text in the sidebar, you can overwrite it by setting `params.linkTitle`.
 
-If the title is to long to fit on a single line it is automatically wrapped. If you want manual control over the line breaks, you can insert newline characters.
+If the title is to long to fit on a single line it is automatically wrapped.
+
+If you want manual control over the line breaks, you can insert newline characters.
+
+If you want no text at all, set it to a string containing only whitespace like `" "`.
 
 {{< multiconfig file=hugo section=params >}}
 linkTitle = "Relearn\nis the greatest\ntheme since\nsliced bread"
 {{< /multiconfig >}}
 
-### Changing the Font Settings
+### Changing the Title Font Settings
 
 You can change font settings with the following CSS variables
 
@@ -39,13 +66,14 @@ You can change font settings with the following CSS variables
 :root {
     --LOGO-font: 'Georgia', serif;
     --LOGO-font-size: 2rem;
+    --LOGO-font-weight: 500;
 }
 </style>
 ````
 
 On smaller screens the logo font size is automatically reduced to 80% of the configured value for better mobile display. This is not configurable.
 
-### Changing the Colors
+### Changing the Title Colors
 
 The logo inherits its colors from the menu header by default. You can customize the normal and hover states
 
@@ -60,20 +88,22 @@ The logo inherits its colors from the menu header by default. You can customize 
 
 The `--LOGO-LINK-color` variable sets the color of the logo link text, while `--LOGO-LINK-HOVER-color` sets the color when hovering over the logo.
 
-### Set Direction of Title & Logo
+### Setting Layout of Title & Logo
 
-You can control the layout direction of the logo and title:
+You can control how the logo and title are arranged:
 
 {{< multiconfig file=hugo section=params >}}
-logo = { direction = 'column' }
+logo = { layout = 'sidebar-column' }
 {{< /multiconfig >}}
 
 Valid values are:
 
-- `row` (default) - Logo and title side by side
-- `column` - Logo above title
+- `sidebar-row` (default) - Logo and title side by side at the top of the menu
+- `sidebar-column` - Logo above title at the top of the menu
 
-## Change the Logo
+When a page is printed or shown as its [print version](configuration/sitemanagement/outputformats#print-support), logo and title are formatted automatically.
+
+## Changing the Logo
 
 {{% badge style="option" %}}Option{{% /badge %}} The theme displays a logo in the sidebar menu if found. By default, it automatically detects logos in your site's `assets/images/`.
 
@@ -83,11 +113,11 @@ If you don't configure a logo explicitly, the theme automatically searches for a
 
 If no logo is found, only your site title will be shown.
 
-The size of the logo will adapt automatically to an opinionated default. See below on [how to resize it](#customizing-size).
+The size of the logo will adapt automatically to an opinionated default. See below on [how to resize it](#changing-the-size-of-the-logo).
 
 ### Manual Configuration
 
-You can explicitly configure a logo in your site's `params.toml`. This will override automatic detection:
+You can explicitly configure a logo in the `params` of your project configuration. This will override automatic detection:
 
 {{< multiconfig file=hugo section=params >}}
 logo = { src = '/images/magic.gif' }
@@ -105,28 +135,28 @@ The theme supports displaying different logos for different color variants. This
 
 Variant-specific logos take precedence over the global `logo.src` setting. If a variant doesn't specify a logo, the global logo setting will be used.
 
-To configure variant-specific logos, use the `logo` field within your `themeVariant` configuration:
+To configure variant-specific logos, set `logo` in the [`params` of the variant](configuration/branding/colors#variant-parameters) within your `themeVariant` configuration:
 
 {{< multiconfig file=hugo section=params >}}
 themeVariant = [
-  { identifier = 'relearn-light', logo = { src = '/images/logo-dark.svg' } },
-  { identifier = 'relearn-dark',  logo = { src = '/images/logo-light.svg' } },
-  { identifier = 'neon',          logo = { src = '/images/logo-neon.svg' } }
+  { identifier = 'relearn-light', params = { logo = { src = '/images/logo-dark.svg' } } },
+  { identifier = 'relearn-dark',  params = { logo = { src = '/images/logo-light.svg' } } },
+  { identifier = 'neon',          params = { logo = { src = '/images/logo-neon.svg' } } }
 ]
 {{< /multiconfig >}}
 
 The theme automatically switches between logos when the user selects a different variant. Logos with the same `src` are grouped together for performance optimization, reducing the number of images loaded.
 
-To disable the logo for a specific variant while keeping the default logo for others, set the variant's `src` to a whitespace string:
+To disable the logo for a specific variant while keeping the default logo for others, set `src` of the variant's `params.logo` to a whitespace string:
 
 {{< multiconfig file=hugo section=params >}}
 themeVariant = [
-  { identifier = 'relearn-light', logo = { src = ' ' } },  # No logo for this variant
-  { identifier = 'relearn-dark' }                          # Uses default logo
+  { identifier = 'relearn-light', params = { logo = { src = ' ' } } },  # No logo for this variant
+  { identifier = 'relearn-dark' }                                      # Uses default logo
 ]
 {{< /multiconfig >}}
 
-### Customizing Size
+### Changing the Size of the Logo
 
 The theme provides CSS variables to customize the logo's size. You can add these to `layouts/partials/custom-header.html`. The logo image has a default width of `4em`. The height is determined by the aspect ratio of the logo.
 
@@ -142,11 +172,11 @@ The theme provides CSS variables to customize the logo's size. You can add these
 
 If you have a monochrome SVG logo and want to display it in the variants color for the logo text, it is mandatory to give it the `inlinecontent` [image effect](authoring/linking/imageeffects). This is not set in the automatic logo detection.
 
-The recoloring applies to all black elements in your SVG:
-
 {{< multiconfig file=hugo section=params >}}
 logo = { src = '/images/logo.svg?inlinecontent' }
 {{< /multiconfig >}}
+
+The recoloring applies to all black elements in your SVG. Elements that get their color from their parent are left untouched. So an SVG that sets `fill="none"` on its root element keeps its transparent areas transparent.
 
 #### Changing the SVG Logo Colors
 

@@ -1,10 +1,12 @@
 {{- $page := .page }}
 {{- $cards := (slice | append (dict
+    "action"   .action
     "color"    .color
     "content"  .content
     "href"     .href
     "icon"     .icon
     "image"    .image
+    "imagealt" .imagealt
     "params"   .params
     "style"    .style
     "template" .template

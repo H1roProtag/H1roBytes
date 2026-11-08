@@ -22,6 +22,15 @@ other = "{1} збігів знайдено для \"{0}\""
 [Clear-History]
 other = "Почистити історію"
 
+[History-cleared]
+other = "Історію почищено"
+
+[Enlarge-graph]
+other = "Збільшити графік"
+
+[Close-graph]
+other = "Закрити збільшений графік"
+
 [Reset-view]
 other = "Скинути вигляд"
 
@@ -44,7 +53,7 @@ other = "Повернутися до початкової сторінки"
 other = "Home"
 
 [Edit-this-page]
-other = "Редагувати"
+other = "Редагувати сторінку"
 
 [Show-Markdown]
 other = "Відобразити Markdown"
@@ -57,6 +66,12 @@ other = "Друк всього розділу"
 
 [More-action]
 other = "Більше"
+
+[Previous-page]
+other = "Попередня сторінка"
+
+[Next-page]
+other = "Наступна сторінка"
 
 [shortcuts-menuTitle]
 other = "Більше"
@@ -141,3 +156,66 @@ other = "Версія"
 
 [Browser-unsupported-feature]
 other = "Цей браузер не підтримує цю функцію"
+
+[Pages-group-fallback]
+other = "Інше"
+
+[Skip-to-content]
+other = "Перейти до основного вмісту"
+
+[Breadcrumbs]
+other = "Навігаційний ланцюжок"
+
+[Search-page]
+other = "Відкрити сторінку пошуку"
+
+[Close-image]
+other = "Закрити збільшене зображення"
+
+[Expand-all]
+other = "Розгорнути все"
+
+[Collapse-all]
+other = "Згорнути все"
+
+[Inserted-text-start]
+other = "Початок вставленого тексту"
+
+[Inserted-text-end]
+other = "Кінець вставленого тексту"
+
+[Deleted-text-start]
+other = "Початок видаленого тексту"
+
+[Deleted-text-end]
+other = "Кінець видаленого тексту"
+
+[N-matches-on-page]
+other = "{1} збігів для \"{0}\" на цій сторінці"
+
+[Sortable-columns]
+other = "Заголовки стовпців із кнопками дозволяють сортування."
+
+[Sort-key-ascending]
+other = "сортування на позиції {0}, за зростанням"
+
+[Sort-key-descending]
+other = "сортування на позиції {0}, за спаданням"
+
+[Sorted-by-ascending]
+other = "Відсортовано за \"{0}\", за зростанням"
+
+[Sorted-by-descending]
+other = "Відсортовано за \"{0}\", за спаданням"
+
+[Unsorted-by]
+other = "Більше не відсортовано за \"{0}\""
+
+[Change-sorting]
+other = "Змінити сортування"
+
+[Reset-sorting]
+other = "Скинути сортування"
+
+[Sorting-reset]
+other = "Сортування скинуто!"

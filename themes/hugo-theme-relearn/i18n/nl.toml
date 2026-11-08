@@ -22,6 +22,15 @@ other = "{1} resultaten gevonden voor \"{0}\""
 [Clear-History]
 other = "Wis geschiedenis"
 
+[History-cleared]
+other = "Geschiedenis gewist"
+
+[Enlarge-graph]
+other = "Grafiek vergroten"
+
+[Close-graph]
+other = "Vergrote grafiek sluiten"
+
 [Reset-view]
 other = "Weergave opnieuw instellen"
 
@@ -44,7 +53,7 @@ other = "Naar startpagina"
 other = "Home"
 
 [Edit-this-page]
-other = "Bewerken"
+other = "Pagina bewerken"
 
 [Show-Markdown]
 other = "Afprijzing weergeven"
@@ -57,6 +66,12 @@ other = "Het hele hoofdstuk afdrukken"
 
 [More-action]
 other = "Snelkoppelingen"
+
+[Previous-page]
+other = "Vorige pagina"
+
+[Next-page]
+other = "Volgende pagina"
 
 [shortcuts-menuTitle]
 other = "Snelkoppelingen"
@@ -89,7 +104,7 @@ other = "Info"
 other = "Notitie"
 
 [tip]
-other = "Fooi"
+other = "Tip"
 
 [warning]
 other = "Waarschuwing"
@@ -141,3 +156,66 @@ other = "Versie"
 
 [Browser-unsupported-feature]
 other = "Deze browser ondersteunt deze functie niet"
+
+[Pages-group-fallback]
+other = "Overig"
+
+[Skip-to-content]
+other = "Ga naar hoofdinhoud"
+
+[Breadcrumbs]
+other = "Kruimelpad"
+
+[Search-page]
+other = "Zoekpagina openen"
+
+[Close-image]
+other = "Vergrote afbeelding sluiten"
+
+[Expand-all]
+other = "Alles uitklappen"
+
+[Collapse-all]
+other = "Alles inklappen"
+
+[Inserted-text-start]
+other = "Begin van ingevoegde tekst"
+
+[Inserted-text-end]
+other = "Einde van ingevoegde tekst"
+
+[Deleted-text-start]
+other = "Begin van verwijderde tekst"
+
+[Deleted-text-end]
+other = "Einde van verwijderde tekst"
+
+[N-matches-on-page]
+other = "{1} overeenkomsten voor \"{0}\" op deze pagina"
+
+[Sortable-columns]
+other = "Kolomkoppen met knoppen zijn sorteerbaar."
+
+[Sort-key-ascending]
+other = "gesorteerd op positie {0}, oplopend"
+
+[Sort-key-descending]
+other = "gesorteerd op positie {0}, aflopend"
+
+[Sorted-by-ascending]
+other = "Gesorteerd op \"{0}\", oplopend"
+
+[Sorted-by-descending]
+other = "Gesorteerd op \"{0}\", aflopend"
+
+[Unsorted-by]
+other = "Niet meer gesorteerd op \"{0}\""
+
+[Change-sorting]
+other = "Sortering wijzigen"
+
+[Reset-sorting]
+other = "Sortering herstellen"
+
+[Sorting-reset]
+other = "Sortering hersteld!"

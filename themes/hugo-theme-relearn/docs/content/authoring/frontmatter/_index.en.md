@@ -1,11 +1,11 @@
-+++
-categories = ['reference']
-description = 'All things front matter'
-title = 'Front Matter'
-weight = 2
+---
+categories:
+- reference
+description: All things front matter
+params:
+  alwaysopen: false
+title: Front Matter
+weight: 2
+---
 
-[params]
-  alwaysopen = false
-+++
-
-{{% children type="list" description=true %}}
+{{% pages display="headings" description=true %}}

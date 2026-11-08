@@ -1,10 +1,12 @@
-+++
-categories = ['explanation']
-description = 'How to apply effects to your images'
-frontmatter = ['imageEffects']
-title = 'Image Effects'
-weight = 3
-+++
+---
+categories:
+- explanation
+description: How to apply effects to your images
+frontmatter:
+- imageEffects
+title: Image Effects
+weight: 3
+---
 
 The theme offers [effects](authoring/markdown#image-effects) for your linked images.
 
@@ -19,18 +21,28 @@ The default image effects shipped with the theme are
 | inlinecontent | if the linked image points to a SVG resource, the content will be used instead of an `<img>` element, this is useful for applying additional CSS styles to the elements inside of the SVG which is otherwise impossible |
 | lazy          | Lets the image be lazy loaded                                     |
 | lightbox      | The image will be clickable to show it enlarged                   |
+| rounded       | Rounds the corners of the image                                   |
 | shadow        | Draws a shadow around the image to make it appear hovered/glowing |
+
+Besides these, you can give the size of an image.
+
+| Name          | Description                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| height        | The height of the image as a CSS value                            |
+| width         | The width of the image as a CSS value                             |
+
+If only one of them is given, the other one follows the image's aspect ratio. An image giving one of them ignores both of the defaults, so it is not stretched by a default width when asking for a height.
 
 One way to use them is to add them as URL query parameter to each individually linked image.
 
-This can become cumbersome to be done consistently for the whole site. Instead, you can [configure the defaults](configuration/customization/imageeffects) in your `hugo.toml` as well as overriding these defaults in a page's front matter.
+This can become cumbersome to be done consistently for the whole site. Instead, you can [configure the defaults](configuration/customization/imageeffects) in your project configuration as well as overriding these defaults in a page's front matter.
 
 ## Effect Priority
 
 Image effects are applied in the following priority order (lowest to highest):
 
 1. Built-in defaults
-2. Site-wide configuration in `hugo.toml`
+2. Site-wide configuration in your project configuration
 3. Page front matter configuration
 4. URL query parameters
 5. Template caller `attributes` parameter (highest priority)
@@ -39,15 +51,18 @@ Explicitly set URL query parameter will override the defaults set for a page or 
 
 If an effect accepts boolean values, only setting the parameter name without a value in the URL will set it to `true`.
 
-Without any settings in your `hugo.toml` `imageEffects` defaults to
+Without any settings in your project configuration, `imageEffects` defaults to
 
 {{< multiconfig >}}
 imageEffects.border = false
 imageEffects.dataurl = false
+imageEffects.height = ""
 imageEffects.inlinecontent = false
 imageEffects.lazy = true
 imageEffects.lightbox = true
+imageEffects.rounded = true
 imageEffects.shadow = false
+imageEffects.width = ""
 {{< /multiconfig >}}
 
 {{% badge style="frontmatter" %}}Front Matter{{% /badge %}} This can be overridden in a pages front matter for example by
@@ -67,10 +82,13 @@ The settings applied to the above image would be
 {{< multiconfig >}}
 imageEffects.border = true
 imageEffects.dataurl = false
+imageEffects.height = ""
 imageEffects.inlinecontent = false
 imageEffects.lazy = true
 imageEffects.lightbox = false
+imageEffects.rounded = true
 imageEffects.shadow = false
+imageEffects.width = ""
 {{< /multiconfig >}}
 
 ## Template Usage

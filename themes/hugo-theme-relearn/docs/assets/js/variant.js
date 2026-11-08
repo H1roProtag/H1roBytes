@@ -1,7 +1,10 @@
 window.relearn = window.relearn || {};
 
-// we need to load this script in the html head to avoid flickering
-// on page load if the user has selected a non default variant
+// the generator makes and changes custom variants and keeps them in the storage of the
+// browser, ready to use: by their identifier, with a name and a stylesheet that applies
+// as it is. on loading a page, the theme replays what it finds there - the styles and
+// the entries in the variant switcher - without knowing what it means; keeping the page
+// we are on in line with a change is up to us
 
 function ready(fn) {
   if (document.readyState == 'complete') {
@@ -14,32 +17,21 @@ function ready(fn) {
 var variants = {
   variants: window.relearn.themevariants,
   isstylesheetloaded: true,
+  // also known to the theme's stylesheet, which keeps its fallback colors away from such a variant
+  customvariantprefix: 'my-custom-',
 
   getCustomVariant: function (customvariantbase) {
-    return window.relearn.customvariantprefix + customvariantbase;
+    return this.customvariantprefix + customvariantbase;
   },
 
-  getAllCustomVariants: function () {
-    var customVariants = [];
-    var prefix = window.relearn.absBaseUri + '/variantstylesheet-' + window.relearn.customvariantprefix;
-    for (var i = 0; i < window.localStorage.length; i++) {
-      var key = window.localStorage.key(i);
-      if (key && key.startsWith(prefix)) {
-        var variantName = key.substring((window.relearn.absBaseUri + '/variantstylesheet-').length);
-        customVariants.push(variantName);
-      }
-    }
-    return customVariants;
-  },
-
-  getCustomVariantStylesheet: function (customVariantName) {
-    return window.localStorage.getItem(window.relearn.absBaseUri + '/variantstylesheet-' + customVariantName) || '';
+  hasCustomVariant: function (customvariant) {
+    return Object.hasOwn(window.relearn.customVariants(), customvariant);
   },
 
   getCustomVariantBase: function (customvariant) {
     // Derive source variant from custom variant name
-    if (customvariant && customvariant.startsWith(window.relearn.customvariantprefix)) {
-      return customvariant.substring(window.relearn.customvariantprefix.length);
+    if (customvariant && customvariant.startsWith(this.customvariantprefix)) {
+      return customvariant.substring(this.customvariantprefix.length);
     }
     return '';
   },
@@ -58,84 +50,60 @@ var variants = {
     }.bind(this);
     extractVariables(this.structure);
 
-    // Load all custom variants from localStorage
-    var customVariants = this.getAllCustomVariants();
-    customVariants.forEach((customvariant) => {
-      var stylesheet = this.getCustomVariantStylesheet(customvariant);
-      this.addCustomVariantStyles(customvariant);
-      this.updateCustomVariantStyles(customvariant, stylesheet);
-    });
-
-    this.init();
-    ready(this.init.bind(this));
-  },
-
-  init: function (variant, old_path) {
-    this.addCustomVariantOption();
-    window.relearn.markVariant();
-    window.relearn.changeVariant(window.localStorage.getItem(window.relearn.absBaseUri + '/variant'));
-  },
-
-  addCustomVariantOption: function (customvariant) {
-    var customVariants = customvariant ? [customvariant] : this.getAllCustomVariants();
-    customVariants.forEach((customvariant) => {
-      document.querySelectorAll('.R-variantswitcher select').forEach((select) => {
-        var option = select.options[`R-select-variant-${customvariant}`];
-        if (!option) {
-          option = document.createElement('option');
-          option.id = `R-select-variant-${customvariant}`;
-          option.value = customvariant;
-          option.text = customvariant.replace(/-/g, ' ').replace(/\w\S*/g, function (w) {
-            return w.replace(/^\w/g, function (c) {
-              return c.toUpperCase();
-            });
-          });
-          select.appendChild(option);
+    // we are loaded in the head, so our listener comes before the one of theme.js
+    // and the graph definition is in place before Mermaid draws it
+    ready(
+      function () {
+        if (document.querySelector('#R-vargenerator')) {
+          this.generator('#R-vargenerator');
         }
-      });
-    });
+      }.bind(this)
+    );
+    document.addEventListener(
+      'click',
+      function (event) {
+        var button = event.target.closest('button[data-button-action^="variant-"]');
+        var actions = {
+          'variant-download': this.getStylesheet,
+          'variant-reset': this.resetVariant,
+          'variant-reset-all': this.resetAllVariants,
+        };
+        if (button && actions[button.dataset.buttonAction]) {
+          actions[button.dataset.buttonAction].call(this);
+          button.blur();
+        }
+      }.bind(this)
+    );
   },
 
-  removeCustomVariantOption: function (customvariant) {
-    document.querySelectorAll(`.R-variantswitcher option[value="${customvariant}"]`).forEach((option) => {
-      option.remove();
-    });
-  },
+  // stores the custom variants and the variant to show from now on, and brings this page in line with them
+  storeCustomVariants: function (customVariants, variant) {
+    window.localStorage.setItem(window.relearn.absBaseUri + '/customvariants', JSON.stringify(customVariants));
+    window.localStorage.setItem(window.relearn.absBaseUri + '/variant', variant);
 
-  addCustomVariantStyles: function (customvariant) {
-    var head = document.querySelector('head');
-    var style = document.createElement('style');
-    style.id = 'R-variant-styles-' + customvariant;
-    head.appendChild(style);
-  },
-
-  updateCustomVariantStyles: function (customvariant, stylesheet) {
-    stylesheet = ":root:not([data-r-output-format='print'])[data-r-theme-variant='" + customvariant + "']  {" + '\n&' + stylesheet + '\n}';
-    var style = document.querySelector('#R-variant-styles-' + customvariant);
-    if (style) {
-      style.textContent = stylesheet;
-    }
+    // the theme replays the storage: the stylesheets and the entries in the variant switcher
+    window.relearn.applyCustomVariants();
+    window.relearn.markVariant();
+    window.relearn.changeVariant(variant);
   },
 
   saveCustomVariant: function () {
     var variant = window.localStorage.getItem(window.relearn.absBaseUri + '/variant') ?? '';
     var customvariant = variant;
-    if (!variant.startsWith(window.relearn.customvariantprefix)) {
+    if (!variant.startsWith(this.customvariantprefix)) {
       customvariant = this.getCustomVariant(variant);
     }
 
-    var stylesheet = this.generateStylesheet(customvariant);
-    window.localStorage.setItem(window.relearn.absBaseUri + '/variant', customvariant);
-    window.localStorage.setItem(window.relearn.absBaseUri + '/variantstylesheet-' + customvariant, stylesheet);
-
-    if (!document.querySelector('#R-variant-styles-' + customvariant)) {
-      this.addCustomVariantStyles(customvariant);
-    }
-    this.updateCustomVariantStyles(customvariant, stylesheet);
-
-    this.addCustomVariantOption(customvariant);
-    window.relearn.markVariant();
-    window.relearn.changeVariant(customvariant);
+    var customVariants = window.relearn.customVariants();
+    customVariants[customvariant] = {
+      name: customvariant.replace(/-/g, ' ').replace(/\w\S*/g, function (w) {
+        return w.replace(/^\w/g, function (c) {
+          return c.toUpperCase();
+        });
+      }),
+      stylesheet: ":root:not([data-r-output-format='print'])[data-r-theme-variant='" + customvariant + "']  {" + '\n&' + this.generateStylesheet(customvariant) + '\n}',
+    };
+    this.storeCustomVariants(customVariants, customvariant);
   },
 
   normalizeColor: function (c) {
@@ -192,6 +160,17 @@ var variants = {
     return null;
   },
 
+  // a custom variant has no element to be found by, its stylesheet is one of those made in script
+  findCustomStylesheet: function (customvariant) {
+    for (let sheet of document.adoptedStyleSheets) {
+      var style = this.findRootRule(sheet.cssRules, [':root:not([data-r-output-format="print"])[data-r-theme-variant="' + customvariant + '"]']);
+      if (style) {
+        return style;
+      }
+    }
+    return null;
+  },
+
   findColor: function (name) {
     var f = this.variantvariables.find(function (x) {
       return x.name == name;
@@ -212,16 +191,22 @@ var variants = {
   // CSS download
   // ------------------------------------------------------------------------
 
+  // the prefix of a custom variant is reserved for the ones made in the browser, so
+  // the downloaded file would fail the build under its name
+  getDownloadIdentifier: function (variant) {
+    return variant.startsWith(this.customvariantprefix) ? 'my-' + variant.substring(this.customvariantprefix.length) : variant;
+  },
+
   generateStylesheet: function (variant) {
     var style = null;
-    if (!variant.startsWith(window.relearn.customvariantprefix)) {
+    if (!variant.startsWith(this.customvariantprefix)) {
       style = this.findLoadedStylesheet('R-format-style', [':root:not([data-r-output-format="print"])[data-r-theme-variant="' + variant + '"]']);
       if (!style) {
         alert('There is nothing to be generated as auto mode variants will be generated by Hugo.');
         return;
       }
     } else {
-      style = this.findLoadedStylesheet('R-variant-styles-' + variant, [':root:not([data-r-output-format="print"])[data-r-theme-variant="' + variant + '"]']);
+      style = this.findCustomStylesheet(variant);
       if (!style) {
         var customvariantbase = this.getCustomVariantBase(variant);
         style = this.findLoadedStylesheet('R-format-style', [':root:not([data-r-output-format="print"])[data-r-theme-variant="' + customvariantbase + '"]']);
@@ -235,7 +220,7 @@ var variants = {
     var style =
       ':root {\n' +
       '  /* ' +
-      variant +
+      this.getDownloadIdentifier(variant) +
       ' */\n' +
       this.variantvariables.reduce(
         function (a, e) {
@@ -264,9 +249,9 @@ var variants = {
     var variant = window.localStorage.getItem(window.relearn.absBaseUri + '/variant') ?? '';
     var customvariantbase = variant;
     var customvariant = variant;
-    if (!variant.startsWith(window.relearn.customvariantprefix)) {
+    if (!variant.startsWith(this.customvariantprefix)) {
       customvariant = this.getCustomVariant(customvariantbase);
-      if (this.getCustomVariantStylesheet(customvariant)) {
+      if (this.hasCustomVariant(customvariant)) {
         alert('You already have changes based on the "' + customvariantbase + '" variant. Please proceed editing the custom variant, reset your changes or ignore this message.');
         return;
       }
@@ -280,14 +265,11 @@ var variants = {
       return;
     }
 
-    var custom_style = this.findLoadedStylesheet('R-variant-styles-' + customvariant, [':root:not([data-r-output-format="print"])[data-r-theme-variant="' + customvariant + '"]']);
-    if (!custom_style) {
-      this.saveCustomVariant();
-      custom_style = this.findLoadedStylesheet('R-variant-styles-' + customvariant, [':root:not([data-r-output-format="print"])[data-r-theme-variant="' + customvariant + '"]']);
-    }
+    // as long as nothing was changed, there is no custom variant and the value is the one of its base
+    var custom_style = this.findCustomStylesheet(customvariant);
 
     var e = this.findColor(c);
-    var v = this.getColorProperty(c, custom_style);
+    var v = this.getColorProperty(c, custom_style ?? base_style);
     var t = c + '\n\n' + e.tooltip + '\n';
     if (e.fallback) {
       t += '\nInherits value "' + this.getColorValue(e.fallback) + '" from ' + e.fallback + ' if not set\n';
@@ -300,12 +282,20 @@ var variants = {
       return;
     }
 
+    if (this.normalizeColor(n).replace('--INTERNAL-', '--') == v) {
+      // a value that was only looked at leaves the variant as it is
+      return;
+    }
+
+    if (!custom_style) {
+      this.saveCustomVariant();
+      custom_style = this.findCustomStylesheet(customvariant);
+    }
+
     if (n) {
       // value set to specific value
       n = this.normalizeColor(n).replace('--INTERNAL-', '--').replace('--', '--INTERNAL-');
-      if (n != v) {
-        custom_style.setProperty('--' + c, n);
-      }
+      custom_style.setProperty('--' + c, n);
     } else {
       // value emptied, so delete it
       custom_style.removeProperty('--' + c);
@@ -316,50 +306,41 @@ var variants = {
 
   resetVariant: function () {
     var customvariant = window.localStorage.getItem(window.relearn.absBaseUri + '/variant');
-    if (!customvariant.startsWith(window.relearn.customvariantprefix)) {
+    if (!customvariant.startsWith(this.customvariantprefix)) {
       alert('There is nothing to be reset here as built-in variants can not be changed.');
       return;
     }
 
     if (confirm('You have made changes to your custom variant "' + customvariant + '". Are you sure you want to reset all changes?')) {
-      window.localStorage.removeItem(window.relearn.absBaseUri + '/variantstylesheet-' + customvariant);
-      this.updateCustomVariantStyles(customvariant, '');
-      this.removeCustomVariantOption(customvariant);
-
       var customvariantbase = this.getCustomVariantBase(customvariant);
       if (!customvariantbase || !window.relearn.themevariants.includes(customvariantbase)) {
         customvariantbase = window.relearn.themevariants[0];
       }
 
-      window.localStorage.setItem(window.relearn.absBaseUri + '/variant', customvariantbase);
-      window.relearn.markVariant();
-      window.relearn.changeVariant(customvariantbase);
+      var customVariants = window.relearn.customVariants();
+      delete customVariants[customvariant];
+      this.storeCustomVariants(customVariants, customvariantbase);
     }
   },
 
   resetAllVariants: function () {
-    var customVariants = this.getAllCustomVariants();
+    var customVariants = Object.keys(window.relearn.customVariants());
     if (!customVariants.length) {
       return;
     }
 
     var variantList = customVariants.map((v) => '"' + v + '"').join(', ');
     if (confirm('Are you sure you want to reset all ' + customVariants.length + ' custom variant(s): ' + variantList + '?')) {
-      var customvariant = window.localStorage.getItem(window.relearn.absBaseUri + '/variant');
-      customVariants.forEach((customvariant) => {
-        window.localStorage.removeItem(window.relearn.absBaseUri + '/variantstylesheet-' + customvariant);
-        this.updateCustomVariantStyles(customvariant, '');
-        this.removeCustomVariantOption(customvariant);
-      });
-
-      var customvariantbase = this.getCustomVariantBase(customvariant);
-      if (!customvariantbase || !window.relearn.themevariants.includes(customvariantbase)) {
-        customvariantbase = window.relearn.themevariants[0];
+      // a built variant stays, a custom one makes way for the one it was made from
+      var variant = window.localStorage.getItem(window.relearn.absBaseUri + '/variant');
+      if (variant.startsWith(this.customvariantprefix)) {
+        variant = this.getCustomVariantBase(variant);
+        if (!variant || !window.relearn.themevariants.includes(variant)) {
+          variant = window.relearn.themevariants[0];
+        }
       }
 
-      window.localStorage.setItem(window.relearn.absBaseUri + '/variant', customvariantbase);
-      window.relearn.markVariant();
-      window.relearn.changeVariant(customvariantbase);
+      this.storeCustomVariants({}, variant);
     }
   },
 
@@ -368,7 +349,7 @@ var variants = {
     var style = this.generateStylesheet(variant);
     if (style) {
       console.log(style);
-      this.download(style, 'text/css', 'theme-' + variant + '.css');
+      this.download(style, 'text/css', 'theme-' + this.getDownloadIdentifier(variant) + '.css');
     }
   },
 
@@ -427,11 +408,41 @@ var variants = {
     }
   },
 
+  // the rules of the graph are kept in a stylesheet of our own: Mermaid draws the graph
+  // anew for every variant, and takes along whatever was put into the styles of its SVG
+  graphSheet: function () {
+    if (!this.graphsheet) {
+      this.graphsheet = new CSSStyleSheet();
+      document.adoptedStyleSheets.push(this.graphsheet);
+    }
+    return this.graphsheet;
+  },
+
   styleGraphGroup: function (selector, colorvar) {
-    this.adjustCSSRules('#R-body svg ' + selector + ' > rect', 'color: var(--INTERNAL-' + colorvar + '); fill: var(--INTERNAL-' + colorvar + '); stroke: #80808080;');
-    this.adjustCSSRules('#R-body svg ' + selector + ' > .label .nodeLabel', 'color: var(--INTERNAL-' + colorvar + '); fill: var(--INTERNAL-' + colorvar + '); stroke: #80808080;');
-    this.adjustCSSRules('#R-body svg ' + selector + ' > .cluster-label .nodeLabel', 'color: var(--INTERNAL-' + colorvar + '); fill: var(--INTERNAL-' + colorvar + '); stroke: #80808080;');
-    this.adjustCSSRules('#R-body svg ' + selector + ' .nodeLabel', 'filter: grayscale(1) invert(1) contrast(10000);');
+    var sheet = this.graphSheet();
+    var color = 'var(--INTERNAL-' + colorvar + ')';
+    // the text is black or white, whatever is further away from the lightness of the color it is
+    // written on; the halo is the other one and shows the more of what is behind shines through
+    // the color; a value that is no color leaves all of this to the fallback
+    var text = 'oklch(from ' + color + ' clamp(0, (0.6 - l) * 1000, 1) 0 0 / 1)';
+    var halo = 'oklch(from ' + color + ' clamp(0, (l - 0.6) * 1000, 1) 0 0 / calc(1 - alpha))';
+    var label = 'color: ' + text + '; -webkit-text-stroke-color: ' + halo + ';';
+    this.adjustCSSRules('#R-body svg ' + selector + ' > rect', 'fill: ' + color + ';', sheet);
+    this.adjustCSSRules('#R-body svg ' + selector + ' > .label .nodeLabel', label, sheet);
+    this.adjustCSSRules('#R-body svg ' + selector + ' > .cluster-label .nodeLabel', label, sheet);
+  },
+
+  // whatever is drawn in the graph may end up on any color, so it comes in a light and
+  // a dark color at once, of which at least one is set apart from what is behind it
+  styleGraphContrast: function () {
+    var sheet = this.graphSheet();
+    var graph = '#R-vargenerator svg';
+    sheet.insertRule(graph + ' :is(.node, .cluster) > rect { stroke: #fff; stroke-width: 2px; outline: 2px solid #000; }', sheet.cssRules.length);
+    // the fallback for a value that is no color: its box inherits the fill, its text the color
+    sheet.insertRule(graph + ' :is(.node, .cluster) { fill: #fff; }', sheet.cssRules.length);
+    sheet.insertRule(graph + ' :is(.label, .cluster-label) { color: #000; -webkit-text-stroke: 3px transparent; paint-order: stroke fill; }', sheet.cssRules.length);
+    sheet.insertRule(graph + ' path.flowchart-link { stroke: #fff !important; stroke-width: 4px !important; }', sheet.cssRules.length);
+    sheet.insertRule(graph + ' .edgePaths { filter: drop-shadow(0 0 2px #000) drop-shadow(0 0 2px #000); }', sheet.cssRules.length);
   },
 
   styleGraph: function () {
@@ -444,7 +455,8 @@ var variants = {
     var styleSubgraphs = function (node) {
       if (!node) return;
       if (node.id && node.color) {
-        this.styleGraphGroup('#' + node.id, node.color);
+        // Mermaid puts the id of its SVG in front of the one we gave the subgraph
+        this.styleGraphGroup('[id$="-' + node.id + '"]', node.color);
       }
       if (node.children) {
         node.children.forEach((child) => styleSubgraphs.call(this, child));
@@ -452,6 +464,37 @@ var variants = {
     }.bind(this);
 
     styleSubgraphs(this.structure);
+
+    this.styleGraphContrast();
+
+    var sheet = this.graphSheet();
+    // the arrow ends grow from their tip, so they still end at the box and not inside of it
+    sheet.insertRule('#R-vargenerator svg marker.flowchart-v2 { overflow: visible; }', sheet.cssRules.length);
+    sheet.insertRule('#R-vargenerator svg marker.flowchart-v2 .arrowMarkerPath { transform: scale(3); transform-origin: 10px 5px; }', sheet.cssRules.length);
+    // an arrow end is shared by all edges, so it takes its color from the edge it is drawn for
+    sheet.insertRule('#R-vargenerator svg marker.flowchart-v2 .arrowMarkerPath { fill: context-stroke !important; stroke: context-stroke !important; }', sheet.cssRules.length);
+    sheet.insertRule('#R-vargenerator svg .node:hover > rect { ' + this.graphhighlight + ' }', sheet.cssRules.length);
+    this.variantvariables.forEach(
+      function (e) {
+        if (e.fallback) {
+          this.styleGraphEdge(e.fallback, e.name);
+        }
+      }.bind(this)
+    );
+  },
+
+  graphhighlight: 'stroke: var(--INTERNAL-ACCENT-color) !important; stroke-width: 8px !important;',
+
+  // hovering a box highlights the edges it is connected by, hovering an edge the boxes it connects
+  styleGraphEdge: function (from, to) {
+    var sheet = this.graphSheet();
+    var highlight = this.graphhighlight;
+    var graph = '#R-vargenerator svg';
+    // Mermaid makes the id of an edge from the names of the boxes it connects, followed by a counter
+    var edge = 'path[data-id*="L_' + from + '_' + to + '_"]';
+    var boxes = ':is(.node.' + from + ', .node.' + to + ')';
+    sheet.insertRule(graph + ' ' + edge + ':hover, ' + graph + ':has(' + boxes + ':hover) ' + edge + ' { ' + highlight + ' }', sheet.cssRules.length);
+    sheet.insertRule(graph + ':has(' + edge + ':hover) ' + boxes + ' > rect { ' + highlight + ' }', sheet.cssRules.length);
   },
 
   generateGraphGroupedEdge: function (e) {
@@ -494,7 +537,8 @@ var variants = {
       return content;
     }.bind(this);
 
-    var graph = 'flowchart LR\n' + generateSubgraph(this.structure, '  ') + this.variantvariables.reduce((a, e) => a + this.generateGraphVarGroupedEdge(e), '') + g_handler;
+    // ELK packs the nested subgraphs into a block too dense to read
+    var graph = '---\nconfig:\n  layout: dagre\n---\nflowchart LR\n' + generateSubgraph(this.structure, '  ') + this.variantvariables.reduce((a, e) => a + this.generateGraphVarGroupedEdge(e), '') + g_handler;
 
     console.log(graph);
     return graph;
@@ -588,6 +632,10 @@ var variants = {
           },
         ],
         variables: [
+          { name: 'MENU-SCROLLBAR-THUMB-color', default: 'color-mix(in srgb, var(--INTERNAL-MENU-SECTIONS-LINK-color) 45%, transparent)', tooltip: 'thumb color of the scrollbar of the menu' },
+          { name: 'MENU-SCROLLBAR-THUMB-HOVER-color', default: 'color-mix(in srgb, var(--INTERNAL-MENU-SECTIONS-LINK-color) 66%, transparent)', tooltip: 'hovered thumb color of the scrollbar of the menu' },
+          { name: 'MENU-SCROLLBAR-TRACK-color', default: 'color-mix(in srgb, var(--INTERNAL-MENU-SECTIONS-LINK-color) 10%, transparent)', tooltip: 'track color of the scrollbar of the menu' },
+          { name: 'MENU-SCROLLBAR-TRACK-HOVER-color', default: 'color-mix(in srgb, var(--INTERNAL-MENU-SECTIONS-LINK-color) 15%, transparent)', tooltip: 'hovered track color of the scrollbar of the menu' },
           { name: 'MENU-S-width', default: '14.375rem', tooltip: 'menu width of the mobile layout' },
           { name: 'MENU-M-width', default: '14.375rem', tooltip: 'menu width of the desktop layout for smaller screens' },
           { name: 'MENU-L-width', default: '18.75rem', tooltip: 'menu width of the desktop layout' },
@@ -606,7 +654,11 @@ var variants = {
           { name: 'TOPBAR-BG-color', default: 'color-mix(in srgb, var(--INTERNAL-MAIN-BG-color), rgba(134, 134, 134, 0.133))', tooltip: 'background color of topbar' },
           { name: 'TOPBAR-TEXT-color', fallback: 'MAIN-TEXT-color', tooltip: 'text color of topbar' },
           { name: 'TOPBAR-SEPARATOR-color', default: 'color-mix(in srgb, var(--INTERNAL-TOPBAR-BG-color), rgba(134, 134, 134, 0.666))', tooltip: 'separator color of vertical lines topbar buttons' },
-          { name: 'TOPBAR-OVERLAY-BG-color', fallback: 'MAIN-BG-color', tooltip: 'background color of topbar popover areas' },
+          { name: 'TOPBAR-OVERLAY-BG-color', default: 'color-mix(in srgb, var(--INTERNAL-BOX-NEUTRAL-color) 16%, var(--INTERNAL-MAIN-BG-color))', tooltip: 'background color of topbar popover areas' },
+          { name: 'TOPBAR-SCROLLBAR-THUMB-color', default: 'color-mix(in srgb, var(--INTERNAL-TOPBAR-TEXT-color) 45%, transparent)', tooltip: 'thumb color of the scrollbar of topbar popover areas' },
+          { name: 'TOPBAR-SCROLLBAR-THUMB-HOVER-color', default: 'color-mix(in srgb, var(--INTERNAL-TOPBAR-TEXT-color) 66%, transparent)', tooltip: 'hovered thumb color of the scrollbar of topbar popover areas' },
+          { name: 'TOPBAR-SCROLLBAR-TRACK-color', default: 'color-mix(in srgb, var(--INTERNAL-TOPBAR-TEXT-color) 10%, transparent)', tooltip: 'track color of the scrollbar of topbar popover areas' },
+          { name: 'TOPBAR-SCROLLBAR-TRACK-HOVER-color', default: 'color-mix(in srgb, var(--INTERNAL-TOPBAR-TEXT-color) 15%, transparent)', tooltip: 'hovered track color of the scrollbar of topbar popover areas' },
           { name: 'MAIN-TOPBAR-BORDER-color', default: 'transparent', tooltip: 'border color between topbar and content' },
         ],
       },
@@ -621,6 +673,10 @@ var variants = {
           { name: 'MAIN-BUTTON-color', fallback: 'MAIN-LINK-color', tooltip: 'button color of content' },
           { name: 'MAIN-BUTTON-HOVER-color', fallback: 'MAIN-LINK-HOVER-color', tooltip: 'hovered button color of content' },
           { name: 'MAIN-BG-color', default: '#ffffff', tooltip: 'background color of content' },
+          { name: 'MAIN-SCROLLBAR-THUMB-color', default: 'color-mix(in srgb, var(--INTERNAL-MAIN-TEXT-color) 45%, transparent)', tooltip: 'thumb color of the scrollbar of the content' },
+          { name: 'MAIN-SCROLLBAR-THUMB-HOVER-color', default: 'color-mix(in srgb, var(--INTERNAL-MAIN-TEXT-color) 66%, transparent)', tooltip: 'hovered thumb color of the scrollbar of the content' },
+          { name: 'MAIN-SCROLLBAR-TRACK-color', default: 'color-mix(in srgb, var(--INTERNAL-MAIN-TEXT-color) 10%, transparent)', tooltip: 'track color of the scrollbar of the content' },
+          { name: 'MAIN-SCROLLBAR-TRACK-HOVER-color', default: 'color-mix(in srgb, var(--INTERNAL-MAIN-TEXT-color) 15%, transparent)', tooltip: 'hovered track color of the scrollbar of the content' },
           { name: 'TAG-BG-color', fallback: 'PRIMARY-color', tooltip: 'tag color' },
           { name: 'MAIN-TEXT-color', default: '#101010', tooltip: 'text color of content and titles' },
           { name: 'MAIN-font', default: '"Roboto Flex", "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif', tooltip: 'text font of content and titles' },
@@ -667,7 +723,11 @@ var variants = {
                 variables: [
                   { name: 'CODE-BLOCK-color', default: '#000000', tooltip: 'fallback text color of block code; should be adjusted to your selected chroma style' },
                   { name: 'CODE-BLOCK-BG-color', default: '#f8f8f8', tooltip: 'fallback background color of block code; should be adjusted to your selected chroma style' },
-                  { name: 'CODE-BLOCK-BORDER-color', fallback: 'CODE-BLOCK-BG-color', tooltip: 'border color of block code' },
+                  { name: 'CODE-BLOCK-BORDER-color', fallback: 'BOX-NEUTRAL-color', tooltip: 'border color of block code' },
+                  { name: 'CODE-BLOCK-SCROLLBAR-THUMB-color', default: 'color-mix(in srgb, var(--INTERNAL-CODE-BLOCK-color) 45%, transparent)', tooltip: 'thumb color of the scrollbar of block code' },
+                  { name: 'CODE-BLOCK-SCROLLBAR-THUMB-HOVER-color', default: 'color-mix(in srgb, var(--INTERNAL-CODE-BLOCK-color) 66%, transparent)', tooltip: 'hovered thumb color of the scrollbar of block code' },
+                  { name: 'CODE-BLOCK-SCROLLBAR-TRACK-color', default: 'color-mix(in srgb, var(--INTERNAL-CODE-BLOCK-color) 10%, transparent)', tooltip: 'track color of the scrollbar of block code' },
+                  { name: 'CODE-BLOCK-SCROLLBAR-TRACK-HOVER-color', default: 'color-mix(in srgb, var(--INTERNAL-CODE-BLOCK-color) 15%, transparent)', tooltip: 'hovered track color of the scrollbar of block code' },
                 ],
               },
               {
@@ -689,10 +749,10 @@ var variants = {
             direction: 'LR',
             color: 'MAIN-BG-color',
             variables: [
-              { name: 'BROWSER-theme', default: 'light', tooltip: 'name of the theme for browser scrollbars of the main section' },
-              { name: 'MERMAID-theme', default: 'default', tooltip: 'name of the default Mermaid theme for this variant, can be overridden in hugo.toml' },
-              { name: 'OPENAPI-theme', default: 'light', tooltip: 'name of the default OpenAPI theme for this variant, can be overridden in hugo.toml' },
-              { name: 'OPENAPI-CODE-theme', default: 'obsidian', tooltip: 'name of the default OpenAPI code theme for this variant, can be overridden in hugo.toml' },
+              { name: 'BROWSER-theme', default: 'light', tooltip: 'name of the theme for controls drawn by the browser like form fields' },
+              { name: 'MERMAID-theme', default: 'redux-color', tooltip: 'name of the default Mermaid theme for this variant, can be overridden in your project configuration' },
+              { name: 'OPENAPI-theme', default: 'light', tooltip: 'name of the default OpenAPI theme for this variant, can be overridden in your project configuration' },
+              { name: 'OPENAPI-CODE-theme', default: 'obsidian', tooltip: 'name of the default OpenAPI code theme for this variant, can be overridden in your project configuration' },
             ],
           },
           {
@@ -716,7 +776,7 @@ var variants = {
               { name: 'BOX-TIP-color', fallback: 'BOX-GREEN-color', tooltip: 'background color of tip boxes' },
               { name: 'BOX-GREEN-TEXT-color', fallback: 'BOX-TEXT-color', tooltip: 'text color of green boxes' },
               { name: 'BOX-TIP-TEXT-color', fallback: 'BOX-GREEN-TEXT-color', tooltip: 'text color of tip boxes' },
-              { name: 'BOX-GREY-color', default: 'rgba(128, 128, 128, 1)', tooltip: 'background color of grey boxes' },
+              { name: 'BOX-GREY-color', default: 'rgba(160, 160, 160, 1)', tooltip: 'background color of grey boxes' },
               { name: 'BOX-NEUTRAL-color', fallback: 'BOX-GREY-color', tooltip: 'background color of neutral boxes' },
               { name: 'BOX-GREY-TEXT-color', fallback: 'BOX-TEXT-color', tooltip: 'text color of grey boxes' },
               { name: 'BOX-NEUTRAL-TEXT-color', fallback: 'BOX-GREY-TEXT-color', tooltip: 'text color of neutral boxes' },
@@ -724,14 +784,18 @@ var variants = {
               { name: 'BOX-CAUTION-color', fallback: 'BOX-MAGENTA-color', tooltip: 'background color of info boxes' },
               { name: 'BOX-MAGENTA-TEXT-color', fallback: 'BOX-TEXT-color', tooltip: 'text color of magenta boxes' },
               { name: 'BOX-CAUTION-TEXT-color', fallback: 'BOX-MAGENTA-TEXT-color', tooltip: 'text color of info boxes' },
-              { name: 'BOX-ORANGE-color', default: 'rgba(237, 153, 9, 1)', tooltip: 'background color of orange boxes' },
-              { name: 'BOX-NOTE-color', fallback: 'BOX-ORANGE-color', tooltip: 'background color of note boxes' },
+              { name: 'BOX-ORANGE-color', default: 'rgba(207, 110, 0, 1)', tooltip: 'background color of orange boxes' },
               { name: 'BOX-ORANGE-TEXT-color', fallback: 'BOX-TEXT-color', tooltip: 'text color of orange boxes' },
-              { name: 'BOX-NOTE-TEXT-color', fallback: 'BOX-ORANGE-TEXT-color', tooltip: 'text color of note boxes' },
+              { name: 'BOX-PURPLE-color', default: 'rgba(150, 91, 248, 1)', tooltip: 'background color of purple boxes' },
+              { name: 'BOX-PURPLE-TEXT-color', fallback: 'BOX-TEXT-color', tooltip: 'text color of purple boxes' },
               { name: 'BOX-RED-color', default: 'rgba(224, 62, 62, 1)', tooltip: 'background color of red boxes' },
               { name: 'BOX-WARNING-color', fallback: 'BOX-RED-color', tooltip: 'background color of warning boxes' },
               { name: 'BOX-RED-TEXT-color', fallback: 'BOX-TEXT-color', tooltip: 'text color of red boxes' },
               { name: 'BOX-WARNING-TEXT-color', fallback: 'BOX-RED-TEXT-color', tooltip: 'text color of warning boxes' },
+              { name: 'BOX-YELLOW-color', default: 'rgba(185, 143, 0, 1)', tooltip: 'background color of yellow boxes' },
+              { name: 'BOX-NOTE-color', fallback: 'BOX-YELLOW-color', tooltip: 'background color of note boxes' },
+              { name: 'BOX-YELLOW-TEXT-color', fallback: 'BOX-TEXT-color', tooltip: 'text color of yellow boxes' },
+              { name: 'BOX-NOTE-TEXT-color', fallback: 'BOX-YELLOW-TEXT-color', tooltip: 'text color of note boxes' },
             ],
           },
         ],

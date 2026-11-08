@@ -6,7 +6,8 @@ The search adapter needs to provide the following functions that are called from
 
 ## init()
 
-Initialize the search engine and the search index
+Initialize the search engine and the search index; called once, not before a
+search is about to happen
 
 ### Parameters
 
@@ -58,6 +59,8 @@ Each array item needs the following layout:
   let lunrIndex, pagesIndex;
 
   function init() {
+    var contentLangs = window.relearn.search.config.contentLangs;
+
     function initIndex(index) {
       if (!window.lunr) {
         return;
@@ -66,7 +69,7 @@ Each array item needs the following layout:
       // Set up Lunr by declaring the fields we use
       // Also provide their boost level for the ranking
       lunrIndex = lunr(function () {
-        this.use(lunr.multiLanguage.apply(null, window.relearn.contentLangs));
+        this.use(lunr.multiLanguage.apply(null, contentLangs));
         this.ref('index');
         this.field('title', {
           boost: 15,
@@ -95,13 +98,16 @@ Each array item needs the following layout:
     if (window.relearn.index_js_url) {
       var js = document.createElement('script');
       js.src = window.relearn.index_js_url;
+      if (window.relearn.index_js_integrity) {
+        js.integrity = window.relearn.index_js_integrity;
+      }
       js.setAttribute('async', '');
-      js.onload = function () {
+      js.addEventListener('load', function () {
         initIndex(relearn_searchindex);
-      };
-      js.onerror = function (e) {
+      });
+      js.addEventListener('error', function (e) {
         console.error('Error getting Hugo index file');
-      };
+      });
       document.head.appendChild(js);
     }
   }
@@ -120,22 +126,25 @@ Each array item needs the following layout:
         { len: 8, typos: 1 },
         { len: 4, typos: 0 },
       ];
-      return [
-        word + '^100',
-        word + '*^10',
-        '*' + word + '^10',
-        word +
-          '~' +
-          typos.reduce(function (a, c, i) {
-            return word.length < c.len ? c : a;
-          }).typos +
-          '^1',
-      ];
+      var patterns = [word + '^100', word + '*^10', '*' + word + '^10'];
+      // typos are only of interest for a word that isn't found as written;
+      // otherwise similar words bury the hits that were asked for
+      if (!lunrIndex.search(patterns.join(' ')).length) {
+        patterns.push(
+          word +
+            '~' +
+            typos.reduce(function (a, c, i) {
+              return word.length < c.len ? c : a;
+            }).typos +
+            '^1'
+        );
+      }
+      return patterns;
     }
 
     // Find the item in our index corresponding to the Lunr one to have more info
     // Remove Lunr special search characters: https://lunrjs.com/guides/searching.html
-    if (!window.lunr) {
+    if (!window.lunr || !lunrIndex) {
       return [];
     }
     term = term.replace(/[*:^~+-]/g, ' ');

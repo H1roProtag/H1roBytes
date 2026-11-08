@@ -22,6 +22,15 @@ other = "{1} rrresults found fer \"{0}\""
 [Clear-History]
 other = "Clearrr Historrry"
 
+[History-cleared]
+other = "Historrry clearrred"
+
+[Enlarge-graph]
+other = "Enlarrrge th' chart"
+
+[Close-graph]
+other = "Close th' enlarrrged chart"
+
 [Reset-view]
 other = "Rrreset view"
 
@@ -44,7 +53,7 @@ other = "Go t' homeplank"
 other = "Home"
 
 [Edit-this-page]
-other = "Edit"
+other = "Edit plank"
 
 [Show-Markdown]
 other = "Show Marrrkd'n"
@@ -57,6 +66,12 @@ other = "Prrrint whole chapterrr"
 
 [More-action]
 other = "Morrre"
+
+[Previous-page]
+other = "Prrrevious plank"
+
+[Next-page]
+other = "Next plank"
 
 [shortcuts-menuTitle]
 other = "Morrre"
@@ -141,3 +156,66 @@ other = "Verrrsion"
 
 [Browser-unsupported-feature]
 other = "This browserrr doesn't supporrrt this featurrre"
+
+[Pages-group-fallback]
+other = "Otherrr"
+
+[Skip-to-content]
+other = "Skip t' th' main rrreadin'"
+
+[Breadcrumbs]
+other = "Brrreadcrumbs"
+
+[Search-page]
+other = "Open th' searrrch page"
+
+[Close-image]
+other = "Close th' enlarrrged picturrre"
+
+[Expand-all]
+other = "Unfurl all"
+
+[Collapse-all]
+other = "Furl all"
+
+[Inserted-text-start]
+other = "Start o' text hauled aboard"
+
+[Inserted-text-end]
+other = "End o' text hauled aboard"
+
+[Deleted-text-start]
+other = "Start o' text sent overboard"
+
+[Deleted-text-end]
+other = "End o' text sent overboard"
+
+[N-matches-on-page]
+other = "{1} matches fer \"{0}\" on this here page"
+
+[Sortable-columns]
+other = "Column headers wit' buttons can be sorted."
+
+[Sort-key-ascending]
+other = "sorted at position {0}, risin'"
+
+[Sort-key-descending]
+other = "sorted at position {0}, sinkin'"
+
+[Sorted-by-ascending]
+other = "Sorted by \"{0}\", risin'"
+
+[Sorted-by-descending]
+other = "Sorted by \"{0}\", sinkin'"
+
+[Unsorted-by]
+other = "No longer sorted by \"{0}\""
+
+[Change-sorting]
+other = "Change th' sortin'"
+
+[Reset-sorting]
+other = "Reset th' sortin'"
+
+[Sorting-reset]
+other = "Sortin' reset!"

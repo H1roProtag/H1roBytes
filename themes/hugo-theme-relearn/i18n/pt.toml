@@ -2,13 +2,13 @@
 other = "ltr"
 
 [Versioning-warning]
-other = 'Esta página mostra a versão {{.pageVersion.title}}. A versão atual pode ser encontrada <a href="{{.latestUrl}}">aqui</a>.'
+other = 'Esta página mostra a versão {{.pageVersion.title}}. A versão atual pode ser consultada <a href="{{.latestUrl}}">aqui</a>.'
 
 [Search]
-other = "Procurar"
+other = "Pesquisar"
 
 [Search-placeholder]
-other = "Procurar..."
+other = "Pesquisar..."
 
 [Clear-search]
 other = "Limpar pesquisa"
@@ -20,31 +20,40 @@ other = "Nenhum resultado encontrado para \"{0}\""
 other = "{1} resultados encontrados para \"{0}\""
 
 [Clear-History]
-other = "Limpar Histórico"
+other = "Limpar histórico"
+
+[History-cleared]
+other = "Histórico limpo"
+
+[Enlarge-graph]
+other = "Ampliar gráfico"
+
+[Close-graph]
+other = "Fechar gráfico ampliado"
 
 [Reset-view]
-other = "Repor vista"
+other = "Repor visualização"
 
 [View-reset]
-other = "Ver reposição!"
+other = "Visualização reposta!"
 
 [Attachments-label]
 other = "Anexos"
 
 [title-404]
-other = "Não localizado"
+other = "Não encontrado"
 
 [message-404]
-other = "Ops. Parece que a página não existe ¯\\_(ツ)_/¯."
+other = "Ups. Parece que esta página não existe ¯\\_(ツ)_/¯."
 
 [Go-to-homepage]
-other = "Ir para o início"
+other = "Ir para a página inicial"
 
 [home-button]
 other = "Home"
 
 [Edit-this-page]
-other = "Editar"
+other = "Editar página"
 
 [Show-Markdown]
 other = "Mostrar Markdown"
@@ -53,10 +62,16 @@ other = "Mostrar Markdown"
 other = "Mostrar código-fonte"
 
 [Print-this-chapter]
-other = "Imprimir capítulo inteiro"
+other = "Imprimir todo o capítulo"
 
 [More-action]
 other = "Mais"
+
+[Previous-page]
+other = "Página anterior"
+
+[Next-page]
+other = "Página seguinte"
 
 [shortcuts-menuTitle]
 other = "Mais"
@@ -80,7 +95,7 @@ other = "MB"
 other = "Cuidado"
 
 [important]
-other = "Important"
+other = "Importante"
 
 [info]
 other = "Informação"
@@ -101,10 +116,10 @@ other = "Copiar texto para a área de transferência"
 other = "Texto copiado para a área de transferência!"
 
 [Copy-link-to-clipboard]
-other = "Copiar link para a área de transferência"
+other = "Copiar ligação para a área de transferência"
 
 [Link-copied-to-clipboard]
-other = "Link copiado para a área de transferência!"
+other = "Ligação copiada para a área de transferência!"
 
 [Chapter]
 other = "Capítulo {{.}}"
@@ -140,4 +155,67 @@ other = "Detalhes"
 other = "Versão"
 
 [Browser-unsupported-feature]
-other = "Este navegador não suporta este recurso"
+other = "Este navegador não suporta esta funcionalidade"
+
+[Pages-group-fallback]
+other = "Outros"
+
+[Skip-to-content]
+other = "Ir para o conteúdo principal"
+
+[Breadcrumbs]
+other = "Caminho de navegação"
+
+[Search-page]
+other = "Abrir página de pesquisa"
+
+[Close-image]
+other = "Fechar imagem ampliada"
+
+[Expand-all]
+other = "Expandir tudo"
+
+[Collapse-all]
+other = "Recolher tudo"
+
+[Inserted-text-start]
+other = "Início do texto inserido"
+
+[Inserted-text-end]
+other = "Fim do texto inserido"
+
+[Deleted-text-start]
+other = "Início do texto removido"
+
+[Deleted-text-end]
+other = "Fim do texto removido"
+
+[N-matches-on-page]
+other = "{1} ocorrências de \"{0}\" nesta página"
+
+[Sortable-columns]
+other = "Os cabeçalhos de coluna com botões podem ser ordenados."
+
+[Sort-key-ascending]
+other = "ordenado na posição {0}, ascendente"
+
+[Sort-key-descending]
+other = "ordenado na posição {0}, descendente"
+
+[Sorted-by-ascending]
+other = "Ordenado por \"{0}\", ascendente"
+
+[Sorted-by-descending]
+other = "Ordenado por \"{0}\", descendente"
+
+[Unsorted-by]
+other = "Já não está ordenado por \"{0}\""
+
+[Change-sorting]
+other = "Alterar ordenação"
+
+[Reset-sorting]
+other = "Repor ordenação"
+
+[Sorting-reset]
+other = "Ordenação reposta!"

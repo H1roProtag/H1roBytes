@@ -11,11 +11,43 @@
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
+  // the searchinput of the dedicated search page; its form may be copied into
+  // the content, but only the search page lists results
+  function getSearchinput() {
+    return document.querySelector('#R-searchresults') && document.querySelector('.searchform input.search-by');
+  }
+
   window.relearn = window.relearn || {};
 
+  // the adapter tells it is ready by calling executeInitialSearch; until then a
+  // search waits instead of answering, as the suggestions keep what they got
+  var resolveSearchEngine;
+  var searchEngineReady = new Promise(function (resolve) {
+    resolveSearchEngine = resolve;
+  });
+
+  // the index may be large, so it is only loaded once a search is about to happen
+  var isSearchEngineRequested = false;
+  function requestSearchEngine() {
+    if (isSearchEngineRequested || !window.relearn.search || !window.relearn.search.adapter) {
+      return;
+    }
+    isSearchEngineRequested = true;
+    // the adapters expect the index URL and its integrity as globals; our data block
+    // is the same for every page, so it knows the index's path from the site's root
+    // and we put the page's own way up there in front of it
+    var config = JSON.parse(document.querySelector('#R-search-config').textContent);
+    window.relearn.index_js_url = window.relearn.relBasePath + '/' + config.indexFile;
+    window.relearn.index_js_integrity = config.indexIntegrity;
+    window.relearn.search.adapter.init();
+  }
+
   window.relearn.executeInitialSearch = function executeInitialSearch() {
+    if (window.relearn.isSearchEngineReady) {
+      resolveSearchEngine();
+    }
     if (window.relearn.isSearchInterfaceReady && window.relearn.isSearchEngineReady) {
-      var input = document.querySelector('#R-search-by-detail');
+      var input = getSearchinput();
       if (!input) {
         return;
       }
@@ -25,7 +57,7 @@
   };
 
   window.relearn.executeTriggeredSearch = function executeTriggeredSearch() {
-    var input = document.querySelector('#R-search-by-detail');
+    var input = getSearchinput();
     if (!input) {
       return;
     }
@@ -67,9 +99,7 @@
           var inputs = document.querySelectorAll('input.search-by');
           inputs.forEach(function (e) {
             e.value = search;
-            var event = document.createEvent('Event');
-            event.initEvent('input', false, false);
-            e.dispatchEvent(event);
+            e.dispatchEvent(new Event('input'));
           });
 
           // recreate the last search results and eventually
@@ -101,7 +131,11 @@
     divlink.innerText = page.title;
     var divtitle = document.createElement('div');
     divtitle.className = 'title';
-    divtitle.innerText = '» ';
+    // the mark in front of the title is decoration
+    var spanmark = document.createElement('span');
+    spanmark.setAttribute('aria-hidden', 'true');
+    spanmark.innerText = '» ';
+    divtitle.appendChild(spanmark);
     divtitle.appendChild(divlink);
     divsuggestion.appendChild(divtitle);
     var divbreadcrumb = document.createElement('div');
@@ -117,24 +151,46 @@
     return divsuggestion;
   }
 
+  function resolvePlaceholders(s, args) {
+    var args = args || [];
+    // use replace to iterate over the string
+    // select the match and check if the related argument is present
+    // if yes, replace the match with the argument
+    return s.replace(/{([0-9]+)}/g, function (match, index) {
+      // check if the argument is present
+      return typeof args[index] == 'undefined' ? match : args[index];
+    });
+  }
+
+  // how many suggestions there are is told without having to look at them
+  function initStatus(list) {
+    var status = document.createElement('div');
+    status.className = 'a11y-only';
+    status.setAttribute('role', 'status');
+    list.insertAdjacentElement('afterend', status);
+    return status;
+  }
+
   function executeSearch(value) {
-    var input = document.querySelector('#R-search-by-detail');
-    function resolvePlaceholders(s, args) {
-      var args = args || [];
-      // use replace to iterate over the string
-      // select the match and check if the related argument is present
-      // if yes, replace the match with the argument
-      return s.replace(/{([0-9]+)}/g, function (match, index) {
-        // check if the argument is present
-        return typeof args[index] == 'undefined' ? match : args[index];
-      });
-    }
+    var input = getSearchinput();
 
     var results = document.querySelector('#R-searchresults');
     var hint = document.querySelector('.searchhint');
     hint.innerText = '';
     results.textContent = '';
+    // the print version searches for the term it is given with its URL
+    var print = document.querySelector('.topbar-button-print a');
+    if (print) {
+      var printUrl = new URL(print.href);
+      printUrl.searchParams.delete('search-by');
+      if (value.length) {
+        printUrl.searchParams.set('search-by', value);
+      }
+      print.href = printUrl;
+    }
     (async function () {
+      requestSearchEngine();
+      await searchEngineReady;
       var a = await window.relearn.search.adapter.search(value);
       if (a.length) {
         hint.innerText = resolvePlaceholders(window.T_N_results_found, [value, a.length]);
@@ -146,7 +202,6 @@
         hint.innerText = resolvePlaceholders(window.T_No_results_found, [value]);
       }
       input.focus();
-      setTimeout(adjustContentWidth, 0);
 
       // if we are initiating search because of a browser history
       // operation, we have to restore the scrolling postion the
@@ -154,7 +209,7 @@
       // by a browser history operation, it simply does nothing
       var state = window.history.state || {};
       state = Object.assign({}, typeof state === 'object' ? state : {});
-      if (state.hasOwnProperty('contentScrollTop')) {
+      if (Object.hasOwn(state, 'contentScrollTop')) {
         window.setTimeout(function () {
           elc.scrollTop = +state.contentScrollTop;
         }, 10);
@@ -167,44 +222,65 @@
     if (!window.relearn.search || !window.relearn.search.adapter) {
       return;
     }
-    window.relearn.search.adapter.init();
 
-    var input = document.querySelector('#R-search-by-detail');
+    var input = getSearchinput();
     if (input) {
+      // the search page is there to show results, so it needs the index right away
+      requestSearchEngine();
       var state = window.history.state || {};
       state = Object.assign({}, typeof state === 'object' ? state : {});
       state.search = window.location.toString();
       window.history.replaceState(state, '');
     }
 
-    new autoComplete({
-      /* selector for the search box element */
-      selectorToInsert: 'search:has(.searchbox)',
-      selector: '#R-search-by',
-      /* source is the callback to perform the search */
-      source: async function (term, response) {
-        let a = await window.relearn.search.adapter.search(term);
-        response(a);
-      },
-      /* renderItem displays individual search results */
-      renderItem: function (item, _term) {
-        return renderItem(item).outerHTML;
-      },
-      /* onSelect callback fires when a search suggestion is chosen */
-      onSelect: function (e, term, item) {
-        location.href = item.getAttribute('href');
-        e.preventDefault();
-      },
+    // each search box gets its own suggestions and its own status
+    document.querySelectorAll('.searchbox input.search-by').forEach(function (box) {
+      // a reader putting the focus into the box is about to search, so the index
+      // has its head start while the term is still typed
+      box.addEventListener('focus', requestSearchEngine, { once: true });
+      var status = null;
+      new autoComplete({
+        /* selector for the search box element */
+        selectorToInsert: 'search:has(.searchbox)',
+        selector: box,
+        /* source is the callback to perform the search */
+        source: async function (term, response) {
+          requestSearchEngine();
+          await searchEngineReady;
+          let a = await window.relearn.search.adapter.search(term);
+          response(a);
+          if (status) {
+            status.innerText = resolvePlaceholders(a.length ? window.T_N_results_found : window.T_No_results_found, [term, a.length]);
+          }
+        },
+        /* renderItem displays individual search results */
+        renderItem: function (item, _term) {
+          return renderItem(item).outerHTML;
+        },
+        /* onSelect callback fires when a search suggestion is chosen */
+        onSelect: function (e, term, item) {
+          location.href = item.getAttribute('href');
+          e.preventDefault();
+        },
+      });
+      if (box.sc) {
+        status = initStatus(box.sc);
+      }
     });
   }
 
   function initSearch() {
     window.addEventListener('popstate', executeHistorySearch);
 
-    var input = document.querySelector('#R-search-by-detail');
+    var input = getSearchinput();
     if (input) {
+      // search in place instead of reloading the page with the term in its URL
+      input.form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        window.relearn.executeTriggeredSearch();
+      });
       input.addEventListener('keydown', function (event) {
-        // if we are pressing ESC in the searchdetail our focus will
+        // if we are pressing ESC in the searchinput our focus will
         // be stolen by the other event handlers, so we have to refocus
         // here after a short while
         if (event.key == 'Escape') {

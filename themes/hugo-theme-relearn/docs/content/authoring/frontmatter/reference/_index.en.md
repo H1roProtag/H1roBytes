@@ -1,10 +1,11 @@
-+++
-categories = ['reference']
-description = 'All front matter for the Relearn theme'
-linkTitle = 'Reference'
-title = 'Front Matter Reference'
-weight = 5
-+++
+---
+categories:
+- reference
+description: All front matter for the Relearn theme
+linkTitle: Reference
+title: Front Matter Reference
+weight: 5
+---
 
 Every Hugo page must have front matter.
 
@@ -12,7 +13,7 @@ In addition to [Hugo's standard front matter](https://gohugo.io/content-manageme
 
 Throughout the documentation, theme-specific front matter is marked with a {{% badge style="frontmatter" %}}Front Matter{{% /badge %}} badge.
 
-Add theme front matter directly to the root of your page's front matter. For example:
+Add theme front matter to the `params` section of your page's front matter. For example:
 
 {{< multiconfig fm=true section=params >}}
 math = true
@@ -27,13 +28,13 @@ math = true
 Here's a list of all available front matter with example values.  Default values are described in the [annotated example](#annotated-front-matter) below or in each front matter's documentation.
 
 {{< multiconfig fm=true section=params >}}
-{{% include "frontmatter.toml" %}}
+{{% include "frontmatter.yaml" %}}
 {{< /multiconfig >}}
 
 ## Annotated Front Matter
 
-````toml {title="toml"}
-+++
-[params]
-{{% include "frontmatter.toml" %}}+++
+````yaml {title="yaml"}
+---
+params:
+{{% include "frontmatter.yaml" %}}---
 ````

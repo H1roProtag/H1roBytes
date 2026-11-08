@@ -1,8 +1,16 @@
-+++
-categories = ['howto', 'reference']
-description = "Beaut'fl math and chemical formulae"
-frontmatter = ['customMathJaxURL', 'math', 'math.force', 'mathJaxInitialize']
-options = ['customMathJaxURL', 'math', 'math.force', 'mathJaxInitialize']
-title = 'Math'
-+++
+---
+categories:
+- howto
+- reference
+description: Beaut'fl math and chemical formulae
+frontmatter:
+- math
+- math.force
+- math.toMath
+options:
+- math
+- math.force
+- math.toMath
+title: Math
+---
 {{< piratify >}}
