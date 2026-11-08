@@ -50,3 +50,13 @@
 #R-logo.R-default.layout-sidebar-column {
     align-items: center;
 }
+
+/* contact form message box: full width of the content area */
+#R-body textarea {
+    width: 100%;
+}
+
+/* contact form: spacing between fields */
+#R-body form div {
+    margin-bottom: 0.75rem;
+}

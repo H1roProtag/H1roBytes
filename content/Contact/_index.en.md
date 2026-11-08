@@ -48,7 +48,7 @@ Contact form:
     <input type="email" placeholder="Email" name="email" required />
   </div>
   <div class="mb-3 pt-0">
-    <textarea placeholder="Your message" name="message" required></textarea>
+    <textarea placeholder="Your message" name="message" rows="8" required></textarea>
   </div>
   <div class="g-recaptcha" data-sitekey="6LeIRRkpAAAAAELO5I7lk1Z8P1PQbryemvz_H4F4"></div>
       <br/>
